@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\BackgroundSlideshow.tsx
-
 import { memo } from 'react';
 import { BackgroundSlideshowProps } from './types';
 

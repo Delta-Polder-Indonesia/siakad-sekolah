@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\index.ts
-
 // ── Barrel export untuk semua sub-modul ──
 export * from './constants';
 export * from './types';

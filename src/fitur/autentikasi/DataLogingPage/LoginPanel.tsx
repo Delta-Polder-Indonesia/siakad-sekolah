@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\LoginPanel.tsx
-
 import React, { memo, useEffect, useRef } from 'react';
 import { Eye, EyeOff, ChevronDown, X } from 'lucide-react';
 import { LoginPanelProps } from './types';

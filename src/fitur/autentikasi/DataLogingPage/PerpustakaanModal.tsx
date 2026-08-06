@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\PerpustakaanModal.tsx
-
 import React, { lazy, Suspense } from 'react';
 import { PerpustakaanModalProps } from './types';
 import { Z_INDEX } from './constants';

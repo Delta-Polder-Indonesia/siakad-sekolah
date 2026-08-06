@@ -30,6 +30,11 @@ export type PortalLoginResult =
   | { status: 'invalid' }
   | { status: 'unreachable' };
 
+export type PortalAdminLoginResult =
+  | { status: 'ok'; profileName: string; accessToken: string; refreshToken: string | null }
+  | { status: 'invalid' }
+  | { status: 'unreachable' };
+
 export function savePortalTokens(accessToken: string, refreshToken: string | null) {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
@@ -79,6 +84,46 @@ export async function loginPortal(
     return {
       status: 'ok',
       user: data.user,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken ?? null,
+    };
+  } catch {
+    return { status: 'unreachable' };
+  }
+}
+
+// Login admin ke backend (POST /api/auth/admin/login).
+// Endpoint memakai field `username` & `pin`. Kredensial admin hanya ada di
+// env backend, tidak pernah di-bundle ke frontend.
+// - 'ok'          → backend memvalidasi kredensial admin
+// - 'invalid'     → backend menolak (401 / ok:false)
+// - 'unreachable' → backend tidak bisa dihubungi → fallback login portal/lokal
+export async function loginAdmin(
+  username: string,
+  pin: string
+): Promise<PortalAdminLoginResult> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, pin }),
+    });
+
+    if (res.status === 401) return { status: 'invalid' };
+    if (!res.ok) return { status: 'unreachable' };
+
+    const data = (await res.json()) as {
+      ok?: boolean;
+      profileName?: string;
+      accessToken?: string;
+      refreshToken?: string | null;
+    };
+
+    if (!data.ok || !data.profileName || !data.accessToken) return { status: 'invalid' };
+
+    return {
+      status: 'ok',
+      profileName: data.profileName,
       accessToken: data.accessToken,
       refreshToken: data.refreshToken ?? null,
     };

@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\hooks.ts
-
 import { useEffect } from 'react';
 
 /**

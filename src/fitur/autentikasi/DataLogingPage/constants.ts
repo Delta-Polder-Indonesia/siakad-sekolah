@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\constants.ts
-
 import { namaSekolahUppercase } from '../../halaman/components/Profile/dataSekolah';
 
 export const LOGO_SMP = `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`;

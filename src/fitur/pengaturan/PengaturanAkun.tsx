@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Eye, EyeOff, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getStudents, getTeachers, saveStudents, saveTeachers } from '../../data/services';
+import { getStudents, getTeachers, hashPassword, saveStudents, saveTeachers } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
 export default function PengaturanAkun() {
@@ -43,22 +43,20 @@ export default function PengaturanAkun() {
   };
 
   useEffect(() => {
+    // Jangan isi field password dengan nilai ter-hash dari store — field
+    // dikosongkan dan hanya di-hash saat user mengetik password baru.
     if (user?.role === 'teacher' && teacher) {
       setIdentifier(teacher.nip);
-      setPassword(teacher.password);
-      setConfirmPassword(teacher.password);
       return;
     }
     if (user?.role === 'student' && student) {
       setIdentifier(student.nis);
-      setPassword(student.password);
-      setConfirmPassword(student.password);
     }
   }, [user, teacher, student]);
 
   if (!user) return null;
 
-  const handleSaveTeacher = () => {
+  const handleSaveTeacher = async () => {
     if (!teacher) return;
     const nextNip = identifier.trim();
     if (!nextNip) {
@@ -78,17 +76,20 @@ export default function PengaturanAkun() {
       return;
     }
 
+    const hashedPassword = await hashPassword(password);
     const nextTeachers = teachers.map((item) =>
-      item.id === teacher.id ? { ...item, nip: nextNip, password } : item
+      item.id === teacher.id ? { ...item, nip: nextNip, password: hashedPassword } : item
     );
 
     saveTeachers(nextTeachers);
     refreshUser();
+    setPassword('');
+    setConfirmPassword('');
     setError('');
     setMessage('Pengaturan akun guru berhasil diperbarui. Data admin ikut terbarui otomatis.');
   };
 
-  const handleSaveStudent = () => {
+  const handleSaveStudent = async () => {
     if (!student) return;
     const nextNis = identifier.trim();
     if (!nextNis) {
@@ -108,12 +109,15 @@ export default function PengaturanAkun() {
       return;
     }
 
+    const hashedPassword = await hashPassword(password);
     const nextStudents = students.map((item) =>
-      item.id === student.id ? { ...item, nis: nextNis, password } : item
+      item.id === student.id ? { ...item, nis: nextNis, password: hashedPassword } : item
     );
 
     saveStudents(nextStudents);
     refreshUser();
+    setPassword('');
+    setConfirmPassword('');
     setError('');
     setMessage('Pengaturan akun siswa berhasil diperbarui. Data admin ikut terbarui otomatis.');
   };

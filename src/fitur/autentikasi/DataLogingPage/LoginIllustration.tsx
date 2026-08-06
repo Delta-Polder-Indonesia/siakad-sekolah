@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\LoginIllustration.tsx
-
 import React, { memo, useState } from 'react';
 import { LOGIN_ILLUSTRATION, Z_INDEX } from './constants';
 

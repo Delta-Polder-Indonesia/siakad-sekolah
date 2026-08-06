@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\context\AuthContext.tsx
-
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import {
@@ -9,7 +7,7 @@ import {
   addLoginLog,
   setClassTeacherId,
 } from '../data/services';
-import { loginPortal, savePortalTokens, clearPortalTokens } from '../services/authApi';
+import { loginPortal, loginAdmin, savePortalTokens, clearPortalTokens } from '../services/authApi';
 import { type AuthUser, type UserRole } from '../types';
 import { logger } from '../utils/logger';
 
@@ -44,17 +42,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (id: string, password: string, role: UserRole): Promise<boolean> => {
-      const adminUsername = import.meta.env.VITE_ADMIN_USERNAME;
-      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-      if (adminUsername && adminPassword && id === adminUsername && password === adminPassword) {
+      // Admin login diverifikasi backend (/api/auth/admin/login). Kredensial
+      // admin hanya ada di env backend, tidak pernah dibundle ke frontend.
+      const adminResult = await loginAdmin(id, password);
+
+      if (adminResult.status === 'ok') {
+        savePortalTokens(adminResult.accessToken, adminResult.refreshToken);
         const authUser: AuthUser = {
-          id: 'admin',
+          id: `admin_${adminResult.profileName}`,
           name: 'Administrator',
           role: 'admin',
         };
         setUser(authUser);
         simpanSesi(authUser);
-        addLoginLog('Administrator', 'admin', 'form');
+        addLoginLog(authUser.name, 'admin', 'form');
         return true;
       }
 
@@ -192,46 +193,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return true;
           }
         }
-      } catch {
-        logger.warn('[AuthContext] Backend Google tidak reachable, fallback ke client-side.');
-      }
 
-      // Fallback: backend unreachable — decode JWT di client (mode demo)
-      try {
-        let payload: Record<string, unknown>;
-
-        if (credential.split('.').length === 3) {
-          const base64Url = credential.split('.')[1];
-          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-          const jsonPayload = decodeURIComponent(
-            window
-              .atob(base64)
-              .split('')
-              .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-              .join('')
-          );
-          payload = JSON.parse(jsonPayload);
-        } else if (credential.startsWith('{')) {
-          payload = JSON.parse(credential);
-        } else {
-          logger.error('[AuthContext] Format credential Google tidak dikenali.');
-          return false;
-        }
-
-        const authUser: AuthUser = {
-          id: `google_${String(payload.sub || payload.id || Date.now())}`,
-          name: String(payload.name || 'Tamu Google'),
-          role: role,
-          avatar:
-            String(payload.picture || '') ||
-            'https://ui-avatars.com/api/?name=Guest&background=0D8ABC&color=fff',
-          email: String(payload.email || ''),
-        };
-
-        setUser(authUser);
-        simpanSesi(authUser);
-        addLoginLog(authUser.name, authUser.role, 'google', authUser.email);
-        return true;
+        // Backend menolak atau tidak memvalidasi kredensial — jangan decode JWT
+        // di client tanpa verifikasi tanda tangan.
+        logger.warn('[AuthContext] Backend menolak kredensial Google.');
+        return false;
       } catch (error) {
         logger.error('[AuthContext] Gagal memproses kredensial Google:', error);
         return false;

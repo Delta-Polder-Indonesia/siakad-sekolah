@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\PpdbModal.tsx
-
 import React, { lazy, Suspense, useRef } from 'react';
 import { PpdbModalProps, PpdbView } from './types';
 import { Z_INDEX } from './constants';

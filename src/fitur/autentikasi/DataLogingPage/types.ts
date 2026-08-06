@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\types.ts
-
 export interface Student {
   id: string;
   name: string;

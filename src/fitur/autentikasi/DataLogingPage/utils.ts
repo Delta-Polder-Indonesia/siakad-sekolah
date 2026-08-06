@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\utils.ts
-
 import { ValidRole } from './types';
 
 /**

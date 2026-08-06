@@ -1,5 +1,3 @@
-// E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\LoginPage.tsx
-
 import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
@@ -183,12 +181,6 @@ export default function LoginPage() {
         } else {
           setLoginAttempts(0);
           setLockoutUntil(null);
-
-          const adminUsername = import.meta.env.VITE_ADMIN_USERNAME;
-          if (adminUsername && trimmedId === adminUsername) {
-            setIsLoginOpen(false);
-            setOpenAdminPanel(true);
-          }
         }
       } catch (err: unknown) {
         logger.error('[LoginPage] Login error:', err);
