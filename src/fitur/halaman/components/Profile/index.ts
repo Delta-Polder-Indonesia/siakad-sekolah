@@ -1,0 +1,9 @@
+export { default as SekilasSekolah } from './SekilasSekolah';
+export { default as TonggakSejarah } from './TonggakSejarah';
+export { default as SambutanKepsek } from './SambutanKepsek';
+export { default as VisiMisi } from './VisiMisi';
+export { default as StrukturOrganisasi } from './StrukturOrganisasi';
+export { default as GuruPegawaiPage } from './GuruPegawaiPage';
+export { default as GtkSiswaPage } from './GtkSiswaPage';
+export { default as AkreditasiPrestasi } from './AkreditasiPrestasi';
+export { default as Operasional } from './Operasional';

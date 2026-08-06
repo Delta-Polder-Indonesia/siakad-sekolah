@@ -1,0 +1,84 @@
+[
+  {
+    "id": "open-house-2026",
+    "title": "Open House & Bazar Sekolah",
+    "date": "15 Juli 2026",
+    "time": "08:00 - 14:00",
+    "type": "Aktivitas Akademik",
+    "location": "Lapangan Utama & Aula Serba Guna",
+    "excerpt": "Pameran karya siswa, bazar UMKM, dan tur kampus terbuka untuk calon siswa baru serta masyarakat umum.",
+    "description": "Open House & Bazar Sekolah tahun 2026 merupakan acara tahunan terbesar SMAN 1 Medan yang bertujuan memperkenalkan lingkungan sekolah kepada calon siswa baru dan masyarakat luas.\n\nKegiatan ini mencakup:\n• Pameran karya ilmiah dan teknologi siswa\n• Bazar produk UMKM lokal hasil karya siswa\n• Tur kampus dengan panduan dari OSIS\n• Simulasi pembelajaran interaktif\n• Pentas seni dan budaya Nusantara\n\nAcara terbuka untuk umum dan tidak dipungut biaya. Pendaftaran tur kampus dapat dilakukan di loket registrasi pada hari H.",
+    "isHighlighted": true
+  },
+  {
+    "id": "seminar-parenting-2026",
+    "title": "Seminar Digital Parenting",
+    "date": "22 Juli 2026",
+    "time": "09:00 - 12:00",
+    "type": "Aktivitas Akademik",
+    "location": "Aula Serba Guna Lantai 2",
+    "excerpt": "Seminar bagi orang tua tentang pengawasan digital dan komunikasi efektif di era teknologi.",
+    "description": "Seminar Digital Parenting 2026 menghadirkan pembicara ahli di bidang psikologi anak dan teknologi informasi. Seminar ini ditujukan khusus untuk orang tua/wali siswa SMAN 1 Medan.\n\nTopik yang akan dibahas:\n• Memahami dampak media sosial terhadap perkembangan remaja\n• Strategi komunikasi positif di era digital\n• Pengawasan tanpa melanggar privasi anak\n• Membangun kepercayaan dan keterbukaan dalam keluarga\n\nPembicara: Dr. Andi Wijaya, M.Psi. (Psikolog Klinis) & Tim Cyber Security Polda Sumut.\n\nKuota terbatas: 200 orang tua. Pendaftaran via Google Form yang dibagikan melalui grup WA kelas."
+  },
+  {
+    "id": "futsal-cup-2026",
+    "title": "Turnamen Futsal Cup SMAN 1",
+    "date": "01 Agustus 2026",
+    "time": "Seluruh Hari",
+    "type": "Aktivitas Akademik",
+    "location": "Gor Futsal SMAN 1 Medan",
+    "excerpt": "Kompetisi futsal antar kelas dengan sistem gugur. Final akan diadakan pada sore hari dengan penghargaan bergengsi.",
+    "description": "Turnamen Futsal Cup SMAN 1 2026 adalah kompetisi tahunan yang melibatkan seluruh kelas X, XI, dan XII. Turnamen ini menggunakan sistem gugur dengan babak penyisihan, perempat final, semifinal, dan final.\n\nJadwal Pertandingan:\n• Babak Penyisihan: 08:00 - 12:00 WIB\n• Semifinal: 13:00 - 15:00 WIB\n• Final & Awarding: 15:30 - 17:00 WIB\n\nHadiah:\n• Juara 1: Piala Bergilir + Uang Pembinaan\n• Juara 2 & 3: Piala Tetap + Sertifikat\n• Pemain Terbaik: Sepatu Futsal Professional\n• Top Scorer: Perlengkapan Olahraga\n\nPenonton dipersilakan hadir dengan memakai atribut kelas masing-masing.",
+    "isHighlighted": true
+  },
+  {
+    "id": "workshop-ai-2026",
+    "title": "Workshop AI & Coding untuk Siswa",
+    "date": "12 November 2026",
+    "time": "13:00 - 16:00",
+    "type": "Aktivitas Akademik",
+    "location": "Laboratorium Komputer Lantai 3",
+    "excerpt": "Workshop praktis pengenalan Artificial Intelligence dan pemrograman Python untuk siswa kelas X dan XI.",
+    "description": "Workshop AI & Coding 2026 merupakan program pengembangan kompetensi digital siswa SMAN 1 Medan bekerjasama dengan Komunitas TechMedan.\n\nMateri Workshop:\n• Pengenalan konsep Machine Learning sederhana\n• Praktik membuat chatbot dengan Python\n• Penggunaan AI tools untuk riset dan pembelajaran\n• Etika penggunaan AI dalam pendidikan\n\nPeserta: 40 siswa terpilih (kelas X & XI) melalui seleksi formulir pendaftaran.\nFasilitator: Tim TechMedan & Guru Informatika SMAN 1 Medan."
+  },
+  {
+    "id": "porseni-2026",
+    "title": "Pekan Olahraga dan Seni (PORSENI)",
+    "date": "15 - 18 Desember 2026",
+    "time": "Seluruh Hari",
+    "type": "Aktivitas Akademik",
+    "location": "Lapangan Utama & Auditorium",
+    "excerpt": "Event akhir tahun yang memadukan kompetisi olahraga, seni, dan kreativitas antar kelas.",
+    "description": "Pekan Olahraga dan Seni (PORSENI) 2026 adalah event akhir tahun terbesar SMAN 1 Medan yang memadukan kompetisi olahraga, seni, dan kreativitas.\n\nCabang Olahraga:\n• Basket, Voli, Badminton, Atletik, Catur\n\nCabang Seni:\n• Band, Tari Tradisional, Paduan Suara, Teater\n\nCabang Kreativitas:\n• Photography, Short Movie, Poster Digital\n\nSetiap kelas wajib mengikuti minimal 5 cabang. Juara umum akan mendapatkan Piala Bergilir dan bonus study tour gratis.",
+    "isHighlighted": true
+  },
+  {
+    "id": "pts-ganjil-2026",
+    "title": "Penilaian Tengah Semester (PTS) Ganjil",
+    "date": "23 - 30 September 2026",
+    "time": "07:30 - 13:00",
+    "type": "Ujian Tengah Semester",
+    "location": "Seluruh Ruang Kelas",
+    "excerpt": "Ujian tengah semester untuk kelas X, XI, dan XII. Jadwal dan ruang dapat diunduh di portal siswa.",
+    "description": "Penilaian Tengah Semester (PTS) Ganjil Tahun Ajaran 2026/2027 akan dilaksanakan selama 6 hari kerja.\n\nKetentuan:\n• Kelas X & XI: Ujian tulis berbasis kertas\n• Kelas XII: Ujian berbasis komputer (CBT)\n• Mapel yang diujikan: Matematika, B. Indonesia, B. Inggris, Fisika/Kimia/Biologi (pilihan), Sejarah, dan PPKn\n\nJadwal lengkap dan pembagian ruang akan diumumkan 1 minggu sebelum pelaksanaan. Siswa wajib membawa kartu ujian dan perlengkapan sesuai jadwal."
+  },
+  {
+    "id": "rapat-wali-murid-2026",
+    "title": "Rapat Koordinasi Wali Murid",
+    "date": "05 Oktober 2026",
+    "time": "09:00 - 11:00",
+    "type": "Rapat",
+    "location": "Aula Serba Guna",
+    "excerpt": "Pertemuan koordinasi antara pihak sekolah dan perwakilan wali murid terkait program semester ganjil.",
+    "description": "Rapat Koordinasi Wali Murid semester ganjil 2026/2027 merupakan forum komunikasi antara pihak sekolah (Kepala Sekolah, Wakasek, dan Guru) dengan perwakilan wali murid dari setiap kelas.\n\nAgenda Rapat:\n1. Laporan perkembangan akademik semester berjalan\n2. Evaluasi program pembiasaan dan ekstrakurikuler\n3. Pembahasan rencana study tour semester genap\n4. Masukan dan saran dari wali murid\n5. Penyampaian kebijakan baru tahun ajaran\n\nDihadiri oleh: 2 perwakilan wali murid per kelas (dipilih oleh kelas masing-masing)."
+  },
+  {
+    "id": "libur-maulid-2026",
+    "title": "Hari Libur Nasional — Maulid Nabi",
+    "date": "04 November 2026",
+    "time": "Libur",
+    "type": "Libur Nasional",
+    "excerpt": "Libur nasional dalam rangka peringatan Maulid Nabi Muhammad SAW. Sekolah diliburkan.",
+    "description": "Sesuai Surat Keputusan Bersama (SKB) 3 Menteri, tanggal 4 November 2026 ditetapkan sebagai Hari Libur Nasional dalam rangka peringatan Maulid Nabi Muhammad SAW 1448 H.\n\nKegiatan opsional:\n• Pengajian akbar di Masjid Al-Hikmah (08:00 - selesai)\n• Lomba hadrah antar kelas (dilaksanakan H-1)\n\nSekolah diliburkan. Kegiatan belajar mengajar dilanjutkan pada tanggal 5 November 2026."
+  }
+]

@@ -1,0 +1,512 @@
+@import 'tailwindcss';
+
+/* ─── DESIGN TOKENS ────────────────────────────────────
+ *  Centralized typography & spacing scale for the entire app.
+ *  Use these CSS variables instead of hardcoded values.
+ *  Compatible with Tailwind utility classes.
+ * ──────────────────────────────────────────────────── */
+:root {
+  /* ── Typography Scale ── */
+  --typo-xs: 0.625rem; /* 10px — smallest labels */
+  --typo-sm: 0.75rem; /* 12px — captions, badges */
+  --typo-base: 1rem; /* 16px — body text (was 14px) */
+  --typo-md: 1.125rem; /* 18px — larger body */
+  --typo-lg: 1.125rem; /* 18px — h4 / lead */
+  --typo-xl: 1.25rem; /* 20px — h3 */
+  --typo-2xl: 1.5rem; /* 24px — h2 */
+  --typo-3xl: 1.875rem; /* 30px — h1 */
+  --typo-4xl: 2.25rem; /* 36px — hero */
+  --typo-5xl: 3rem; /* 48px — large hero */
+
+  /* ── Line Heights ── */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* ── Font Weights ── */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* ── Letter Spacing ── */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* ── Spacing Scale (for padding/margin) ── */
+  --space-1: 0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Border Radius ── */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── THEME COLORS & FONTS (Tailwind v4) ─── */
+@theme {
+  --color-primary: #0b2f9f;
+  --color-blue-900: #021624;
+  --color-grey-800: #1e293b;
+  --color-grey-600: #475569;
+  --color-grey-500: #64748b;
+  --color-grey-300: #cbd5e1;
+  --color-grey-200: #e2e8f0;
+  --color-grey-100: #f1f5f9;
+
+  /* Font Families */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Lora', Georgia, Cambria, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── SCROLLBAR CONFIGURATION ─── */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE dan Edge lama */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, dan Opera */
+}
+
+/* ─── BASE STYLES ─── */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--typo-base);
+  font-weight: 500;
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Reduce global letter-spacing since Inter has tighter default spacing */
+  letter-spacing: -0.01em;
+}
+
+/* ─── ACCESSIBILITY — Keyboard focus ─── */
+/* Garis fokus jelas untuk navigasi keyboard (tidak mengubah desain hover). */
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* ─── ANIMATIONS & KEYFRAMES ─── */
+
+/* Fade In + Slide Up */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide In from Right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In from Left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale In (for modals, cards) */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade In Up (hero sections) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered Fade In (for list items) */
+@keyframes fadeInStagger {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse glow (for buttons, important elements) */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Ken Burns: Zoom In */
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.1) translate(-1%, -1%);
+  }
+}
+
+/* Ken Burns: Zoom Out */
+@keyframes kenBurnsOut {
+  0% {
+    transform: scale(1.2) translate(1%, 2%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+/* Ken Burns: Diagonal */
+@keyframes kenBurnsDiagonal {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1) translate(2%, -2%);
+  }
+}
+
+/* ─── ANIMATION UTILITY CLASSES ─── */
+
+/* Page transition: fade + slide up (default) */
+main > div {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Page transition: slide in from right (forward navigation) */
+.animate-page-enter {
+  animation: slideInRight 0.35s ease-out;
+}
+
+/* Page transition: slide in from left (back navigation) */
+.animate-page-enter-left {
+  animation: slideInLeft 0.35s ease-out;
+}
+
+/* Scale in entrance (modal, dropdown) */
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Fade in up (staggered elements) */
+.animate-fade-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* Staggered items — apply with animation-delay via style */
+.animate-stagger {
+  animation: fadeInStagger 0.3s ease-out both;
+}
+
+/* Pulse glow for primary CTAs */
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Efek Ken Burns Standard (8 detik, berhenti di akhir) */
+.animate-ken-burns {
+  animation: kenBurns 8s ease-out forwards;
+}
+
+/* Efek Ken Burns Zoom In (Perulangan bolak-balik lambat) */
+.animate-ken-burns-in {
+  animation: kenBurns 20s ease-in-out infinite alternate;
+}
+
+/* Efek Ken Burns Zoom Out */
+.animate-ken-burns-out {
+  animation: kenBurnsOut 25s ease-out infinite alternate;
+}
+
+/* Efek Ken Burns Diagonal (Titik awal dari kiri bawah) */
+.animate-ken-burns-diagonal {
+  transform-origin: bottom left;
+  animation: kenBurnsDiagonal 18s ease-in-out infinite alternate;
+}
+
+/* ─── TYPOGRAPHY UTILITY CLASSES ───
+ *  Consistent typography using design tokens.
+ *  Use these instead of hardcoded Tailwind classes.
+ * ───────────────────────────────────────────── */
+
+/* Hero title — landing pages, dashboards */
+.typo-hero {
+  font-size: var(--typo-4xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+@media (min-width: 640px) {
+  .typo-hero {
+    font-size: var(--typo-5xl);
+  }
+}
+
+/* Section headings (h1) */
+.typo-h1 {
+  font-size: var(--typo-2xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Section subheadings (h2) */
+.typo-h2 {
+  font-size: var(--typo-xl);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-semibold);
+}
+
+/* Card titles (h3) */
+.typo-h3 {
+  font-size: var(--typo-lg);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-semibold);
+}
+
+/* Small section titles (h4) */
+.typo-h4 {
+  font-size: var(--typo-base);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-semibold);
+}
+
+/* Body text */
+.typo-body {
+  font-size: var(--typo-base);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-normal);
+}
+
+/* Small body / description */
+.typo-body-sm {
+  font-size: var(--typo-sm);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+}
+
+/* Labels — small, uppercase, semibold */
+.typo-label {
+  font-size: var(--typo-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* Captions — smallest text */
+.typo-caption {
+  font-size: var(--typo-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-medium);
+}
+
+/* Meta — secondary, subdued text */
+.typo-meta {
+  font-size: var(--typo-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-grey-500);
+}
+
+/* ─── BERANDA SECTION TYPOGRAPHY ───
+ *  Consistent text scale for landing-page sections (DataBeranda).
+ *  Use these in place of hardcoded text-* / font-* classes so every
+ *  section shares the same sizes & font (no more big/small mismatch).
+ * ───────────────────────────────────────────── */
+
+/* Small uppercase label above section titles */
+.sec-eyebrow {
+  font-size: var(--typo-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Main section title (h1/h2) */
+.sec-title {
+  font-size: var(--typo-2xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Subtitle / lead paragraph under the title */
+.sec-subtitle {
+  font-size: var(--typo-md);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-semibold);
+}
+
+/* Body paragraph */
+.sec-body {
+  font-size: var(--typo-sm);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-normal);
+}
+
+/* Card title */
+.sec-card-title {
+  font-size: var(--typo-lg);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-semibold);
+}
+
+/* Card description */
+.sec-card-body {
+  font-size: var(--typo-sm);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+}
+
+/* Meta / small labels (date, source, tags) */
+.sec-meta {
+  font-size: var(--typo-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+}
+
+/* Buttons / links-as-buttons */
+.sec-btn {
+  font-size: var(--typo-sm);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Responsive bump — same scale across all sections */
+@media (min-width: 768px) {
+  .sec-eyebrow {
+    font-size: var(--typo-sm);
+  }
+  .sec-title {
+    font-size: var(--typo-4xl);
+  }
+  .sec-subtitle {
+    font-size: var(--typo-xl);
+  }
+  .sec-body {
+    font-size: var(--typo-base);
+  }
+  .sec-card-title {
+    font-size: var(--typo-xl);
+  }
+  .sec-btn {
+    font-size: var(--typo-base);
+  }
+}
+
+/* ─── SPACING UTILITY CLASSES ───
+ *  Consistent card/container spacing
+ * ───────────────────────────────────────────── */
+
+/* Standard card padding */
+.panel-padding {
+  padding: var(--space-4);
+}
+@media (min-width: 640px) {
+  .panel-padding {
+    padding: var(--space-6);
+  }
+}
+@media (min-width: 1024px) {
+  .panel-padding {
+    padding: var(--space-8);
+  }
+}
+
+/* Standard section gap */
+.section-gap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Standard card/container header */
+.panel-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-grey-200);
+}
+
+/* ─── TRANSITION UTILITY CLASSES ─── */
+
+/* Smooth hover lift */
+.hover\:lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.hover\:lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Smooth active press */
+.active\:press:active {
+  transform: scale(0.97);
+}
