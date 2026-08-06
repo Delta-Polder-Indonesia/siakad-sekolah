@@ -28,8 +28,8 @@ export default function PengaturanAkun() {
 
   const validatePassword = () => {
     if (!password) {
-      setError('Kata sandi tidak boleh kosong.');
-      return false;
+      // Password kosong → user tidak ingin mengganti kata sandi, pertahankan yang lama.
+      return true;
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
       setError(`Kata sandi minimal ${MIN_PASSWORD_LENGTH} karakter.`);
@@ -76,7 +76,7 @@ export default function PengaturanAkun() {
       return;
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = password ? await hashPassword(password) : teacher.password;
     const nextTeachers = teachers.map((item) =>
       item.id === teacher.id ? { ...item, nip: nextNip, password: hashedPassword } : item
     );
@@ -109,7 +109,7 @@ export default function PengaturanAkun() {
       return;
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = password ? await hashPassword(password) : student.password;
     const nextStudents = students.map((item) =>
       item.id === student.id ? { ...item, nis: nextNis, password: hashedPassword } : item
     );
@@ -165,7 +165,10 @@ export default function PengaturanAkun() {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <p className="mt-1 text-xs text-gray-500">Minimal {MIN_PASSWORD_LENGTH} karakter.</p>
+          <p className="mt-1 text-xs text-gray-500">
+            Minimal {MIN_PASSWORD_LENGTH} karakter. Kosongkan jika tidak ingin mengganti kata
+            sandi.
+          </p>
         </div>
 
         <div>

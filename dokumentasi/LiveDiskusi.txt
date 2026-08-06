@@ -1,13 +1,16 @@
+Repo: Delta-Polder-Indonesia/Siakad-siswa
 
+Perbaiki isu keamanan/bug pada alur autentikasi berikut:
 
-Perbaiki isu keamanan pada alur autentikasi berikut:
+1. `src/context/AuthContext.tsx` fungsi `login()` (baris ~47-59): hapus pengecekan admin berbasis `import.meta.env.VITE_ADMIN_USERNAME`/`VITE_ADMIN_PASSWORD` karena variabel VITE_* ter-embed ke bundle frontend publik. Arahkan login admin ke endpoint backend `POST /api/auth/admin/login` (lihat `backend/src/modules/auth/auth.controller.ts` dan `loginAdmin` di `backend/src/modules/auth/auth.service.ts`). Tambahkan role `admin` ke `ROLE_MAP`/jalur pemanggil di `src/services/authApi.ts` bila perlu.
 
-1. Di `src/context/AuthContext.tsx` fungsi `login()`: hapus pengecekan admin berbasis `import.meta.env.VITE_ADMIN_USERNAME`/`VITE_ADMIN_PASSWORD` (baris ~47-59) karena variabel VITE_* ter-embed ke bundle frontend publik. Arahkan login admin ke endpoint backend `POST /api/auth/admin/login` (lihat `backend/src/modules/auth/auth.controller.ts` `handleAdminLogin` dan `backend/src/modules/auth/auth.service.ts` `loginAdmin`). Tambahkan fungsi pemanggil di `src/services/authApi.ts` bila belum ada.
+2. `src/context/AuthContext.tsx` fungsi `loginGoogle()` (baris ~199-234): hapus atau gerbang di belakang flag demo eksplisit fallback client-side yang mendekode JWT tanpa verifikasi tanda tangan. Andalkan verifikasi backend `loginGoogle` (`OAuth2Client.verifyIdToken`).
 
-2. Di `src/context/AuthContext.tsx` fungsi `loginGoogle()`: hapus (atau gerbang di belakang flag demo eksplisit) fallback client-side yang mendekode JWT tanpa verifikasi tanda tangan (baris ~199-234). Andalkan verifikasi backend `loginGoogle` yang sudah memakai `OAuth2Client.verifyIdToken`.
+3. `src/fitur/pengaturan/PengaturanAkun.tsx`:
+   - Ubah `useEffect` (baris ~45-57) agar TIDAK mengisi field password dengan `teacher.password`/`student.password` (yang sudah ter-hash). Biarkan field password & konfirmasi kosong saat load.
+   - Pada `handleSaveTeacher` dan `handleSaveStudent` (baris ~81-83 dan ~111-113), hash password baru dengan `hashPassword` dari `src/data/services` sebelum disimpan lewat `saveTeachers`/`saveStudents`, agar konsisten dengan perbandingan `t.password === hashedInput` / `s.password === hashedInput` di `AuthContext.login()`.
+   - Jika field password dibiarkan kosong (user tidak ingin ganti password), pertahankan password lama tanpa mengubahnya.
 
-3. Di `src/fitur/pengaturan/PengaturanAkun.tsx`: pada `handleSaveTeacher` dan `handleSaveStudent`, hash password baru dengan `hashPassword` dari `src/data/services` sebelum disimpan lewat `saveTeachers`/`saveStudents`, agar konsisten dengan perbandingan `s.password === hashedInput` di `AuthContext.login()`. Perhatikan bahwa `useEffect` yang mengisi field dari `teacher.password`/`student.password` (yang sudah ter-hash) sebaiknya tidak menaruh hash ke input password; sesuaikan agar field password dikosongkan dan hanya di-hash saat user mengetik password baru.
-
-4. Bersihkan komentar path absolut lokal pengembang (mis. `// E:\guthub\...`) di file yang terdampak.
+4. Bersihkan komentar path absolut lokal pengembang (mis. `// E:\guthub\...`) di `src/context/AuthContext.tsx` baris 1 dan file lain yang terdampak.
 
 Pastikan `npm run typecheck`, `npm run lint`, dan `npm test` lulus setelah perubahan.
