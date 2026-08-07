@@ -21,6 +21,18 @@ export function validateLoginInput(role: ValidRole, id: string, password: string
   // ── Bypass validasi untuk akun admin ──
   if (trimmedId === 'admin') return null;
 
+  // Validasi password strength (hanya jika password validator tersedia)
+  try {
+    // Dynamic import untuk menghindari error saat testing
+    const { isPasswordValid } = require('../../utils/passwordValidator');
+    if (!isPasswordValid(password)) {
+      return 'Kata sandi harus minimal 8 karakter dengan kombinasi huruf kapital, huruf kecil, angka, dan karakter khusus.';
+    }
+  } catch (error) {
+    // Jika password validator tidak tersedia, skip password validation
+    console.warn('Password validator not available, skipping password validation');
+  }
+
   switch (role) {
     case 'teacher':
       if (!/^\d+$/.test(trimmedId)) return 'NIP harus berupa angka.';

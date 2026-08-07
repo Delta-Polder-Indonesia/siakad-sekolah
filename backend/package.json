@@ -10,7 +10,13 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "vitest --config vitest.e2e.config.ts",
+    "data-retention": "tsx scripts/dataRetentionScheduler.ts",
+    "test-migrations": "tsx scripts/migrationTestRunner.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,6 +32,8 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "request-ip": "^3.3.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -36,9 +44,12 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.10.2",
     "@types/request-ip": "^0.0.41",
+    "@types/supertest": "^7.2.1",
     "prisma": "6.19.3",
+    "supertest": "^7.2.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^1.6.0"
   },
   "overrides": {
     "esbuild": "^0.28.1"

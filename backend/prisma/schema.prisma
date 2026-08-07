@@ -5,6 +5,11 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Connection pool configuration
+  // connection_limit = 10
+  // pool_timeout = 10
+  // Connect timeout in seconds
+  // connection_timeout = 10
 }
 
 model SchoolConfig {
@@ -94,6 +99,10 @@ model Teacher {
   classes         ClassRoomTeacher[]
   homeroomClasses ClassRoom[]         @relation("HomeroomTeacher")
   lessonNotes     TeacherLessonNote[]
+
+  @@index([name]) // untuk search guru
+  @@index([subject]) // untuk filtering berdasarkan mata pelajaran
+  @@index([email]) // untuk lookup by email
 }
 
 model Student {
@@ -119,6 +128,11 @@ model Student {
   classRoom      ClassRoom              @relation(fields: [classId], references: [id])
   classMutations StudentClassMutation[]
   suratIzin      SuratIzin[]
+
+  @@index([classId])
+  @@index([name]) // untuk search siswa
+  @@index([gender]) // untuk filtering
+  @@index([nis]) // untuk lookup by NIS
 }
 
 model ClassRoomTeacher {
@@ -150,6 +164,8 @@ model Attendance {
   @@index([date])
   @@index([studentId, date])
   @@index([classId, date])
+  @@index([status]) // untuk filtering berdasarkan status
+  @@index([studentId, status]) // untuk query siswa berdasarkan status
 }
 
 model Announcement {
@@ -254,6 +270,9 @@ model ReportCard {
   @@unique([studentId, classId, academicYear, semester, subject])
   @@index([studentId])
   @@index([classId])
+  @@index([academicYear, semester]) // untuk filtering tahun ajaran
+  @@index([subject]) // untuk filtering mata pelajaran
+  @@index([grade]) // untuk filtering berdasarkan nilai
 }
 
 model BillingConfig {
@@ -476,6 +495,18 @@ model Like {
 
   @@unique([programId, ip]) // 1 IP hanya bisa like 1x per program
   @@index([programId])
+}
+
+model TokenBlacklist {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedBy String?
+  reason    String?
+
+  @@index([expiresAt])
+  @@index([token])
 }
 
 enum UserRole {

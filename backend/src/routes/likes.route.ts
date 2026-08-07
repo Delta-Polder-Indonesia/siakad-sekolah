@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import requestIp from 'request-ip';
 import { prisma } from '../lib/prisma.js';
+import { logger } from '../config/logger.js';
 
-export const likesRoute = Router();
+export const likesRouter = Router();
 
 // GET /api/likes/:programId
-likesRoute.get('/:programId', async (req, res) => {
+likesRouter.get('/:programId', async (req, res) => {
   try {
     const { programId } = req.params;
     const userIp = requestIp.getClientIp(req) || '';
@@ -23,13 +24,13 @@ likesRoute.get('/:programId', async (req, res) => {
     res.json({ count, userLiked: !!userLiked, programId });
 
   } catch (error) {
-    console.error('GET /likes error:', error);
+    logger.error('GET /likes error:', { error: (error as Error).message });
     res.status(500).json({ error: 'Gagal mengambil data like' });
   }
 });
 
 // POST /api/likes/:programId
-likesRoute.post('/:programId', async (req, res) => {
+likesRouter.post('/:programId', async (req, res) => {
   try {
     const { programId } = req.params;
     const userIp = requestIp.getClientIp(req) || '';
@@ -63,9 +64,7 @@ likesRoute.post('/:programId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('POST /likes error:', error);
+    logger.error('POST /likes error:', { error: (error as Error).message });
     res.status(500).json({ error: 'Gagal memproses like' });
   }
 });
-
-export default likesRoute;

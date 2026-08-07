@@ -7,8 +7,8 @@ Copy this file to `.env` and fill in the actual values for your environment.
 ### Required Variables
 
 ```bash
-# Database
-DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+# Database dengan connection pooling
+DATABASE_URL=postgresql://username:password@localhost:5432/database_name?connection_limit=10&pool_timeout=10
 
 # Server Configuration
 PORT=4000
@@ -26,6 +26,24 @@ JWT_REFRESH_EXPIRES_IN=7d
 # CHANGE THESE IN PRODUCTION!
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin
+
+# Log Aggregation (Optional)
+# Enable centralized log aggregation to external services (ELK, Splunk, etc.)
+LOG_AGGREGATION_ENABLED=false
+LOG_AGGREGATION_HOST=your-log-aggregation-service.com
+LOG_AGGREGATION_PORT=443
+LOG_AGGREGATION_PATH=/api/logs
+LOG_AGGREGATION_API_KEY=your_api_key_here
+LOG_BATCH_SIZE=10
+LOG_FLUSH_INTERVAL=30000
+
+# Alert Webhook (Optional)
+# Send critical error alerts to monitoring services
+ALERT_WEBHOOK_URL=https://your-monitoring-service.com/webhook/alerts
+
+# Migration Testing (Optional)
+# Test database name for migration testing
+TEST_DB_NAME=test_portal_siswa
 ```
 
 ### Optional Variables

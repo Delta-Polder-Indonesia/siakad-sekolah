@@ -34,6 +34,13 @@ export default defineConfig(({ command }) => ({
       usePolling: false,
       ignored: ['**/node_modules/**', '**/.git/**'],
     },
+    headers: {
+      // Security Headers untuk development
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+    },
   },
 
   // Development -> /

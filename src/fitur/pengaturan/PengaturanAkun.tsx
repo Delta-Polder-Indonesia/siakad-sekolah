@@ -3,11 +3,16 @@ import { Eye, EyeOff, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getStudents, getTeachers, hashPassword, saveStudents, saveTeachers } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
+import { 
+  validatePassword as validatePasswordStrength, 
+  generateStrongPassword, 
+  PasswordValidator,
+  type PasswordValidationResult 
+} from '../../utils/passwordValidator';
 
 export default function PengaturanAkun() {
   const { user, refreshUser } = useAuth();
   const storeVersion = useStoreVersion();
-  const MIN_PASSWORD_LENGTH = 8;
 
   const teacher = useMemo(
     () => getTeachers().find((item) => item.id === user?.id),
@@ -25,21 +30,47 @@ export default function PengaturanAkun() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult | null>(null);
 
   const validatePassword = () => {
     if (!password) {
       // Password kosong → user tidak ingin mengganti kata sandi, pertahankan yang lama.
+      setPasswordValidation(null);
       return true;
     }
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(`Kata sandi minimal ${MIN_PASSWORD_LENGTH} karakter.`);
+    
+    const validation = validatePasswordStrength(password);
+    setPasswordValidation(validation);
+    
+    if (!validation.isValid) {
+      setError(validation.errors[0] || 'Password tidak memenuhi kebijakan keamanan.');
       return false;
     }
+    
     if (password !== confirmPassword) {
       setError('Konfirmasi kata sandi tidak sama.');
       return false;
     }
+    
     return true;
+  };
+
+  const handleGeneratePassword = () => {
+    const newPassword = generateStrongPassword(12);
+    setPassword(newPassword);
+    setConfirmPassword(newPassword);
+    const validation = validatePasswordStrength(newPassword);
+    setPasswordValidation(validation);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (value) {
+      const validation = validatePasswordStrength(value);
+      setPasswordValidation(validation);
+    } else {
+      setPasswordValidation(null);
+    }
   };
 
   useEffect(() => {
@@ -85,6 +116,7 @@ export default function PengaturanAkun() {
     refreshUser();
     setPassword('');
     setConfirmPassword('');
+    setPasswordValidation(null);
     setError('');
     setMessage('Pengaturan akun guru berhasil diperbarui. Data admin ikut terbarui otomatis.');
   };
@@ -118,6 +150,7 @@ export default function PengaturanAkun() {
     refreshUser();
     setPassword('');
     setConfirmPassword('');
+    setPasswordValidation(null);
     setError('');
     setMessage('Pengaturan akun siswa berhasil diperbarui. Data admin ikut terbarui otomatis.');
   };
@@ -145,29 +178,78 @@ export default function PengaturanAkun() {
 
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Kata Sandi Baru</label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value);
-                setMessage('');
-                setError('');
-              }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="space-y-2">
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(event) => {
+                  handlePasswordChange(event.target.value);
+                  setMessage('');
+                  setError('');
+                }}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Biarkan kosong jika tidak ingin mengganti"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+                className="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-gray-700"
+                aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            
+            {/* Password Strength Indicator */}
+            {passwordValidation && password && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 rounded-full bg-gray-200">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${PasswordValidator.getStrengthColor(passwordValidation.strength)}`}
+                      style={{ width: `${PasswordValidator.getStrengthPercentage(passwordValidation.strength)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-gray-600">
+                    {PasswordValidator.formatStrength(passwordValidation.strength)}
+                  </span>
+                </div>
+                
+                {passwordValidation.errors.length > 0 && (
+                  <div className="rounded-md bg-red-50 p-2">
+                    <p className="text-xs font-medium text-red-700">Perbaikan diperlukan:</p>
+                    <ul className="mt-1 list-inside list-disc text-xs text-red-600">
+                      {passwordValidation.errors.map((error, idx) => (
+                        <li key={idx}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {passwordValidation.warnings.length > 0 && (
+                  <div className="rounded-md bg-yellow-50 p-2">
+                    <p className="text-xs font-medium text-yellow-700">Saran perbaikan:</p>
+                    <ul className="mt-1 list-inside list-disc text-xs text-yellow-600">
+                      {passwordValidation.warnings.map((warning, idx) => (
+                        <li key={idx}>{warning}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <button
               type="button"
-              onClick={() => setShowPassword((current) => !current)}
-              className="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-gray-700"
-              aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              onClick={handleGeneratePassword}
+              className="text-xs text-blue-600 hover:text-blue-700 underline"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              Generate Password Kuat
             </button>
           </div>
           <p className="mt-1 text-xs text-gray-500">
-            Minimal {MIN_PASSWORD_LENGTH} karakter. Kosongkan jika tidak ingin mengganti kata
-            sandi.
+            Minimal 8 karakter dengan kombinasi huruf kapital, huruf kecil, angka, dan karakter khusus. Kosongkan jika tidak ingin mengganti kata sandi.
           </p>
         </div>
 
@@ -185,6 +267,7 @@ export default function PengaturanAkun() {
                 setError('');
               }}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ulangi kata sandi baru"
             />
             <button
               type="button"

@@ -31,8 +31,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       
-      // 1. Matikan aturan ketat tipe 'any' agar coding lebih bebas
-      '@typescript-eslint/no-explicit-any': 'off',
+      // 1. Aktifkan peringatan untuk tipe 'any' - akan ditingkatkan ke 'error' secara bertahap
+      '@typescript-eslint/no-explicit-any': 'warn',
       
       // 2. Abaikan variabel yang tidak terpakai (Unused Variables)
       '@typescript-eslint/no-unused-vars': 'off', 

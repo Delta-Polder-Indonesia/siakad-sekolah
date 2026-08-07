@@ -4,6 +4,8 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
+import { isTokenBlacklisted } from '../utils/tokenManager.js';
+import { logger, logSecurityEvent } from '../config/logger.js';
 
 export interface JwtPayload {
   userId: string;
@@ -11,7 +13,7 @@ export interface JwtPayload {
   name:   string;
 }
 
-export const requireAuth: RequestHandler = (req, res, next) => {
+export const requireAuth: RequestHandler = async (req, res, next) => {
   const header = req.headers.authorization;
 
   if (!header?.startsWith('Bearer ')) {
@@ -22,10 +24,25 @@ export const requireAuth: RequestHandler = (req, res, next) => {
   const token = header.slice(7);
 
   try {
+    // Check if token is blacklisted
+    const blacklisted = await isTokenBlacklisted(token);
+    if (blacklisted) {
+      logSecurityEvent('blacklisted_token_used', {
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+      });
+      res.status(401).json({ ok: false, message: 'Token telah di-revoke. Silakan login kembali.' });
+      return;
+    }
+
     const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     req.jwtUser = payload;
     next();
-  } catch {
+  } catch (error) {
+    logger.warn('Token validation failed', { 
+      error: (error as Error).message,
+      ip: req.ip,
+    });
     res.status(401).json({ ok: false, message: 'Token tidak valid atau sudah kedaluwarsa.' });
   }
 };
@@ -33,8 +50,61 @@ export const requireAuth: RequestHandler = (req, res, next) => {
 // Hanya ADMIN yang boleh akses
 export const requireAdmin: RequestHandler = (req, res, next) => {
   if (req.jwtUser?.role !== 'ADMIN') {
+    logSecurityEvent('unauthorized_admin_access_attempt', {
+      userId: req.jwtUser?.userId,
+      role: req.jwtUser?.role,
+      ip: req.ip,
+    });
     res.status(403).json({ ok: false, message: 'Akses ditolak.' });
     return;
   }
   next();
+};
+
+// Hanya GURU yang boleh akses
+export const requireTeacher: RequestHandler = (req, res, next) => {
+  if (req.jwtUser?.role !== 'GURU') {
+    logSecurityEvent('unauthorized_teacher_access_attempt', {
+      userId: req.jwtUser?.userId,
+      role: req.jwtUser?.role,
+      ip: req.ip,
+    });
+    res.status(403).json({ ok: false, message: 'Akses ditolak. Role Guru diperlukan.' });
+    return;
+  }
+  next();
+};
+
+// Hanya MURID yang boleh akses
+export const requireStudent: RequestHandler = (req, res, next) => {
+  if (req.jwtUser?.role !== 'MURID') {
+    logSecurityEvent('unauthorized_student_access_attempt', {
+      userId: req.jwtUser?.userId,
+      role: req.jwtUser?.role,
+      ip: req.ip,
+    });
+    res.status(403).json({ ok: false, message: 'Akses ditolak. Role Siswa diperlukan.' });
+    return;
+  }
+  next();
+};
+
+// Multiple roles yang boleh akses
+export const requireRoles = (...allowedRoles: ('ADMIN' | 'GURU' | 'MURID' | 'TAMU')[]): RequestHandler => {
+  return (req, res, next) => {
+    if (!req.jwtUser || !allowedRoles.includes(req.jwtUser.role)) {
+      logSecurityEvent('unauthorized_access_attempt', {
+        userId: req.jwtUser?.userId,
+        role: req.jwtUser?.role,
+        allowedRoles,
+        ip: req.ip,
+      });
+      res.status(403).json({ 
+        ok: false, 
+        message: 'Akses ditolak. Role tidak diizinkan.' 
+      });
+      return;
+    }
+    next();
+  };
 };

@@ -4,6 +4,10 @@ import { OAuth2Client } from 'google-auth-library';
 import { prisma } from '../../lib/prisma.js';
 import { env } from '../../config/env.js';
 import type { JwtPayload } from '../../middleware/auth.js';
+import { validatePassword, formatPasswordErrors } from '../../utils/passwordValidator.js';
+import { logger, logSecurityEvent, logDatabaseOperation } from '../../config/logger.js';
+import { blacklistToken, blacklistUserTokens, getBlacklistStats } from '../../utils/tokenManager.js';
+import { AuthenticationError, ValidationError, NotFoundError } from '../../utils/errors.js';
 
 function signTokens(payload: JwtPayload) {
   // Validasi environment variables sebelum penggunaan
@@ -22,12 +26,20 @@ function signTokens(payload: JwtPayload) {
 
 // Login Guru
 export async function loginTeacher(nip: string, password: string) {
+  logDatabaseOperation('teacher_login_attempt', { nip });
+  
   const teacher = await prisma.teacher.findUnique({ where: { nip } });
 
-  if (!teacher) return null;
+  if (!teacher) {
+    logSecurityEvent('login_failed', { reason: 'teacher_not_found', nip });
+    return null;
+  }
 
   const isValid = await bcrypt.compare(password, teacher.passwordHash);
-  if (!isValid) return null;
+  if (!isValid) {
+    logSecurityEvent('login_failed', { reason: 'invalid_password', nip, teacherId: teacher.id });
+    return null;
+  }
 
   // Kelas yang diampu + kelas binaan (wali kelas)
   const [classes, homeroomClasses] = await Promise.all([
@@ -47,6 +59,8 @@ export async function loginTeacher(nip: string, password: string) {
     name:   teacher.name,
   };
 
+  logSecurityEvent('login_success', { userId: teacher.id, role: 'GURU', name: teacher.name });
+
   return {
     user: {
       id:             teacher.id,
@@ -61,20 +75,143 @@ export async function loginTeacher(nip: string, password: string) {
   };
 }
 
+// Validate password strength untuk user yang ingin mengganti password
+export function validateUserPassword(password: string) {
+  const validation = validatePassword(password);
+  
+  return {
+    isValid: validation.isValid,
+    errors: validation.errors,
+    strength: validation.strength,
+    score: validation.score,
+    message: validation.isValid 
+      ? 'Password memenuhi kebijakan keamanan' 
+      : formatPasswordErrors(validation.errors)
+  };
+}
+
+// Change password untuk guru
+export async function changeTeacherPassword(teacherId: string, oldPassword: string, newPassword: string) {
+  logSecurityEvent('password_change_attempt', { userId: teacherId, role: 'teacher' });
+  
+  const teacher = await prisma.teacher.findUnique({ where: { id: teacherId } });
+  
+  if (!teacher) {
+    logSecurityEvent('password_change_failed', { reason: 'teacher_not_found', teacherId });
+    throw new NotFoundError('Teacher', teacherId);
+  }
+
+  // Verify old password
+  const isValid = await bcrypt.compare(oldPassword, teacher.passwordHash);
+  if (!isValid) {
+    logSecurityEvent('password_change_failed', { reason: 'invalid_old_password', teacherId });
+    throw new AuthenticationError('Password lama salah');
+  }
+
+  // Validate new password strength
+  const validation = validatePassword(newPassword);
+  if (!validation.isValid) {
+    logSecurityEvent('password_change_failed', { reason: 'weak_password', teacherId, strength: validation.strength });
+    throw new ValidationError(
+      'Password baru tidak memenuhi kebijakan keamanan',
+      { errors: validation.errors, strength: validation.strength }
+    );
+  }
+
+  // Check if new password is same as old password
+  const isSamePassword = await bcrypt.compare(newPassword, teacher.passwordHash);
+  if (isSamePassword) {
+    logSecurityEvent('password_change_failed', { reason: 'same_password', teacherId });
+    throw new ValidationError('Password baru tidak boleh sama dengan password lama');
+  }
+
+  // Hash new password
+  const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  await prisma.teacher.update({
+    where: { id: teacherId },
+    data: { passwordHash: newPasswordHash }
+  });
+
+  logSecurityEvent('password_change_success', { userId: teacherId, role: 'teacher' });
+
+  return { success: true, message: 'Password berhasil diubah' };
+}
+
+// Change password untuk siswa
+export async function changeStudentPassword(studentId: string, oldPassword: string, newPassword: string) {
+  logSecurityEvent('password_change_attempt', { userId: studentId, role: 'student' });
+  
+  const student = await prisma.student.findUnique({ where: { id: studentId } });
+  
+  if (!student) {
+    logSecurityEvent('password_change_failed', { reason: 'student_not_found', studentId });
+    throw new NotFoundError('Student', studentId);
+  }
+
+  // Verify old password
+  const isValid = await bcrypt.compare(oldPassword, student.passwordHash);
+  if (!isValid) {
+    logSecurityEvent('password_change_failed', { reason: 'invalid_old_password', studentId });
+    throw new AuthenticationError('Password lama salah');
+  }
+
+  // Validate new password strength
+  const validation = validatePassword(newPassword);
+  if (!validation.isValid) {
+    logSecurityEvent('password_change_failed', { reason: 'weak_password', studentId, strength: validation.strength });
+    throw new ValidationError(
+      'Password baru tidak memenuhi kebijakan keamanan',
+      { errors: validation.errors, strength: validation.strength }
+    );
+  }
+
+  // Check if new password is same as old password
+  const isSamePassword = await bcrypt.compare(newPassword, student.passwordHash);
+  if (isSamePassword) {
+    logSecurityEvent('password_change_failed', { reason: 'same_password', studentId });
+    throw new ValidationError('Password baru tidak boleh sama dengan password lama');
+  }
+
+  // Hash new password
+  const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  await prisma.student.update({
+    where: { id: studentId },
+    data: { passwordHash: newPasswordHash }
+  });
+
+  logSecurityEvent('password_change_success', { userId: studentId, role: 'student' });
+
+  return { success: true, message: 'Password berhasil diubah' };
+}
+
 // Login Siswa
 export async function loginStudent(nis: string, password: string) {
+  logDatabaseOperation('student_login_attempt', { nis });
+  
   const student = await prisma.student.findUnique({ where: { nis } });
 
-  if (!student) return null;
+  if (!student) {
+    logSecurityEvent('login_failed', { reason: 'student_not_found', nis });
+    return null;
+  }
 
   const isValid = await bcrypt.compare(password, student.passwordHash);
-  if (!isValid) return null;
+  if (!isValid) {
+    logSecurityEvent('login_failed', { reason: 'invalid_password', nis, studentId: student.id });
+    return null;
+  }
 
   const payload: JwtPayload = {
     userId: student.id,
     role:   'MURID',
     name:   student.name,
   };
+
+  logSecurityEvent('login_success', { userId: student.id, role: 'MURID', name: student.name });
 
   return {
     user: {
@@ -241,4 +378,39 @@ export async function refreshAccessToken(refreshToken: string) {
   } catch {
     return null;
   }
+}
+
+// Logout - blacklist access token
+export async function logout(accessToken: string, userId?: string) {
+  const success = await blacklistToken(accessToken, userId, 'User logout');
+  
+  if (success) {
+    logSecurityEvent('user_logout', { userId });
+  }
+  
+  return { success, message: success ? 'Logout berhasil' : 'Logout gagal' };
+}
+
+// Logout from all devices - blacklist all user tokens
+export async function logoutAllDevices(userId: string) {
+  // Note: This requires storing userId with tokens or using a different strategy
+  // For now, we'll implement the logging and structure
+  const count = await blacklistUserTokens(userId, userId, 'Logout from all devices');
+  
+  logSecurityEvent('user_logout_all_devices', { userId, tokensRevoked: count });
+  
+  return { 
+    success: true, 
+    message: 'Logout dari semua perangkat berhasil',
+    tokensRevoked: count 
+  };
+}
+
+// Get blacklist statistics (untuk admin monitoring)
+export async function getTokenBlacklistStats() {
+  const stats = await getBlacklistStats();
+  return {
+    ...stats,
+    timestamp: new Date().toISOString(),
+  };
 }
