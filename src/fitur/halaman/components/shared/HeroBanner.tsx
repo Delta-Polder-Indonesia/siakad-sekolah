@@ -31,7 +31,9 @@ export default function HeroBanner({
   };
 
   return (
-    <div className={`relative min-h-[280px] w-full overflow-hidden bg-slate-100 h-[90vh] ${maxHeight}`}>
+    <div
+      className={`relative h-[90vh] min-h-[280px] w-full overflow-hidden bg-slate-100 ${maxHeight}`}
+    >
       {!imageError ? (
         <img
           src={`${import.meta.env.BASE_URL}${imageSrc}`}
@@ -73,9 +75,7 @@ export default function HeroBanner({
         </h1>
 
         {subtitle && (
-          <p className="mt-1 text-sm font-semibold text-slate-300 md:text-base">
-            {subtitle}
-          </p>
+          <p className="mt-1 text-sm font-semibold text-slate-300 md:text-base">{subtitle}</p>
         )}
       </div>
     </div>

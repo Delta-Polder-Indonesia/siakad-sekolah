@@ -15,11 +15,7 @@ export function getNavAriaLabel(action: string, target?: string): string {
 /**
  * Generate proper alt text untuk images dengan fallback
  */
-export function getImageAltText(
-  baseAlt: string,
-  fallback?: string,
-  context?: string
-): string {
+export function getImageAltText(baseAlt: string, fallback?: string, context?: string): string {
   if (context) {
     return `${baseAlt} - ${context}`;
   }
@@ -95,7 +91,10 @@ export function trapFocus(
 /**
  * Screen reader announcement utilities
  */
-export function announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite') {
+export function announceToScreenReader(
+  message: string,
+  priority: 'polite' | 'assertive' = 'polite'
+) {
   const announcement = document.createElement('div');
   announcement.setAttribute('role', 'status');
   announcement.setAttribute('aria-live', priority);

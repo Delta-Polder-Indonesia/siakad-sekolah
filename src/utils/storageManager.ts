@@ -57,11 +57,11 @@ export class StorageManager {
   static setItem(key: string, value: unknown): boolean {
     try {
       const quotaCheck = this.checkQuota();
-      
+
       if (!quotaCheck.available) {
         logger.error('Storage penuh, mencoba cleanup...');
         this.cleanupOldEntries();
-        
+
         // Cek lagi setelah cleanup
         const quotaAfterCleanup = this.checkQuota();
         if (!quotaAfterCleanup.available) {
@@ -71,7 +71,7 @@ export class StorageManager {
 
       const serialized = JSON.stringify(value);
       localStorage.setItem(key, serialized);
-      
+
       logger.log(`Data tersimpan: ${key} (${serialized.length} bytes)`);
       return true;
     } catch (error) {
@@ -134,20 +134,28 @@ export class StorageManager {
       const MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 hari
 
       // Daftar key yang tidak boleh dihapus
-      const protectedKeys = ['absensi_auth', 'absensi_data', 'portal_access_token', 'portal_refresh_token'];
+      const protectedKeys = [
+        'absensi_auth',
+        'absensi_data',
+        'portal_access_token',
+        'portal_refresh_token',
+      ];
 
       for (const key in localStorage) {
-        if (Object.prototype.hasOwnProperty.call(localStorage, key) && !protectedKeys.includes(key)) {
+        if (
+          Object.prototype.hasOwnProperty.call(localStorage, key) &&
+          !protectedKeys.includes(key)
+        ) {
           try {
             const value = localStorage.getItem(key);
             if (value) {
               const parsed = JSON.parse(value);
-              
+
               // Hapus jika memiliki timestamp dan sudah terlalu lama
-              if (parsed.createdAt && (now - parsed.createdAt) > MAX_AGE) {
+              if (parsed.createdAt && now - parsed.createdAt > MAX_AGE) {
                 keysToRemove.push(key);
               }
-              
+
               // Hapus cache data sementara
               if (key.startsWith('cache_') || key.startsWith('temp_')) {
                 keysToRemove.push(key);
@@ -163,7 +171,7 @@ export class StorageManager {
       }
 
       // Hapus key yang teridentifikasi
-      keysToRemove.forEach(key => {
+      keysToRemove.forEach((key) => {
         localStorage.removeItem(key);
       });
 
@@ -181,12 +189,10 @@ export class StorageManager {
   static compressData(data: unknown): string {
     try {
       const serialized = JSON.stringify(data);
-      
+
       // Basic compression: hapus whitespace yang tidak perlu
-      const compressed = serialized
-        .replace(/\s+/g, ' ')
-        .replace(/\s*([{}:;,])\s*/g, '$1');
-      
+      const compressed = serialized.replace(/\s+/g, ' ').replace(/\s*([{}:;,])\s*/g, '$1');
+
       logger.log(`Data dikompresi: ${serialized.length} -> ${compressed.length} bytes`);
       return compressed;
     } catch (error) {
@@ -269,11 +275,11 @@ export class StorageManager {
    */
   static formatBytes(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   }
 }

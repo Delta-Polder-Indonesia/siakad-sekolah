@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Eye, EyeOff, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getStudents, getTeachers, hashPassword, saveStudents, saveTeachers } from '../../data/services';
+import {
+  getStudents,
+  getTeachers,
+  hashPassword,
+  saveStudents,
+  saveTeachers,
+} from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import { 
-  validatePassword as validatePasswordStrength, 
-  generateStrongPassword, 
+import {
+  validatePassword as validatePasswordStrength,
+  generateStrongPassword,
   PasswordValidator,
-  type PasswordValidationResult 
+  type PasswordValidationResult,
 } from '../../utils/passwordValidator';
 
 export default function PengaturanAkun() {
@@ -30,7 +36,9 @@ export default function PengaturanAkun() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult | null>(null);
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult | null>(
+    null
+  );
 
   const validatePassword = () => {
     if (!password) {
@@ -38,20 +46,20 @@ export default function PengaturanAkun() {
       setPasswordValidation(null);
       return true;
     }
-    
+
     const validation = validatePasswordStrength(password);
     setPasswordValidation(validation);
-    
+
     if (!validation.isValid) {
       setError(validation.errors[0] || 'Password tidak memenuhi kebijakan keamanan.');
       return false;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Konfirmasi kata sandi tidak sama.');
       return false;
     }
-    
+
     return true;
   };
 
@@ -200,22 +208,24 @@ export default function PengaturanAkun() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            
+
             {/* Password Strength Indicator */}
             {passwordValidation && password && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 rounded-full bg-gray-200">
-                    <div 
+                  <div className="h-2 flex-1 rounded-full bg-gray-200">
+                    <div
                       className={`h-2 rounded-full transition-all duration-300 ${PasswordValidator.getStrengthColor(passwordValidation.strength)}`}
-                      style={{ width: `${PasswordValidator.getStrengthPercentage(passwordValidation.strength)}%` }}
+                      style={{
+                        width: `${PasswordValidator.getStrengthPercentage(passwordValidation.strength)}%`,
+                      }}
                     />
                   </div>
                   <span className="text-xs font-medium text-gray-600">
                     {PasswordValidator.formatStrength(passwordValidation.strength)}
                   </span>
                 </div>
-                
+
                 {passwordValidation.errors.length > 0 && (
                   <div className="rounded-md bg-red-50 p-2">
                     <p className="text-xs font-medium text-red-700">Perbaikan diperlukan:</p>
@@ -226,7 +236,7 @@ export default function PengaturanAkun() {
                     </ul>
                   </div>
                 )}
-                
+
                 {passwordValidation.warnings.length > 0 && (
                   <div className="rounded-md bg-yellow-50 p-2">
                     <p className="text-xs font-medium text-yellow-700">Saran perbaikan:</p>
@@ -239,17 +249,18 @@ export default function PengaturanAkun() {
                 )}
               </div>
             )}
-            
+
             <button
               type="button"
               onClick={handleGeneratePassword}
-              className="text-xs text-blue-600 hover:text-blue-700 underline"
+              className="text-xs text-blue-600 underline hover:text-blue-700"
             >
               Generate Password Kuat
             </button>
           </div>
           <p className="mt-1 text-xs text-gray-500">
-            Minimal 8 karakter dengan kombinasi huruf kapital, huruf kecil, angka, dan karakter khusus. Kosongkan jika tidak ingin mengganti kata sandi.
+            Minimal 8 karakter dengan kombinasi huruf kapital, huruf kecil, angka, dan karakter
+            khusus. Kosongkan jika tidak ingin mengganti kata sandi.
           </p>
         </div>
 

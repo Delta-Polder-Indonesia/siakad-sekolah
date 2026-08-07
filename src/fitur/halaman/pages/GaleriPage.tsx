@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { PageProps } from '../types';
-import { galleryItems } from '../../DataContent/galeriData';
+import { galleryItems, type GalleryItem } from '../../DataContent/galeriData';
 import { namaSekolahUppercase } from '../components/Profile/dataSekolah';
-
-interface GalleryItem {
-  id: string | number;
-  title: string;
-  category: string;
-  image: string;
-}
 
 export default function GaleriPage({ onNavigate: _onNavigate }: PageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All Collections');
@@ -40,7 +33,7 @@ export default function GaleriPage({ onNavigate: _onNavigate }: PageProps) {
 
   const tahunAjaran = useMemo(() => ['2024/2025', '2025/2026', '2026/2027', '2027/2028'], []);
 
-  const safeGalleryItems = useMemo(() => (galleryItems as GalleryItem[]) || [], []);
+  const safeGalleryItems = useMemo(() => galleryItems || [], []);
   const heroItems = useMemo(() => safeGalleryItems.slice(0, 8), [safeGalleryItems]);
 
   useEffect(() => {

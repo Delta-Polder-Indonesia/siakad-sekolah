@@ -98,10 +98,7 @@ export async function loginPortal(
 // - 'ok'          → backend memvalidasi kredensial admin
 // - 'invalid'     → backend menolak (401 / ok:false)
 // - 'unreachable' → backend tidak bisa dihubungi → fallback login portal/lokal
-export async function loginAdmin(
-  username: string,
-  pin: string
-): Promise<PortalAdminLoginResult> {
+export async function loginAdmin(username: string, pin: string): Promise<PortalAdminLoginResult> {
   try {
     const res = await fetch(`${API_BASE}/auth/admin/login`, {
       method: 'POST',

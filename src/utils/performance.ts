@@ -40,7 +40,7 @@ export class PerformanceMonitor {
   static trackPageLoad(): void {
     try {
       const perfData = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+
       if (!perfData) {
         logger.warn('Navigation timing data tidak tersedia');
         return;
@@ -50,13 +50,13 @@ export class PerformanceMonitor {
         // Timing utama
         domContentLoaded: perfData.domContentLoadedEventEnd - perfData.fetchStart,
         loadComplete: perfData.loadEventEnd - perfData.fetchStart,
-        
+
         // Timing detail
         dnsLookup: perfData.domainLookupEnd - perfData.domainLookupStart,
         tcpConnection: perfData.connectEnd - perfData.connectStart,
         requestTime: perfData.responseEnd - perfData.requestStart,
         domProcessing: perfData.domComplete - perfData.domInteractive,
-        
+
         // Resource timing
         redirectTime: perfData.redirectEnd - perfData.redirectStart,
         unloadTime: perfData.unloadEventEnd - perfData.unloadEventStart,
@@ -97,7 +97,7 @@ export class PerformanceMonitor {
         const fidObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           entries.forEach((entry) => {
-            const fidEntry = entry as { processingStart: number; startTime: number };
+            const fidEntry = entry as unknown as { processingStart: number; startTime: number };
             logger.log('FID:', fidEntry.processingStart - fidEntry.startTime);
             this.metrics.set('FID', fidEntry.processingStart - fidEntry.startTime);
           });
@@ -109,7 +109,7 @@ export class PerformanceMonitor {
           const entries = list.getEntries();
           let clsValue = 0;
           entries.forEach((entry) => {
-            const clsEntry = entry as { value: number; hadRecentInput: boolean };
+            const clsEntry = entry as unknown as { value: number; hadRecentInput: boolean };
             if (!clsEntry.hadRecentInput) {
               clsValue += clsEntry.value;
             }
@@ -130,7 +130,7 @@ export class PerformanceMonitor {
   static trackNavigationTiming(): void {
     try {
       const perfData = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+
       if (!perfData) return;
 
       const navigationMetrics = {
@@ -161,7 +161,7 @@ export class PerformanceMonitor {
    */
   static trackComponentRender(componentName: string, renderTime: number): void {
     this.metrics.set(`component_${componentName}`, renderTime);
-    
+
     if (renderTime > 100) {
       logger.warn(`Component ${componentName} render lambat: ${renderTime}ms`);
     } else {
@@ -174,14 +174,14 @@ export class PerformanceMonitor {
    */
   static startTiming(operation: string): () => void {
     const startTime = performance.now();
-    
+
     return () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
-      
+
       this.metrics.set(operation, duration);
       logger.log(`${operation}: ${duration.toFixed(2)}ms`);
-      
+
       return duration;
     };
   }
@@ -192,17 +192,18 @@ export class PerformanceMonitor {
   static trackResourcePerformance(): void {
     try {
       const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-      
-      const slowResources = resources.filter(
-        (resource) => resource.duration > 1000
-      );
+
+      const slowResources = resources.filter((resource) => resource.duration > 1000);
 
       if (slowResources.length > 0) {
-        logger.warn('Slow resources detected:', slowResources.map(r => ({
-          name: r.name,
-          duration: r.duration,
-          size: r.transferSize,
-        })));
+        logger.warn(
+          'Slow resources detected:',
+          slowResources.map((r) => ({
+            name: r.name,
+            duration: r.duration,
+            size: r.transferSize,
+          }))
+        );
       }
 
       const totalTransferSize = resources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
@@ -300,7 +301,9 @@ export class PerformanceMonitor {
     // Generate rekomendasi berdasarkan metrics
     const lcp = metrics.LCP || 0;
     if (lcp > 4000) {
-      recommendations.push('LCP terlalu lambat. Pertimbangkan untuk mengoptimasi loading resource utama.');
+      recommendations.push(
+        'LCP terlalu lambat. Pertimbangkan untuk mengoptimasi loading resource utama.'
+      );
     } else if (lcp > 2500) {
       recommendations.push('LCP bisa ditingkatkan dengan optimasi loading resource.');
     }
@@ -321,7 +324,9 @@ export class PerformanceMonitor {
 
     const loadTime = metrics.loadComplete || 0;
     if (loadTime > 5000) {
-      recommendations.push('Load time terlalu lambat. Pertimbangkan untuk mengoptimasi bundle size.');
+      recommendations.push(
+        'Load time terlalu lambat. Pertimbangkan untuk mengoptimasi bundle size.'
+      );
     } else if (loadTime > 3000) {
       recommendations.push('Load time bisa ditingkatkan dengan lazy loading.');
     }
@@ -357,12 +362,12 @@ export function usePerformanceMeasure(componentName: string) {
     end: () => {
       performance.mark(endMark);
       performance.measure(componentName, startMark, endMark);
-      
+
       const measure = performance.getEntriesByName(componentName)[0];
       if (measure) {
         PerformanceMonitor.trackComponentRender(componentName, measure.duration);
       }
-      
+
       performance.clearMarks(startMark);
       performance.clearMarks(endMark);
       performance.clearMeasures(componentName);

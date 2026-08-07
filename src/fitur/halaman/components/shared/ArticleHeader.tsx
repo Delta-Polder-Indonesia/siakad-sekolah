@@ -7,7 +7,6 @@ interface ArticleHeaderProps {
   subtitle?: string;
   category?: string;
   showLogo?: boolean;
-  onNavigate?: (page: string) => void;
 }
 
 export default function ArticleHeader({
@@ -15,7 +14,6 @@ export default function ArticleHeader({
   subtitle,
   category,
   showLogo = true,
-  onNavigate,
 }: ArticleHeaderProps) {
   const goBack = useBackNavigation();
 

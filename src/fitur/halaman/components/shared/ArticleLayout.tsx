@@ -56,7 +56,6 @@ export default function ArticleLayout({
         subtitle={subtitle}
         category={category}
         showLogo={showLogo}
-        onNavigate={onNavigate}
       />
 
       {/* Hero Banner */}

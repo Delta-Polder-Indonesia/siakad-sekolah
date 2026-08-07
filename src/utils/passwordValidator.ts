@@ -18,13 +18,7 @@ export const PASSWORD_POLICY = {
     'admin', // Kata admin yang umum
     'welcome', // Kata welcome yang umum
   ],
-  FORBIDDEN_COMMON_PASSWORDS: [
-    'password123',
-    'admin123',
-    '12345678',
-    'qwerty123',
-    'welcome123',
-  ],
+  FORBIDDEN_COMMON_PASSWORDS: ['password123', 'admin123', '12345678', 'qwerty123', 'welcome123'],
 } as const;
 
 /**
@@ -55,7 +49,7 @@ export class PasswordValidator {
       errors.push(`Password minimal ${PASSWORD_POLICY.MIN_LENGTH} karakter`);
     } else {
       score += 10;
-      
+
       // Bonus untuk password yang lebih panjang
       if (password.length >= 12) score += 10;
       if (password.length >= 16) score += 10;
@@ -95,7 +89,7 @@ export class PasswordValidator {
 
     // Cek pattern yang dilarang
     const lowerPassword = password.toLowerCase();
-    PASSWORD_POLICY.FORBIDDEN_PATTERNS.forEach(pattern => {
+    PASSWORD_POLICY.FORBIDDEN_PATTERNS.forEach((pattern) => {
       if (lowerPassword.includes(pattern)) {
         errors.push(`Password tidak boleh mengandung pola umum: ${pattern}`);
         score -= 20;
@@ -103,7 +97,7 @@ export class PasswordValidator {
     });
 
     // Cek password umum
-    PASSWORD_POLICY.FORBIDDEN_COMMON_PASSWORDS.forEach(common => {
+    PASSWORD_POLICY.FORBIDDEN_COMMON_PASSWORDS.forEach((common) => {
       if (lowerPassword === common) {
         errors.push('Password terlalu umum, gunakan password yang lebih unik');
         score -= 30;
@@ -158,10 +152,7 @@ export class PasswordValidator {
       const nextCharCode = password.charCodeAt(i + 1);
       const nextNextCharCode = password.charCodeAt(i + 2);
 
-      if (
-        charCode + 1 === nextCharCode &&
-        nextCharCode + 1 === nextNextCharCode
-      ) {
+      if (charCode + 1 === nextCharCode && nextCharCode + 1 === nextNextCharCode) {
         return true;
       }
     }
@@ -193,22 +184,25 @@ export class PasswordValidator {
     const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
     const allChars = uppercase + lowercase + numbers + special;
-    
+
     let password = '';
-    
+
     // Pastikan minimal satu dari setiap kategori
     password += uppercase[Math.floor(Math.random() * uppercase.length)];
     password += lowercase[Math.floor(Math.random() * lowercase.length)];
     password += numbers[Math.floor(Math.random() * numbers.length)];
     password += special[Math.floor(Math.random() * special.length)];
-    
+
     // Isi sisa dengan random characters
     for (let i = password.length; i < length; i++) {
       password += allChars[Math.floor(Math.random() * allChars.length)];
     }
-    
+
     // Shuffle password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    return password
+      .split('')
+      .sort(() => Math.random() - 0.5)
+      .join('');
   }
 
   /**
@@ -217,31 +211,31 @@ export class PasswordValidator {
   static getSuggestions(validation: PasswordValidationResult): string[] {
     const suggestions: string[] = [];
 
-    if (validation.errors.some(e => e.includes('minimal'))) {
+    if (validation.errors.some((e) => e.includes('minimal'))) {
       suggestions.push('Tambah panjang password');
     }
 
-    if (validation.errors.some(e => e.includes('huruf kapital'))) {
+    if (validation.errors.some((e) => e.includes('huruf kapital'))) {
       suggestions.push('Tambah huruf kapital (A-Z)');
     }
 
-    if (validation.errors.some(e => e.includes('huruf kecil'))) {
+    if (validation.errors.some((e) => e.includes('huruf kecil'))) {
       suggestions.push('Tambah huruf kecil (a-z)');
     }
 
-    if (validation.errors.some(e => e.includes('angka'))) {
+    if (validation.errors.some((e) => e.includes('angka'))) {
       suggestions.push('Tambah angka (0-9)');
     }
 
-    if (validation.errors.some(e => e.includes('karakter khusus'))) {
+    if (validation.errors.some((e) => e.includes('karakter khusus'))) {
       suggestions.push('Tambah karakter khusus (!@#$%^&*)');
     }
 
-    if (validation.warnings.some(w => w.includes('berurutan'))) {
+    if (validation.warnings.some((w) => w.includes('berurutan'))) {
       suggestions.push('Hindari karakter berurutan (123, abc)');
     }
 
-    if (validation.warnings.some(w => w.includes('berulang'))) {
+    if (validation.warnings.some((w) => w.includes('berulang'))) {
       suggestions.push('Hindari karakter berulang (aaa, 111)');
     }
 

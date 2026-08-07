@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  PasswordValidator, 
-  validatePassword, 
-  generateStrongPassword, 
-  isPasswordValid 
+import {
+  PasswordValidator,
+  validatePassword,
+  generateStrongPassword,
+  isPasswordValid,
 } from './passwordValidator';
 
 describe('PasswordValidator', () => {
@@ -48,19 +48,19 @@ describe('PasswordValidator', () => {
     it('should reject common passwords', () => {
       const result = validatePassword('admin123!');
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(e => e.includes('umum'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('umum'))).toBe(true);
     });
 
     it('should reject passwords with forbidden patterns', () => {
       const result = validatePassword('MyKataSandi123!');
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(e => e.includes('pola umum'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('pola umum'))).toBe(true);
     });
 
     it('should calculate strength correctly', () => {
       const weakResult = validatePassword('KataSandi1!');
       expect(['weak', 'very_weak']).toContain(weakResult.strength);
-      
+
       const strongResult = validatePassword('SuperSecurePassword123!@#XYZ');
       expect(['medium', 'strong', 'very_strong']).toContain(strongResult.strength);
     });
@@ -131,19 +131,19 @@ describe('PasswordValidator', () => {
       const validation = validatePassword('kata');
       const suggestions = PasswordValidator.getSuggestions(validation);
       expect(suggestions.length).toBeGreaterThan(0);
-      expect(suggestions.some(s => s.includes('panjang'))).toBe(true);
+      expect(suggestions.some((s) => s.includes('panjang'))).toBe(true);
     });
 
     it('should provide suggestions for password without uppercase', () => {
       const validation = validatePassword('katasandi123!');
       const suggestions = PasswordValidator.getSuggestions(validation);
-      expect(suggestions.some(s => s.includes('kapital'))).toBe(true);
+      expect(suggestions.some((s) => s.includes('kapital'))).toBe(true);
     });
 
     it('should provide suggestions for password without numbers', () => {
       const validation = validatePassword('KataSandi!');
       const suggestions = PasswordValidator.getSuggestions(validation);
-      expect(suggestions.some(s => s.includes('angka'))).toBe(true);
+      expect(suggestions.some((s) => s.includes('angka'))).toBe(true);
     });
   });
 

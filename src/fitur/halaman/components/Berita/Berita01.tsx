@@ -26,19 +26,18 @@ export default function Berita01Page({ onNavigate }: PageProps) {
             Ringkasan Berita
           </h2>
           <p className="text-justify first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-5xl first-letter:leading-none first-letter:font-bold first-letter:text-blue-900">
-            Prestasi yang diraih oleh tim siswa {namaSekolahUppercase} dalam Lomba Kompetensi
-            Siswa (LKS) bidang Rekayasa Perangkat Lunak tingkat Provinsi Jawa Barat membuka
-            jendela bagi kita untuk mengamati lebih dalam dinamika pendidikan vokasi di
-            Indonesia—khususnya bagaimana kompetisi akademik berfungsi sebagai katalisator
-            transformasi kualitas pembelajaran. Kemenangan ini bukan sekadar peristiwa insidental
-            yang patut dibanggakan secara ceremonial; lebih dari itu, ia merefleksikan sebuah
-            ekosistem pendidikan yang mampu mengkonversikan potensi siswa menjadi produktivitas
-            nyata melalui pendekatan pembelajaran berbasis proyek dan bimbingan yang terstruktur.
-            Dalam konteks pendidikan kejuruan, di mana tujuan utamanya adalah mempersiapkan
-            lulusan yang siap bersaing di dunia kerja, kompetisi seperti LKS beroperasi sebagai
-            proxy—sebuah simulasi yang mendekati kondisi riil industri teknologi informasi, di
-            mana tekanan waktu, standar kualitas, dan kebutuhan inovasi harus dipenuhi secara
-            simultan.
+            Prestasi yang diraih oleh tim siswa {namaSekolahUppercase} dalam Lomba Kompetensi Siswa
+            (LKS) bidang Rekayasa Perangkat Lunak tingkat Provinsi Jawa Barat membuka jendela bagi
+            kita untuk mengamati lebih dalam dinamika pendidikan vokasi di Indonesia—khususnya
+            bagaimana kompetisi akademik berfungsi sebagai katalisator transformasi kualitas
+            pembelajaran. Kemenangan ini bukan sekadar peristiwa insidental yang patut dibanggakan
+            secara ceremonial; lebih dari itu, ia merefleksikan sebuah ekosistem pendidikan yang
+            mampu mengkonversikan potensi siswa menjadi produktivitas nyata melalui pendekatan
+            pembelajaran berbasis proyek dan bimbingan yang terstruktur. Dalam konteks pendidikan
+            kejuruan, di mana tujuan utamanya adalah mempersiapkan lulusan yang siap bersaing di
+            dunia kerja, kompetisi seperti LKS beroperasi sebagai proxy—sebuah simulasi yang
+            mendekati kondisi riil industri teknologi informasi, di mana tekanan waktu, standar
+            kualitas, dan kebutuhan inovasi harus dipenuhi secara simultan.
           </p>
         </div>
 
@@ -47,18 +46,18 @@ export default function Berita01Page({ onNavigate }: PageProps) {
             Persiapan yang dilakukan selama berbulan-bulan oleh tim {namaSekolahUppercase}
             mengindikasikan adanya proses pembelajaran yang jauh melampaui paradigma{' '}
             <i>teaching to the test</i> yang sering dikritik dalam sistem pendidikan konvensional.
-            Bimbingan intensif dari guru pembimbing tidak hanya berarti transfer pengetahuan
-            teknis semata, melainkan juga pembentukan habitus profesional—sebuah disposisi mental
-            yang memungkinkan siswa untuk berpikir kritis, bekerja dalam tim, dan mengelola
-            kompleksitas proyek teknologi.
+            Bimbingan intensif dari guru pembimbing tidak hanya berarti transfer pengetahuan teknis
+            semata, melainkan juga pembentukan habitus profesional—sebuah disposisi mental yang
+            memungkinkan siswa untuk berpikir kritis, bekerja dalam tim, dan mengelola kompleksitas
+            proyek teknologi.
           </p>
         </div>
 
         {/* Korporat Highlight / Pull Quote */}
         <blockquote className="my-8 border-l-4 border-blue-600 bg-slate-50 px-6 py-4 text-slate-800 italic md:text-lg">
           "LKS beroperasi sebagai proxy—sebuah simulasi yang mendekati kondisi riil industri
-          teknologi informasi, di mana tekanan waktu, standar kualitas, dan kebutuhan inovasi
-          harus dipenuhi secara simultan."
+          teknologi informasi, di mana tekanan waktu, standar kualitas, dan kebutuhan inovasi harus
+          dipenuhi secara simultan."
         </blockquote>
 
         <div>
@@ -67,19 +66,19 @@ export default function Berita01Page({ onNavigate }: PageProps) {
             demokratisasi akses terhadap pendidikan teknologi di Jawa Barat. Namun, demokratisasi
             dalam hal kuantitas peserta perlu dibedakan dengan kesetaraan dalam hal kualitas
             persiapan. Kemenangan {namaSekolahUppercase} mengisyaratkan adanya kesenjangan dalam
-            kapasitas infrastruktur, kualitas bimbingan, atau ekosistem pendukung yang dimiliki
-            oleh sekolah-sekolah lainnya.
+            kapasitas infrastruktur, kualitas bimbingan, atau ekosistem pendukung yang dimiliki oleh
+            sekolah-sekolah lainnya.
           </p>
         </div>
 
         <div>
           <p className="text-justify">
             Proyek aplikasi mobile yang dinilai tertinggi oleh juri menarik untuk dikaji dari sisi
-            epistemologi rekayasa perangkat lunak. Aplikasi mobile, sebagai medium yang paling
-            intim dengan kehidupan sehari-hari pengguna, menuntut pemahaman mendalam terhadap
-            perilaku manusia, konteks sosial, dan kebutuhan praktis. Inovasi dalam bidang ini
-            tidak selalu berarti menciptakan teknologi yang sepenuhnya baru, melainkan sering kali
-            berupa rekombinasi cerdas dari solusi yang ada untuk menjawab masalah spesifik.
+            epistemologi rekayasa perangkat lunak. Aplikasi mobile, sebagai medium yang paling intim
+            dengan kehidupan sehari-hari pengguna, menuntut pemahaman mendalam terhadap perilaku
+            manusia, konteks sosial, dan kebutuhan praktis. Inovasi dalam bidang ini tidak selalu
+            berarti menciptakan teknologi yang sepenuhnya baru, melainkan sering kali berupa
+            rekombinasi cerdas dari solusi yang ada untuk menjawab masalah spesifik.
           </p>
         </div>
 
@@ -102,11 +101,11 @@ export default function Berita01Page({ onNavigate }: PageProps) {
           <p className="text-justify">
             Tiket menuju tingkat nasional yang akan berlangsung pada September mendatang membawa
             konsekuensi tersendiri. Pada level provinsi, kompetisi masih beroperasi dalam kerangka
-            familiaritas—peserta berkompetisi dalam ekosistem yang relatif homogen dari segi
-            budaya, akses informasi, dan standar teknis. Namun, ketika arena beralih ke tingkat
-            nasional, variabel-variabel tersebut menjadi jauh lebih heterogen. Tim SMA NEGERI 1
-            MEDAN akan berhadapan dengan peserta dari sekolah-sekolah unggulan di provinsi lain
-            yang mungkin memiliki tradisi lebih panjang dalam rekayasa perangkat lunak.
+            familiaritas—peserta berkompetisi dalam ekosistem yang relatif homogen dari segi budaya,
+            akses informasi, dan standar teknis. Namun, ketika arena beralih ke tingkat nasional,
+            variabel-variabel tersebut menjadi jauh lebih heterogen. Tim SMA NEGERI 1 MEDAN akan
+            berhadapan dengan peserta dari sekolah-sekolah unggulan di provinsi lain yang mungkin
+            memiliki tradisi lebih panjang dalam rekayasa perangkat lunak.
           </p>
         </div>
 
@@ -124,10 +123,10 @@ export default function Berita01Page({ onNavigate }: PageProps) {
           <p className="text-justify">
             Refleksi atas kemenangan ini mengarahkan kita pada pertanyaan yang lebih luas mengenai
             arah pendidikan vokasi Indonesia. Dalam era di mana teknologi berubah dengan kecepatan
-            eksponensial, kompetensi spesifik dalam satu bahasa pemrograman atau satu kerangka
-            kerja dapat menjadi usang dalam hitungan tahun. Oleh karena itu, nilai fundamental
-            dari pengalaman LKS bukan terletak pada aplikasi mobile yang berhasil dikembangkan,
-            melainkan pada kapasitas metakognitif yang dibangun selama prosesnya.
+            eksponensial, kompetensi spesifik dalam satu bahasa pemrograman atau satu kerangka kerja
+            dapat menjadi usang dalam hitungan tahun. Oleh karena itu, nilai fundamental dari
+            pengalaman LKS bukan terletak pada aplikasi mobile yang berhasil dikembangkan, melainkan
+            pada kapasitas metakognitif yang dibangun selama prosesnya.
           </p>
         </div>
       </div>

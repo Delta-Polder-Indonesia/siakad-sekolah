@@ -72,11 +72,14 @@ export class GlobalErrorHandler {
    */
   private static handleResourceError = (event: Event): void => {
     const target = event.target as HTMLElement;
-    
+
     // Cek apakah ini error resource loading
-    if (target && (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+    if (
+      target &&
+      (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')
+    ) {
       let src = '';
-      
+
       if (target.tagName === 'IMG') {
         src = (target as HTMLImageElement).src;
       } else if (target.tagName === 'SCRIPT') {
@@ -84,7 +87,7 @@ export class GlobalErrorHandler {
       } else if (target.tagName === 'LINK') {
         src = (target as HTMLLinkElement).href;
       }
-      
+
       logger.warn('Resource loading error:', {
         tag: target.tagName,
         src: src,
