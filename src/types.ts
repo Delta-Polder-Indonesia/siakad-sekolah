@@ -589,3 +589,19 @@ export interface MataPelajaran {
   kelompok?: string; // mis. "Wajib" | "Peminatan"
   createdAt: number;
 }
+
+/** Feedback dari pengguna sistem. */
+export interface Feedback {
+  id: string;
+  name: string;
+  email?: string;
+  role: string;
+  category: 'bug' | 'saran' | 'keluhan' | 'pertanyaan' | 'lainnya';
+  subject: string;
+  message: string;
+  priority: 'rendah' | 'sedang' | 'tinggi';
+  status: 'pending' | 'dibaca' | 'diproses' | 'selesai';
+  submittedAt: number;
+  adminNotes?: string;
+  processedAt?: number;
+}

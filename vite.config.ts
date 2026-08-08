@@ -63,13 +63,47 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id
-              .toString()
-              .split('node_modules/')[1]
-              .split('/')[0];
+          // React ecosystem
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
           }
+          // PDF library
+          if (id.includes('jspdf')) {
+            return 'pdf-vendor';
+          }
+          // Icons
+          if (id.includes('lucide-react')) {
+            return 'icons-vendor';
+          }
+          // Google OAuth
+          if (id.includes('@react-oauth/google')) {
+            return 'google-vendor';
+          }
+          // Maps
+          if (id.includes('@react-google-maps/api')) {
+            return 'maps-vendor';
+          }
+          // QR code
+          if (id.includes('qrcode')) {
+            return 'qrcode-vendor';
+          }
+          // Return undefined untuk node_modules lain agar default Rollup handling
+          return undefined;
         },
+        // Cache headers untuk aset statis
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name?.split('.') || [];
+          const extType = info[info.length - 1];
+          if (/\.(css|woff|woff2|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
+            return `assets/[name]-[hash][extname]`;
+          }
+          if (/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(assetInfo.name || '')) {
+            return `assets/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
 

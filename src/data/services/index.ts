@@ -218,6 +218,21 @@ export {
   getLoginStats,
 } from './loginHistoryService';
 
+export {
+  getFeedbacks,
+  saveFeedbacks,
+  addFeedback,
+  updateFeedbackStatus,
+  getFeedbacksByStatus,
+  getFeedbacksByCategory,
+  getFeedbacksByPriority,
+  deleteFeedback,
+  sendFeedbackToEmail,
+  getFeedbackStats,
+} from './feedbackService';
+
+export type { Feedback } from './feedbackService';
+
 export type {
   Student,
   Teacher,

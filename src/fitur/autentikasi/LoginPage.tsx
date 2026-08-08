@@ -3,6 +3,9 @@ import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import { logger } from '../../utils/logger';
 import { ToastProvider } from '../../components/ui';
+import { FeedbackButton } from '../halaman/feedback';
+
+const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
 
 import {
   BACKGROUND_IMAGES,
@@ -44,6 +47,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showFeedbackPage, setShowFeedbackPage] = useState(false);
 
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
@@ -237,6 +241,16 @@ export default function LoginPage() {
 
   const currentImage = BACKGROUND_IMAGES[currentSlide];
 
+  if (showFeedbackPage) {
+    return (
+      <ToastProvider>
+        <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
+          <FeedbackPage onNavigate={() => setShowFeedbackPage(false)} />
+        </Suspense>
+      </ToastProvider>
+    );
+  }
+
   return (
     <ToastProvider>
       <div className="relative h-screen w-full overflow-hidden bg-slate-900 font-sans antialiased">
@@ -385,6 +399,9 @@ export default function LoginPage() {
             />
           )}
         </Suspense>
+
+        {/* Feedback Button */}
+        <FeedbackButton onNavigate={() => setShowFeedbackPage(true)} />
       </div>
     </ToastProvider>
   );

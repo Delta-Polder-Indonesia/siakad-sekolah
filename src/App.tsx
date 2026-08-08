@@ -8,6 +8,7 @@ import Sidebar from './layout/Sidebar';
 import { GuestBookProvider } from './fitur/tamu/context/GuestBookContext';
 import { NotificationProvider } from './fitur/bersama/NotificationProvider';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import { FeedbackButton } from './fitur/halaman/feedback';
 import { ToastProvider, lazyPage } from './components/ui';
 
 // ── Lazy-loaded page components (split by role) ──
@@ -58,6 +59,7 @@ const LazyAgendaPage = lazyPage(
 const LazyDasborKalenderAkademik = lazyPage(
   () => import('./fitur/halaman/components/KalenderAkademik/DasborKalenderAkademik')
 );
+const LazyFeedbackPage = lazyPage(() => import('./fitur/halaman/feedback/FeedbackPage'));
 
 // Guest pages
 const LazyGuestDashboard = lazyPage(() => import('./fitur/tamu/pages/GuestDashboard'));
@@ -128,6 +130,7 @@ const TEACHER_PAGES: Record<string, ComponentType<PageProps>> = {
   'personal-messages': LazyPesanMasuk,
   'teacher-announcements': LazyDaftarNamaGuru,
   'academic-agenda': LazyDasborKalenderAkademik,
+  feedback: LazyFeedbackPage,
 };
 
 const STUDENT_PAGES: Record<string, ComponentType<PageProps>> = {
@@ -146,6 +149,7 @@ const STUDENT_PAGES: Record<string, ComponentType<PageProps>> = {
   'personal-messages': LazyPesanMasuk,
   'teacher-announcements': LazyDaftarNamaGuru,
   'academic-agenda': LazyDasborKalenderAkademik,
+  feedback: LazyFeedbackPage,
 };
 
 const PARENT_PAGES: Record<string, ComponentType<PageProps>> = {
@@ -159,6 +163,7 @@ const PARENT_PAGES: Record<string, ComponentType<PageProps>> = {
   'attendance-history': LazyRiwayatAbsensiAnak,
   'letters-status': LazyStatusSuratIzinAnak,
   'bk-record': LazyCatatanBKAnak,
+  feedback: LazyFeedbackPage,
 };
 
 const GUEST_PAGES: Record<string, ComponentType<PageProps>> = {
@@ -181,6 +186,7 @@ const GUEST_PAGES: Record<string, ComponentType<PageProps>> = {
   'daftar-tamu': DaftarTamuWrapper,
   'statistik-tamu': StatistikTamuWrapper,
   profile: LazyProfileSaya,
+  feedback: LazyFeedbackPage,
 };
 
 const ADMIN_PAGES: Record<string, ComponentType<PageProps>> = {
@@ -189,6 +195,7 @@ const ADMIN_PAGES: Record<string, ComponentType<PageProps>> = {
   'school-announcements': LazyPengumumanSekolah,
   'teacher-announcements': LazyDaftarNamaGuru,
   'academic-agenda': LazyDasborKalenderAkademik,
+  feedback: LazyFeedbackPage,
 };
 
 function getPagesByRole(role?: string): Record<string, ComponentType<PageProps>> {
@@ -285,6 +292,7 @@ function AppContent() {
                 </section>
               ) : null}
             </main>
+            <FeedbackButton onNavigate={setActivePage} />
           </div>
         </ToastProvider>
       </NotificationProvider>

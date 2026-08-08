@@ -81,6 +81,12 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
+/* Font display swap untuk optimasi loading */
+@font-face {
+  font-family: 'Lora';
+  font-display: swap;
+}
+
 /* ─── SCROLLBAR CONFIGURATION ─── */
 * {
   scrollbar-width: none; /* Firefox */
