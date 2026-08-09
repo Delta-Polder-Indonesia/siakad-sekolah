@@ -16,7 +16,7 @@ const timelineData: TimelineItem[] = [
       `${namaSekolah} didirikan pada era awal pembangunan pendidikan nasional pasca-kemerdekaan. Sejarah mencatat bahwa eksistensi sekolah ini dibangun sejak sekitar tahun 1950-an, ketika Pemerintah Republik Indonesia menunjuk Angkatan Darat yang kemudian mendirikan PT Eksploitasi Tambang Minyak Sumatera Utara untuk mengelola ladang minyak di wilayah Sumatera. Kemudian perusahaan tersebut berubah nama menjadi PT Perusahaan Minyak Nasional, disingkat PERMINA, pada tanggal 10 Desember 1957 yang hingga kini diperingati sebagai hari lahirnya Pertamina.`,
       'Selama dekade pertama, sekolah memperkokoh eksistensinya sebagai satu-satunya institusi pendidikan unggulan yang mengejawantahkan semangat mencerdaskan kehidupan bangsa sesuai amanat UUD 1945.',
     ],
-    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.jpg`,
+    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.webp`,
   },
   {
     periode: '1968 – 1977',
@@ -25,7 +25,7 @@ const timelineData: TimelineItem[] = [
       'Melaksanakan adaptasi kurikulum nasional dan memperkokoh eksistensi sebagai institusi pendidikan unggulan. Memasuki dekade kedua, sekolah memaksimalkan pertumbuhan operasional dan memberikan kontribusi nyata pada pembangunan sumber daya manusia di Sumatera Utara.',
       'Pembangunan gedung baru dan laboratorium sains menjadi prioritas utama dalam pengembangan fasilitas pendidikan yang modern dan representatif.',
     ],
-    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.jpg`,
+    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.webp`,
   },
   {
     periode: '1978 – 1987',
@@ -34,7 +34,7 @@ const timelineData: TimelineItem[] = [
       'Berhasil meraih status akreditasi A dan memperkenalkan laboratorium komputer pertama di kota Medan. Pencapaian ini menjadi tonggak penting yang menempatkan sekolah sebagai pelopor modernisasi pendidikan di Sumatera Utara.',
       'Pengembangan program ekstrakurikuler yang komprehensif turut memperkuat karakter dan kompetensi siswa di luar kegiatan akademik formal.',
     ],
-    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-3.jpg`,
+    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-3.webp`,
   },
   {
     periode: '1988 – 1997',
@@ -52,7 +52,7 @@ const timelineData: TimelineItem[] = [
       'Ditetapkan sebagai Sekolah Adiwiyata tingkat nasional dan meluncurkan sistem informasi akademik daring pertama. Transformasi digital mulai dirintis sebagai bagian dari modernisasi layanan pendidikan kepada peserta didik dan orang tua.',
       'Peluncuran sistem informasi akademik daring menjadi langkah strategis menuju penyelenggaraan pendidikan yang transparan, akuntabel, dan berbasis teknologi informasi.',
     ],
-    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-5.jpg`,
+    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-5.webp`,
   },
   {
     periode: '2008 – 2023',
@@ -61,7 +61,7 @@ const timelineData: TimelineItem[] = [
       'Menyelenggarakan pembelajaran jarak jauh dan transformasi digital menyeluruh. Sekolah terus berinovasi dalam menghadapi tantangan era baru, termasuk adaptasi cepat selama masa pandemi global yang menuntut fleksibilitas tinggi dalam proses belajar mengajar.',
       'Peluncuran portal informasi terpadu serta penguatan implementasi Kurikulum Merdeka secara komprehensif menjadi wujud nyata komitmen sekolah dalam mencetak generasi yang adaptif, kreatif, dan berdaya saing global.',
     ],
-    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-6.jpg`,
+    gambar: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-6.webp`,
   },
 ];
 
@@ -155,11 +155,12 @@ export default function TonggakSejarah() {
               index === activeIndex ? 'z-[1] opacity-100' : 'z-0 opacity-0'
             }`}
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${item.gambar})` }}
-              role="img"
-              aria-label={`Foto dokumentasi periode ${item.periode}`}
+            <img
+              src={item.gambar}
+              alt={`Foto dokumentasi periode ${item.periode}`}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "auto"}
             />
             {/* Dark overlay */}
             <div className="pointer-events-none absolute inset-0 bg-black/60" />

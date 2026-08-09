@@ -59,7 +59,7 @@ export default function Berita02Page({ onNavigate }: PageProps) {
 
         {!imageError ? (
           <img
-            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.jpg`}
+            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.webp`}
             alt="Kunjungan Industri Kelas XI"
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}

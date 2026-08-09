@@ -1,16 +1,62 @@
-E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\data\berita\data.ts
+**Instruksi Perbaikan Performa Website (Aset Gambar dan Font)** 
 
-E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BeritaPage.tsx
+**1. Optimasi File Gambar (Kompresi & Format)**
+Ubah format dan ukuran fisik file gambar di folder /siakad-sekolah/images/Dashboard/ menjadi format modern (.webp) dengan dimensi yang proporsional agar tidak terjadi distorsi dan menghemat ukuran transfer data: 
 
-E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Berita
+* **Konoha-1.jpg** -> Ubah ke **Konoha-1.webp**, resize resolusi fisik menjadi **1350 x 530 piksel** (atau pertahankan rasio asli dengan lebar maksimal 1350px).
+* **Konoha-2.jpg** -> Ubah ke **Konoha-2.webp**, resize resolusi fisik menjadi **1350 x 530 piksel**.
+* **Konoha-5.jpg** -> Ubah ke **Konoha-5.webp**, resize resolusi fisik menjadi **1350 x 600 piksel**.
+* **Konoha-6.jpg** -> Ubah ke **Konoha-6.webp**, cari aset asli dengan resolusi lebih tinggi dan resize ke **1350 x 1012 piksel** (untuk menggantikan ukuran asli 516x387 yang terlalu kecil/pecah).
+* **Konoha-3.jpg** -> Ubah ke **Konoha-3.webp**, resize resolusi fisik menjadi **1350 x 527 piksel**.
 
-E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx
+**2. Perbaikan Kode HTML Component / Carousel**
+Perbarui tag <img> pada file pembungkus komponen (misalnya pada file dashboard atau komponen banner sekolah) dengan menghapus atribut width="1920" height="1080" yang tidak akurat, serta menambahkan class CSS object-cover untuk mencegah gambar melar: 
 
+html
 
+<!-- Contoh Perbaikan Komponen Gambar Fasilitas -->
+<img alt="Fasilitas Pembelajaran Modern" 
+     class="h-full w-full object-cover" 
+     loading="eager" 
+     src="/siakad-sekolah/images/Dashboard/Konoha-1.webp">
 
-catatan:
+<!-- Contoh Perbaikan Komponen Gambar Kegiatan Ekstrakurikuler -->
+<img alt="Kegiatan Ekstrakurikuler" 
+     class="h-full w-full object-cover" 
+     loading="lazy" 
+     src="/siakad-sekolah/images/Dashboard/Konoha-2.webp">
 
-jadi gini saya itu mau berita asli nya itu di  E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BeritaPage.tsx
-dan yang di bagian E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx ini hanya seperti berita klan yang di tampilkan dari E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Berita
-karna bagian E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\DataBeranda\BeritaKegiatanSection.test.tsx dia kan tidak punya halaman jadi mau saya tampilan ini di ambil dari berita 1 2 dan 3 yang untuk di tampilan di E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx
-paham iyah jadi untuk datanya di perbaiki mau saya itu 1 pintu 2 pungsi 1 di beranda yang satu di berita, agar beritanya memaki narasi yang sama 
+<!-- Contoh Perbaikan Komponen Gambar Lingkungan Belajar -->
+<img alt="Lingkungan Belajar Nyaman" 
+     class="h-full w-full object-cover" 
+     loading="lazy" 
+     src="/siakad-sekolah/images/Dashboard/Konoha-5.webp">
+
+<!-- Contoh Perbaikan Komponen Gambar Alumni -->
+<img alt="Alumni Tahun Ajaran 2024/2025" 
+     class="h-full w-full object-cover" 
+     loading="lazy" 
+     src="/siakad-sekolah/images/Dashboard/Konoha-6.webp">
+
+<!-- Contoh Perbaikan Komponen Gambar Prestasi -->
+<img alt="Prestasi Siswa Berprestasi" 
+     class="h-full w-full object-cover" 
+     loading="lazy" 
+     src="/siakad-sekolah/images/Dashboard/Konoha-3.webp">
+
+Gunakan kode dengan hati-hati.
+
+**3. Perbaikan Load Font (Eliminasi Pemblokiran Render)**
+Buka file utama index.html di folder root project, lalu perbarui pemanggilan Google Fonts di dalam tag <head> agar dimuat secara asinkron menggunakan teknik non-blocking: 
+
+html
+
+<!-- Ganti baris pemanggilan Google Fonts lama dengan baris ini -->
+<link rel="stylesheet" 
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" 
+      media="print" 
+      onload="this.media='all'">
+
+Gunakan kode dengan hati-hati.
+
+*(Catatan: Sesuaikan bagian family=Plus+Jakarta+Sans dengan nama font asli yang Anda gunakan pada project).*

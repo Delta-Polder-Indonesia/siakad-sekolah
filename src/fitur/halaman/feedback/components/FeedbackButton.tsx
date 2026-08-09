@@ -25,9 +25,9 @@ export default function FeedbackButton({ onNavigate }: FeedbackButtonProps) {
         className="transition-all duration-200 hover:scale-110 active:scale-95"
         title="Kirim Feedback"
       >
-        <img 
-          src="/images/Dashboard/hubungikami.png" 
-          alt="Hubungi Kami" 
+        <img
+          src={`${import.meta.env.BASE_URL}images/Dashboard/hubungikami.png`}
+          alt="Hubungi Kami"
           className="h-12 w-12 object-contain"
         />
       </button>

@@ -44,10 +44,10 @@ export default defineConfig(({ command }) => ({
   },
 
   // Development -> /
-  // Build (GitHub Pages) -> /projeck-portal-siswa/
+  // Build (GitHub Pages) -> /siakad-sekolah/
   // Build (Vercel) -> / (Vercel sets VERCEL env)
   base: command === 'build'
-    ? (process.env.VERCEL ? '/' : '/projeck-portal-siswa/')
+    ? (process.env.VERCEL ? '/' : '/siakad-sekolah/')
     : '/',
 
   define: {

@@ -59,7 +59,7 @@ export default function Berita04Page({ onNavigate }: PageProps) {
 
         {!imageError ? (
           <img
-            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.jpg`}
+            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.webp`}
             alt="Pembukaan PPDB Gelombang 1"
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}

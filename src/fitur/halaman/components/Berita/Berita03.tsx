@@ -59,7 +59,7 @@ export default function Berita03Page({ onNavigate }: PageProps) {
 
         {!imageError ? (
           <img
-            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.jpg`}
+            src={`${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.webp`}
             alt="Seminar Karir dan Beasiswa"
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}
