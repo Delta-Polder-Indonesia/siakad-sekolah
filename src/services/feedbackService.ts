@@ -121,10 +121,13 @@ export async function toggleFeedbackLikeApi(
 ): Promise<LikeResult> {
   return withLocalFallback(
     async () => {
-      const body = await request<ApiResponse<LikeResult>>(`/feedback/${encodeURIComponent(feedbackId)}/like`, {
-        method: 'POST',
-        body: JSON.stringify({ userId }),
-      });
+      const body = await request<ApiResponse<LikeResult>>(
+        `/feedback/${encodeURIComponent(feedbackId)}/like`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ userId }),
+        }
+      );
       return body.data;
     },
     () => {

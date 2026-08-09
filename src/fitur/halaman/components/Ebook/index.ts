@@ -7,8 +7,4 @@ export { default as Ebook6Page } from './ebook_6';
 export { default as Ebook7Page } from './ebook_7';
 export { default as Ebook8Page } from './ebook_8';
 
-export {
-  ebookData,
-  getEbookById,
-  type EbookItem,
-} from '../../data/beranda/ebook/data';
+export { ebookData, getEbookById, type EbookItem } from '../../data/beranda/ebook/data';

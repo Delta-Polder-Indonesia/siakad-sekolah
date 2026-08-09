@@ -1,9 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import {
-  captureErrorContext,
-  getErrorReportLink,
-  logger,
-} from './logger';
+import { captureErrorContext, getErrorReportLink, logger } from './logger';
 
 describe('logger', () => {
   beforeEach(() => {

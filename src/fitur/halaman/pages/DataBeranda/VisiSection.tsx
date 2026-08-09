@@ -3,7 +3,7 @@ import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
 
 export default function VisiSection() {
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(90deg,_#43AD35_0%,_#038A47_25%,_#0B6839_50%)] py-16">
+    <section className="relative overflow-hidden bg-[linear-gradient(90deg,_#43AD35_0%,_#038A47_25%,_#0B6839_50%)] py-16 font-serif">
       {/* Foto nempel kiri sebagai background */}
       <a
         href="https://youtu.be/cYndxIWek0w"

@@ -159,8 +159,8 @@ export default function TonggakSejarah() {
               src={item.gambar}
               alt={`Foto dokumentasi periode ${item.periode}`}
               className="absolute inset-0 h-full w-full object-cover"
-              loading={index === 0 ? "eager" : "lazy"}
-              fetchPriority={index === 0 ? "high" : "auto"}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : 'auto'}
             />
             {/* Dark overlay */}
             <div className="pointer-events-none absolute inset-0 bg-black/60" />

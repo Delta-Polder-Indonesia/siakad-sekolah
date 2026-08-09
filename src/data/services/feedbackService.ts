@@ -51,18 +51,22 @@ export function addFeedback(feedback: Omit<Feedback, 'id' | 'submittedAt' | 'sta
     submittedAt: Date.now(),
     status: 'pending',
   };
-  
+
   feedbacks.unshift(newFeedback); // Add to beginning
   saveFeedbacks(feedbacks);
-  
+
   return newFeedback;
 }
 
 // Update status feedback
-export function updateFeedbackStatus(id: string, status: Feedback['status'], adminNotes?: string): void {
+export function updateFeedbackStatus(
+  id: string,
+  status: Feedback['status'],
+  adminNotes?: string
+): void {
   const feedbacks = getFeedbacks();
-  const index = feedbacks.findIndex(f => f.id === id);
-  
+  const index = feedbacks.findIndex((f) => f.id === id);
+
   if (index !== -1) {
     feedbacks[index] = {
       ...feedbacks[index],
@@ -76,31 +80,34 @@ export function updateFeedbackStatus(id: string, status: Feedback['status'], adm
 
 // Mendapatkan feedback berdasarkan status
 export function getFeedbacksByStatus(status: Feedback['status']): Feedback[] {
-  return getFeedbacks().filter(f => f.status === status);
+  return getFeedbacks().filter((f) => f.status === status);
 }
 
 // Mendapatkan feedback berdasarkan kategori
 export function getFeedbacksByCategory(category: Feedback['category']): Feedback[] {
-  return getFeedbacks().filter(f => f.category === category);
+  return getFeedbacks().filter((f) => f.category === category);
 }
 
 // Mendapatkan feedback berdasarkan prioritas
 export function getFeedbacksByPriority(priority: Feedback['priority']): Feedback[] {
-  return getFeedbacks().filter(f => f.priority === priority);
+  return getFeedbacks().filter((f) => f.priority === priority);
 }
 
 // Menghapus feedback
 export function deleteFeedback(id: string): void {
-  const feedbacks = getFeedbacks().filter(f => f.id !== id);
+  const feedbacks = getFeedbacks().filter((f) => f.id !== id);
   saveFeedbacks(feedbacks);
 }
 
 // Kirim feedback ke email (menggunakan EmailJS)
-export async function sendFeedbackToEmail(feedback: Feedback, recipientEmail: string): Promise<{ success: boolean; message: string }> {
+export async function sendFeedbackToEmail(
+  feedback: Feedback,
+  recipientEmail: string
+): Promise<{ success: boolean; message: string }> {
   try {
     // Import EmailJS secara dinamis untuk menghindari import error saat development
     const emailjs = (await import('@emailjs/browser')).default;
-    
+
     const templateParams = {
       from_name: feedback.name,
       from_email: feedback.email || 'Tidak ada email',
@@ -112,43 +119,44 @@ export async function sendFeedbackToEmail(feedback: Feedback, recipientEmail: st
       to_email: recipientEmail,
       submitted_at: new Date(feedback.submittedAt).toLocaleString('id-ID'),
     };
-    
+
     // Gunakan EmailJS service ID, template ID, dan public key
     // Untuk development, kita akan menggunakan mode simulasi jika kredensial belum diset
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'default_service';
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'default_template';
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'default_public_key';
-    
+
     // Cek apakah kredensial EmailJS sudah diset
-    if (serviceId === 'default_service' || templateId === 'default_template' || publicKey === 'default_public_key') {
+    if (
+      serviceId === 'default_service' ||
+      templateId === 'default_template' ||
+      publicKey === 'default_public_key'
+    ) {
       console.log('EmailJS credentials belum diset, menggunakan mode simulasi');
       console.log('Feedback data yang akan dikirim:', templateParams);
-      
+
       // Mode simulasi - return success tapi log data
       return {
         success: true,
-        message: 'Feedback berhasil disimpan (mode simulasi - email tidak dikirim)'
+        message: 'Feedback berhasil disimpan (mode simulasi - email tidak dikirim)',
       };
     }
-    
+
     // Kirim email menggunakan EmailJS yang sebenarnya
-    const response = await emailjs.send(
-      serviceId,
-      templateId,
-      templateParams,
-      publicKey
-    );
-    
+    const response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
     return {
       success: response.status === 200,
-      message: response.status === 200 ? 'Feedback berhasil dikirim ke email admin' : 'Gagal mengirim email'
+      message:
+        response.status === 200
+          ? 'Feedback berhasil dikirim ke email admin'
+          : 'Gagal mengirim email',
     };
-    
   } catch (error) {
     console.error('Error sending feedback email:', error);
     return {
       success: false,
-      message: 'Gagal mengirim feedback ke email'
+      message: 'Gagal mengirim feedback ke email',
     };
   }
 }
@@ -156,35 +164,37 @@ export async function sendFeedbackToEmail(feedback: Feedback, recipientEmail: st
 // Mendapatkan statistik feedback
 export function getFeedbackStats() {
   const feedbacks = getFeedbacks();
-  
+
   return {
     total: feedbacks.length,
-    pending: feedbacks.filter(f => f.status === 'pending').length,
-    dibaca: feedbacks.filter(f => f.status === 'dibaca').length,
-    diproses: feedbacks.filter(f => f.status === 'diproses').length,
-    selesai: feedbacks.filter(f => f.status === 'selesai').length,
+    pending: feedbacks.filter((f) => f.status === 'pending').length,
+    dibaca: feedbacks.filter((f) => f.status === 'dibaca').length,
+    diproses: feedbacks.filter((f) => f.status === 'diproses').length,
+    selesai: feedbacks.filter((f) => f.status === 'selesai').length,
     byCategory: {
-      bug: feedbacks.filter(f => f.category === 'bug').length,
-      saran: feedbacks.filter(f => f.category === 'saran').length,
-      keluhan: feedbacks.filter(f => f.category === 'keluhan').length,
-      pertanyaan: feedbacks.filter(f => f.category === 'pertanyaan').length,
-      lainnya: feedbacks.filter(f => f.category === 'lainnya').length,
+      bug: feedbacks.filter((f) => f.category === 'bug').length,
+      saran: feedbacks.filter((f) => f.category === 'saran').length,
+      keluhan: feedbacks.filter((f) => f.category === 'keluhan').length,
+      pertanyaan: feedbacks.filter((f) => f.category === 'pertanyaan').length,
+      lainnya: feedbacks.filter((f) => f.category === 'lainnya').length,
     },
     byPriority: {
-      rendah: feedbacks.filter(f => f.priority === 'rendah').length,
-      sedang: feedbacks.filter(f => f.priority === 'sedang').length,
-      tinggi: feedbacks.filter(f => f.priority === 'tinggi').length,
+      rendah: feedbacks.filter((f) => f.priority === 'rendah').length,
+      sedang: feedbacks.filter((f) => f.priority === 'sedang').length,
+      tinggi: feedbacks.filter((f) => f.priority === 'tinggi').length,
     },
     // Rating statistics
-    averageRating: feedbacks.length > 0 && feedbacks.some(f => f.rating) 
-      ? feedbacks.filter(f => f.rating).reduce((sum, f) => sum + (f.rating || 0), 0) / feedbacks.filter(f => f.rating).length 
-      : 0,
+    averageRating:
+      feedbacks.length > 0 && feedbacks.some((f) => f.rating)
+        ? feedbacks.filter((f) => f.rating).reduce((sum, f) => sum + (f.rating || 0), 0) /
+          feedbacks.filter((f) => f.rating).length
+        : 0,
     ratingBreakdown: {
-      5: feedbacks.filter(f => f.rating === 5).length,
-      4: feedbacks.filter(f => f.rating === 4).length,
-      3: feedbacks.filter(f => f.rating === 3).length,
-      2: feedbacks.filter(f => f.rating === 2).length,
-      1: feedbacks.filter(f => f.rating === 1).length,
+      5: feedbacks.filter((f) => f.rating === 5).length,
+      4: feedbacks.filter((f) => f.rating === 4).length,
+      3: feedbacks.filter((f) => f.rating === 3).length,
+      2: feedbacks.filter((f) => f.rating === 2).length,
+      1: feedbacks.filter((f) => f.rating === 1).length,
     },
   };
 }
@@ -192,33 +202,33 @@ export function getFeedbackStats() {
 // Like/Unlike feedback
 export function toggleFeedbackLike(feedbackId: string, userId: string): void {
   const feedbacks = getFeedbacks();
-  const index = feedbacks.findIndex(f => f.id === feedbackId);
-  
+  const index = feedbacks.findIndex((f) => f.id === feedbackId);
+
   if (index !== -1) {
     const feedback = feedbacks[index];
     const likedBy = feedback.likedBy || [];
     const hasLiked = likedBy.includes(userId);
-    
+
     if (hasLiked) {
       // Unlike
-      feedback.likedBy = likedBy.filter(id => id !== userId);
+      feedback.likedBy = likedBy.filter((id) => id !== userId);
       feedback.likes = Math.max(0, (feedback.likes || 0) - 1);
     } else {
       // Like
       feedback.likedBy = [...likedBy, userId];
       feedback.likes = (feedback.likes || 0) + 1;
     }
-    
+
     saveFeedbacks(feedbacks);
   }
 }
 
 // Mendapatkan feedback dengan rating (untuk reviews)
 export function getFeedbacksWithRating(): Feedback[] {
-  return getFeedbacks().filter(f => f.rating && f.rating > 0);
+  return getFeedbacks().filter((f) => f.rating && f.rating > 0);
 }
 
 // Mendapatkan feedback berdasarkan rating
 export function getFeedbacksByRating(rating: number): Feedback[] {
-  return getFeedbacks().filter(f => f.rating === rating);
+  return getFeedbacks().filter((f) => f.rating === rating);
 }

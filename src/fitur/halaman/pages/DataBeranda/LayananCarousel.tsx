@@ -191,14 +191,16 @@ export default function LayananCarousel() {
   // Dipindahkan ke BAWAH semua Hooks agar mematuhi rules-of-hooks
   if (total === 0) {
     return (
-      <div className="overflow-hidden bg-white py-5">
+      <div className="overflow-hidden bg-white py-5 font-serif">
         <div className="relative mx-auto max-w-7xl space-y-6">
           <div className="flex flex-col">
             <span className="sec-eyebrow text-slate-900">
               {namaSekolahUppercase} Sekolah Solusi
             </span>
-            <h2 className="sec-title mb-4 text-slate-900">Layanan Unggulan Sekolah Kami</h2>
-            <p className="sec-body text-slate-600">Data layanan tidak tersedia</p>
+            <h2 className="sec-title mb-4 font-serif text-slate-900">
+              Layanan Unggulan Sekolah Kami
+            </h2>
+            <p className="sec-body font-serif text-slate-600">Data layanan tidak tersedia</p>
           </div>
         </div>
       </div>
@@ -221,13 +223,17 @@ export default function LayananCarousel() {
   };
 
   return (
-    <div className="overflow-hidden bg-white py-5">
+    <div className="overflow-hidden bg-white py-5 font-serif">
       <div className="relative mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <div className="flex flex-col px-4 sm:px-0">
-          <span className="sec-eyebrow text-slate-900">{namaSekolahUppercase} Sekolah Solusi</span>
-          <h2 className="sec-title mb-4 text-slate-900">Layanan Unggulan Sekolah Kami</h2>
-          <p className="sec-body text-slate-600">
+          <span className="sec-eyebrow font-serif text-slate-900">
+            {namaSekolahUppercase} Sekolah Solusi
+          </span>
+          <h2 className="sec-title mb-4 font-serif text-slate-900">
+            Layanan Unggulan Sekolah Kami
+          </h2>
+          <p className="sec-body font-serif text-slate-600">
             Berbagai fasilitas dan layanan terbaik untuk mendukung tumbuh kembang siswa
           </p>
         </div>

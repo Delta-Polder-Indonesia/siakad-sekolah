@@ -64,10 +64,12 @@ export default function HeroSection({ onRegister, onShowAgenda }: HeroSectionPro
         <div className="relative z-10">
           <div className="container mx-auto flex flex-col items-center justify-between gap-8 px-6 lg:flex-row lg:gap-12 lg:px-8">
             <div className="flex-1 space-y-6 text-left">
-              <p className="text-scale-0-b py-2 text-white">Selamat datang di Laman Resmi</p>
-              <h1 className="typo-hero text-white">
+              <p className="text-scale-0-b py-2 font-serif text-white">
+                Selamat datang di Laman Resmi
+              </p>
+              <h1 className="typo-hero font-serif text-white">
                 {namaSekolahUppercase} <br />
-                <span className="text-amber-400">Sekolah Unggul Masa Depan</span>
+                <span className="font-serif text-amber-400">Sekolah Unggul Masa Depan</span>
               </h1>
             </div>
 
@@ -83,10 +85,10 @@ export default function HeroSection({ onRegister, onShowAgenda }: HeroSectionPro
       <div className="relative z-20 -mt-16 px-6 lg:-mt-29 lg:px-8">
         <div className="container mx-auto">
           <div className="mx-auto max-w-5xl rounded-2xl border border-slate-500 bg-white p-6 lg:p-8">
-            <h2 className="sec-title text-slate-900">
+            <h2 className="font-serif text-3xl font-bold text-slate-900 md:text-4xl">
               Siapkah Kamu untuk bergabung Membangun Bangsa?
             </h2>
-            <p className="sec-body mt-4 text-slate-600">
+            <p className="sec-body mt-4 font-serif text-slate-600">
               "Menyediakan pendidikan berkualitas dengan kurikulum modern, fasilitas lengkap, dan
               tenaga pengajar profesional untuk mempersiapkan generasi unggul Indonesia."
             </p>
@@ -94,14 +96,14 @@ export default function HeroSection({ onRegister, onShowAgenda }: HeroSectionPro
               <button
                 type="button"
                 onClick={onRegister}
-                className="sec-btn cursor-pointer rounded-lg bg-[#0b2f9f] px-6 py-3 text-white uppercase shadow-md transition-all hover:border-slate-400 hover:bg-[#0746BD]"
+                className="sec-btn cursor-pointer rounded-lg bg-[#0b2f9f] px-6 py-3 font-serif text-white uppercase shadow-md transition-all hover:border-slate-400 hover:bg-[#0746BD]"
               >
                 Daftar Sekarang
               </button>
               <button
                 type="button"
                 onClick={onShowAgenda}
-                className="sec-btn cursor-pointer rounded-lg border-2 border-slate-300 bg-white px-6 py-3 text-slate-900 uppercase transition-all hover:border-slate-400 hover:bg-slate-50"
+                className="sec-btn cursor-pointer rounded-lg border-2 border-slate-300 bg-white px-6 py-3 font-serif text-slate-900 uppercase transition-all hover:border-slate-400 hover:bg-slate-50"
               >
                 Agenda Academic
               </button>

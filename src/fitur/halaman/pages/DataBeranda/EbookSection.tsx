@@ -8,7 +8,7 @@ interface EbookSectionProps {
 
 export default function EbookSection({ onNavigate }: EbookSectionProps) {
   return (
-    <section className="w-full bg-white font-sans">
+    <section className="w-full bg-white font-serif">
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
@@ -60,7 +60,6 @@ function EbookCard({ ebook, ebookNumber, onNavigate }: EbookCardProps) {
     if (nav) onNavigate?.(nav);
   };
 
-
   const coverSrc = ebook.coverImage
     ? `${import.meta.env.BASE_URL}${ebook.coverImage}`
     : `${import.meta.env.BASE_URL}images/Ebook/cover-placeholder.png`;
@@ -89,7 +88,7 @@ function EbookCard({ ebook, ebookNumber, onNavigate }: EbookCardProps) {
         <h3 className="sec-card-title line-clamp-1 text-slate-900 group-hover:text-emerald-700">
           {ebook.title}
         </h3>
-        <p className="sec-card-body line-clamp-3 text-sm text-slate-600 flex-1">
+        <p className="sec-card-body line-clamp-3 flex-1 text-sm text-slate-600">
           {ebook.description}
         </p>
         <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-500">

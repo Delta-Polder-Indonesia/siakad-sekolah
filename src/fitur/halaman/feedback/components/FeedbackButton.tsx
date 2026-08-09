@@ -4,7 +4,7 @@ interface FeedbackButtonProps {
 
 export default function FeedbackButton({ onNavigate }: FeedbackButtonProps) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    <div className="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-2">
       {/* Main Button */}
       <button
         type="button"

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
-import { silaServices, asaServices, layananLinks, type ServiceItemProps } from '../../data/beranda/silaAsaService/data';
+import {
+  silaServices,
+  asaServices,
+  layananLinks,
+  type ServiceItemProps,
+} from '../../data/beranda/silaAsaService/data';
 import { resolveSilaAsaNav } from './detailNav';
 
 const CheckIcon = ({ className }: { className?: string }) => (
@@ -140,10 +145,10 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                     src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
                   />
                 </div>
-                <h2 className="sec-subtitle mb-2 text-white">
+                <h2 className="sec-subtitle mb-2 font-serif text-white">
                   Kini, kamu bisa mengakses berbagai layanan administratif dengan lebih mudah.
                 </h2>
-                <p className="sec-body mb-3 font-light text-white">
+                <p className="sec-body mb-3 font-serif font-light text-white">
                   Dengan Putri (Sistem Informasi Layanan Administrasi) {namaSekolahUppercase},
                   proses administrasi yang sebelumnya rumit kini menjadi lebih mudah dan efisien.
                   Semua kebutuhan administratif siswa terintegrasi dalam satu pintu digital,
@@ -156,7 +161,9 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <span className="sec-btn font-semibold text-green-500">Kunjungi Putri</span>
+                  <span className="sec-btn font-serif font-semibold text-green-500">
+                    Kunjungi Putri
+                  </span>
                   <ArrowIcon className="ease h-2.5 w-2.5 text-green-500 transition-all duration-300 group-hover:translate-x-1 lg:h-3 lg:w-3" />
                 </a>
               </div>
@@ -212,10 +219,10 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                     src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
                   />
                 </div>
-                <h2 className="sec-subtitle mb-2 text-white">
+                <h2 className="sec-subtitle mb-2 font-serif text-white">
                   Mengajukan berbagai dokumen akademik sekarang lebih mudah dan efisien.
                 </h2>
-                <p className="sec-body mb-3 font-light text-white">
+                <p className="sec-body mb-3 font-serif font-light text-white">
                   Dari pengurusan ujian akhir hingga permohonan magang, Putra (Aplikasi Satu Atap)
                   mengakomodasi semua layanan permohonan dengan mudah melalui satu platform digital.
                   Hilangkan kerumitan dan percepat penyelesaian urusan akademik, memberikan
@@ -227,7 +234,9 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <span className="sec-btn font-semibold text-green-500">Kunjungi Putra</span>
+                  <span className="sec-btn font-serif font-semibold text-green-500">
+                    Kunjungi Putra
+                  </span>
                   <ArrowIcon className="ease h-2.5 w-2.5 text-green-500 transition-all duration-300 group-hover:translate-x-1 lg:h-3 lg:w-3" />
                 </a>
               </div>

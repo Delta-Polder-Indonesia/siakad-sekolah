@@ -35,11 +35,7 @@ export function printViaBlob(html: string, opts: PrintOptions = {}): void {
 
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
-  const printWindow = window.open(
-    url,
-    '_blank',
-    `${width},${height},scrollbars=yes,resizable=yes`
-  );
+  const printWindow = window.open(url, '_blank', `${width},${height},scrollbars=yes,resizable=yes`);
 
   if (!printWindow) {
     URL.revokeObjectURL(url);

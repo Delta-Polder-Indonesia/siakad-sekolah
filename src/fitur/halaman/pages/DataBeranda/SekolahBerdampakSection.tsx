@@ -50,11 +50,11 @@ export default function KampusBerdampakSection({
           <div className="relative z-10 flex h-full max-w-[560px] flex-col justify-center gap-6">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <span className="sec-eyebrow text-lime-300">{titleTag}</span>
-                <h2 className="sec-title text-white">{headline}</h2>
+                <span className="sec-eyebrow font-serif text-lime-300">{titleTag}</span>
+                <h2 className="sec-title font-serif text-white">{headline}</h2>
               </div>
 
-              <p className="sec-body text-white">{description}</p>
+              <p className="sec-body font-serif text-white">{description}</p>
 
               {/* Badge/Tags */}
               <div className="flex flex-wrap gap-2">
@@ -63,7 +63,7 @@ export default function KampusBerdampakSection({
                     key={index}
                     className="flex items-center justify-center rounded-md border border-white/40 bg-white/10 px-3 py-1 backdrop-blur-sm"
                   >
-                    <span className="sec-meta font-medium text-white">{tag}</span>
+                    <span className="sec-meta font-serif font-medium text-white">{tag}</span>
                   </div>
                 ))}
               </div>
@@ -74,7 +74,7 @@ export default function KampusBerdampakSection({
               href={`/id/${buttonLink}`}
               onClick={(e) => handleLinkClick(e, buttonLink)}
               aria-label={titleTag}
-              className="group mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-emerald-600 bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition-all duration-200 hover:bg-emerald-50 hover:shadow-md"
+              className="group mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-emerald-600 bg-white px-4 py-2 font-serif font-semibold text-emerald-700 shadow-sm transition-all duration-200 hover:bg-emerald-50 hover:shadow-md"
             >
               <span>{buttonText}</span>
               <svg

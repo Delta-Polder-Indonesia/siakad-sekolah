@@ -39,9 +39,8 @@ export function captureErrorContext(
  */
 export function getErrorReportLink(report: ErrorReport): string {
   // Potong pesan agar URL tidak terlalu panjang (mencegah error pada browser mail client)
-  const safeMessage = report.message.length > 100 
-    ? `${report.message.slice(0, 97)}...` 
-    : report.message;
+  const safeMessage =
+    report.message.length > 100 ? `${report.message.slice(0, 97)}...` : report.message;
 
   const subject = encodeURIComponent(`[Laporan Bug SIAKAD] - ${safeMessage}`);
 

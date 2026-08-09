@@ -29,7 +29,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
   const secondaryItems = filteredItems.slice(1, 3);
 
   return (
-    <section className="w-full bg-white font-sans">
+    <section className="w-full bg-white font-serif">
       {/* 1. Header Hero Banner dengan Gambar Absolute Kanan (Gaya USU) */}
       <section className="relative flex min-h-[300px] w-full items-center overflow-hidden bg-emerald-800 md:min-h-[380px]">
         {/* Foto Samping Kanan */}

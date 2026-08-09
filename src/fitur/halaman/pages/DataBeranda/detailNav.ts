@@ -4,11 +4,7 @@
 // dikembalikan sebagai null — pemanggil cukup melewatkan navigasi (no-op),
 // sehingga tidak nyasar ke Beranda seperti perilaku default switch sebelumnya.
 
-const RISET_LINKS = new Set([
-  'riset-air-bersih',
-  'riset-infrastruktur',
-  'riset-digitalisasi',
-]);
+const RISET_LINKS = new Set(['riset-air-bersih', 'riset-infrastruktur', 'riset-digitalisasi']);
 
 const SDGS_MIN = 1;
 const SDGS_MAX = 17;
@@ -79,8 +75,5 @@ export const resolveRegNav = (rawId?: string | number): string | null => {
 export const resolveBeritaNav = (rawId?: string | number): string | null => {
   if (rawId === undefined || rawId === null || rawId === '') return null;
   const n = Number(String(rawId).replace(/^berita-/, ''));
-  return Number.isInteger(n) && n >= BERITA_MIN && n <= BERITA_MAX
-    ? `berita-${n}`
-    : null;
+  return Number.isInteger(n) && n >= BERITA_MIN && n <= BERITA_MAX ? `berita-${n}` : null;
 };
-

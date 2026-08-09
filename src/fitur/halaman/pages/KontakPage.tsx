@@ -14,12 +14,7 @@ import {
   emailDomain,
   mapsQuery,
 } from '../components/Profile/dataSekolah';
-import {
-  CONTACT_INFO,
-  MAPS_URL,
-  MAPS_EXTERNAL_URL,
-  TIM_DAPODIK,
-} from '../data/kontak/data';
+import { CONTACT_INFO, MAPS_URL, MAPS_EXTERNAL_URL, TIM_DAPODIK } from '../data/kontak/data';
 
 // ============================================================
 // Sub-component: InfoItem

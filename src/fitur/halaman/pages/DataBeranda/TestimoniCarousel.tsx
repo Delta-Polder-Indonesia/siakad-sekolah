@@ -209,13 +209,13 @@ export default function TestimoniCarousel() {
       <div className="overflow-hidden bg-[#ECF5FE] py-5">
         <div className="relative mx-auto max-w-7xl space-y-6">
           <div className="flex flex-col px-4 sm:px-0">
-            <span className="sec-eyebrow text-slate-900">
+            <span className="sec-eyebrow font-serif text-slate-900">
               {namaSekolahUppercase} Sekolah Solusi
             </span>
-            <h2 className="sec-title mb-4 text-slate-900">
+            <h2 className="sec-title mb-4 font-serif text-slate-900">
               Cerita Mereka di {namaSekolahUppercase}
             </h2>
-            <p className="sec-body text-slate-600">Data testimoni tidak tersedia</p>
+            <p className="sec-body font-serif text-slate-600">Data testimoni tidak tersedia</p>
           </div>
         </div>
       </div>
@@ -242,9 +242,13 @@ export default function TestimoniCarousel() {
       <div className="relative mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <div className="flex flex-col px-4 sm:px-0">
-          <span className="sec-eyebrow text-slate-900">{namaSekolahUppercase} Sekolah Solusi</span>
-          <h2 className="sec-title mb-4 text-slate-900">Cerita Mereka di {namaSekolahUppercase}</h2>
-          <p className="sec-body text-slate-600">
+          <span className="sec-eyebrow font-serif text-slate-900">
+            {namaSekolahUppercase} Sekolah Solusi
+          </span>
+          <h2 className="sec-title mb-4 font-serif text-slate-900">
+            Cerita Mereka di {namaSekolahUppercase}
+          </h2>
+          <p className="sec-body font-serif text-slate-600">
             Simak pengalaman langsung dari para guru dan kepala sekolah
           </p>
         </div>

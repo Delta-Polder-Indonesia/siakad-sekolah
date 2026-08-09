@@ -145,7 +145,9 @@ export default function PengaturanAkun() {
         // Token kedaluwarsa/tidak valid — jangan blokir; simpan lokal & beri tahu.
         // Kalau bukan masalah autentikasi (password lama salah dll.), blokir simpan.
         if (result.authFailed) {
-          setMessage('Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.');
+          setMessage(
+            'Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.'
+          );
         } else {
           setError(result.message || 'Gagal mengubah kata sandi di server.');
           return;
@@ -204,7 +206,9 @@ export default function PengaturanAkun() {
       if (!result.ok) {
         // Token kedaluwarsa/tidak valid — jangan blokir; simpan lokal & beri tahu.
         if (result.authFailed) {
-          setMessage('Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.');
+          setMessage(
+            'Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.'
+          );
         } else {
           setError(result.message || 'Gagal mengubah kata sandi di server.');
           return;
@@ -250,9 +254,7 @@ export default function PengaturanAkun() {
 
         {hasApi && (
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Kata Sandi Lama
-            </label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Kata Sandi Lama</label>
             <input
               type="password"
               value={oldPassword}

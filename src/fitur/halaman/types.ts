@@ -125,4 +125,3 @@ export type NavItem =
 export interface PageProps {
   onNavigate?: (menu: NavItem) => void;
 }
-

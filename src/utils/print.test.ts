@@ -8,9 +8,7 @@ describe('escapeHtml', () => {
   });
 
   it('meng-escape karakter HTML dangerous', () => {
-    expect(escapeHtml('<script>alert(1)</script>')).toBe(
-      '&lt;script&gt;alert(1)&lt;/script&gt;'
-    );
+    expect(escapeHtml('<script>alert(1)</script>')).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(escapeHtml('a & b < c > d')).toBe('a &amp; b &lt; c &gt; d');
   });
 
@@ -50,9 +48,12 @@ describe('printViaBlob', () => {
     };
 
     window.open = vi.fn(() => mockWindow as unknown as Window);
-    vi.stubGlobal('Blob', class {
-      constructor(public parts: unknown[]) {}
-    });
+    vi.stubGlobal(
+      'Blob',
+      class {
+        constructor(public parts: unknown[]) {}
+      }
+    );
     vi.stubGlobal('URL', {
       createObjectURL: vi.fn(() => 'blob:mock-url'),
       revokeObjectURL: mockRevoke,

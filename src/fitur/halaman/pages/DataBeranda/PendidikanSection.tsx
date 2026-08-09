@@ -23,7 +23,7 @@ export default function PendidikanSection({
   };
 
   return (
-    <section className="w-full bg-white py-12 md:py-16">
+    <section className="w-full bg-white py-12 font-serif md:py-16">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8 max-md:mb-6 md:gap-12 lg:gap-16">
           <img

@@ -202,17 +202,15 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                     <tr>
                       <td className="py-2.5 font-bold text-gray-900">Admin PPDB</td>
                       <td className="py-2.5 font-mono text-xs text-gray-900">admin</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-gray-900">
-                        (env)
-                      </td>
+                      <td className="py-2.5 text-right font-mono text-xs text-gray-900">(env)</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <p className="mt-1 text-xs text-gray-900 italic">
                 *Akun admin PPDB dikonfigurasi administrator melalui variabel{' '}
-                <code className="font-mono">VITE_ADMIN_PIN</code> — tidak dicantumkan di
-                dalam aplikasi. Akses tersedia hanya melalui panel penerimaan siswa baru.
+                <code className="font-mono">VITE_ADMIN_PIN</code> — tidak dicantumkan di dalam
+                aplikasi. Akses tersedia hanya melalui panel penerimaan siswa baru.
               </p>
             </div>
 

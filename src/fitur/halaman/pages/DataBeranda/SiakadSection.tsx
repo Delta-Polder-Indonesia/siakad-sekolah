@@ -14,7 +14,7 @@ export default function SiakadSection({
       1. '-mt-36' & 'z-20' menjaga agar background biru tetap naik ke atas menimpa section banner.
       2. 'pb-16 px-4 md:px-12' memberikan ruang bawah dan samping.
     */
-    <section className="z-20 -mt-36 w-full bg-gradient-to-b from-[#dff5f8] via-[#eef9fa] via-95% to-white px-4 pb-16 font-sans md:px-12">
+    <section className="z-20 -mt-36 w-full bg-gradient-to-b from-[#dff5f8] via-[#eef9fa] via-95% to-white px-4 pb-16 font-serif md:px-12">
       {/* 
         3. 'pt-44' atau 'pt-48' ditambahkan DI SINI untuk menurunkan teks & gambar 
            secara aman ke bawah card banner tanpa menggeser background birunya.

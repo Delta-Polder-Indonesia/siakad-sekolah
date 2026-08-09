@@ -1,6 +1,11 @@
 import React from 'react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
-import { DEFAULT_ARTICLES, DEFAULT_SDGS, type ResearchArticle, type SdgsItem } from '../../data/beranda/researchArticle/data';
+import {
+  DEFAULT_ARTICLES,
+  DEFAULT_SDGS,
+  type ResearchArticle,
+  type SdgsItem,
+} from '../../data/beranda/researchArticle/data';
 import { resolveRisetNav, resolveSdgsNav } from './detailNav';
 
 export interface ResearchArticleSectionProps {
@@ -65,7 +70,7 @@ export default function ResearchArticleSection({
                     <span className="sec-eyebrow text-lime-300">
                       {namaSekolahUppercase} Sekolah Solusi
                     </span>
-                    <h2 className="sec-title text-white">
+                    <h2 className="sec-title font-serif text-white">
                       Menggerakkan Innovation & Research Berdampak untuk Indonesia Emas 2045
                     </h2>
                   </div>
@@ -76,7 +81,7 @@ export default function ResearchArticleSection({
             {/* Bagian Peran dan Marquee SDGs */}
             <div className="flex flex-col gap-6 md:flex-row md:items-center">
               <div className="flex shrink-0 flex-col gap-4 md:w-[320px] md:flex-row md:items-center">
-                <span className="sec-subtitle bg-[linear-gradient(270deg,_#43AD35_1.19%,_#038A47_25.6%,_#0B6839_50%)] bg-clip-text font-bold text-transparent">
+                <span className="sec-subtitle bg-[linear-gradient(270deg,_#43AD35_1.19%,_#038A47_25.6%,_#0B6839_50%)] bg-clip-text font-serif text-transparent">
                   Peran {namaSekolahUppercase} dalam Inovasi Berdampak
                 </span>
                 <div className="h-0.5 w-16 border-b border-orange-400 md:h-16 md:w-0 md:border-r"></div>
@@ -124,16 +129,16 @@ export default function ResearchArticleSection({
                     {/* Kategori Artikel */}
                     <div className="flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1">
                       <span className="h-2 w-2 rounded-full bg-emerald-600"></span>
-                      <span className="sec-meta font-semibold text-emerald-800">
+                      <span className="sec-meta font-serif font-semibold text-emerald-800">
                         {primaryArticle.category}
                       </span>
                     </div>
                     {/* Judul Artikel */}
-                    <span className="sec-card-title line-clamp-2 text-white">
+                    <span className="sec-card-title line-clamp-2 font-serif text-white">
                       {primaryArticle.title}
                     </span>
                     {/* Tanggal Artikel */}
-                    <span className="sec-meta font-normal text-slate-200">
+                    <span className="sec-meta font-serif font-normal text-slate-200">
                       {primaryArticle.date}
                     </span>
                   </div>
@@ -157,16 +162,18 @@ export default function ResearchArticleSection({
                         {/* Kategori Artikel Sekunder */}
                         <div className="flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
-                          <span className="sec-meta font-semibold text-emerald-800">
+                          <span className="sec-meta font-serif font-semibold text-emerald-800">
                             {article.category}
                           </span>
                         </div>
                         {/* Judul Artikel Sekunder */}
-                        <span className="sec-card-title line-clamp-2 text-white">
+                        <span className="sec-card-title line-clamp-2 font-serif text-white">
                           {article.title}
                         </span>
                         {/* Tanggal Artikel Sekunder */}
-                        <span className="sec-meta font-normal text-slate-200">{article.date}</span>
+                        <span className="sec-meta font-serif font-normal text-slate-200">
+                          {article.date}
+                        </span>
                       </div>
                     </a>
                   ))}
@@ -174,7 +181,7 @@ export default function ResearchArticleSection({
 
                 {/* Deskripsi Tambahan dan Tombol Tautan */}
                 <div className="mt-2 flex flex-col gap-4">
-                  <p className="sec-body text-slate-800">
+                  <p className="sec-body font-serif text-slate-800">
                     Kami berperan aktif dalam inovasi yang berdampak melalui berbagai cara, termasuk
                     pengembangan riset dan kolaborasi dengan berbagai pihak. {namaSekolahUppercase}
                     berupaya menghasilkan inovasi yang tidak hanya bermanfaat bagi sivitas

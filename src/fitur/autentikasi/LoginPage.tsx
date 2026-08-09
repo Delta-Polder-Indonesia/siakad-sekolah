@@ -244,7 +244,11 @@ export default function LoginPage() {
   if (showFeedbackPage) {
     return (
       <ToastProvider>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center text-white">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex h-screen items-center justify-center text-white">Loading...</div>
+          }
+        >
           <FeedbackPage onNavigate={() => setShowFeedbackPage(false)} />
         </Suspense>
       </ToastProvider>
@@ -326,9 +330,7 @@ export default function LoginPage() {
               <span className="text-white">{currentImage.caption}</span>
             </div>
 
-            <h1 className="mb-5 max-w-[1000px] text-4xl leading-tight font-bold tracking-tight text-white drop-shadow-lg sm:text-5xl md:text-6xl">
-              {currentImage.caption}
-            </h1>
+            <h2 className="text-3xl font-bold text-white/90 md:text-4xl">{currentImage.caption}</h2>
 
             <p className="mb-10 max-w-[900px] text-sm leading-8 text-white/90 sm:text-base">
               {currentImage.description}

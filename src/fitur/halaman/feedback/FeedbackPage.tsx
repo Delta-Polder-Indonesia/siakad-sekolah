@@ -51,7 +51,9 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   // Load real feedback data (dari backend kalau aktif, else localStorage)
   const [reviews, setReviews] = useState<Feedback[]>([]);
   const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
-  const [feedbackStats, setFeedbackStats] = useState<Awaited<ReturnType<typeof fetchFeedbackStats>> | null>(null);
+  const [feedbackStats, setFeedbackStats] = useState<Awaited<
+    ReturnType<typeof fetchFeedbackStats>
+  > | null>(null);
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
   const refreshReviews = useCallback(async () => {
@@ -102,17 +104,16 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   // Persentase bar dihitung dari total review yang ber-rating — kalau pakai
   // totalReviews (termasuk feedback tanpa rating) angkanya jadi salah.
   const totalRated = ratingCounts.reduce((sum, n) => sum + n, 0);
-  const ratingBreakdown = totalRated > 0
-    ? ratingCounts.map((count) => (count / totalRated) * 100)
-    : [0, 0, 0, 0, 0];
+  const ratingBreakdown =
+    totalRated > 0 ? ratingCounts.map((count) => (count / totalRated) * 100) : [0, 0, 0, 0, 0];
 
   const handleLike = async (feedbackId: string) => {
     if (!user?.id) return;
 
     // Optimistik UI
-    setLikedReviews(prev => ({
+    setLikedReviews((prev) => ({
       ...prev,
-      [feedbackId]: !prev[feedbackId]
+      [feedbackId]: !prev[feedbackId],
     }));
 
     try {
@@ -122,9 +123,9 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
     } catch (error) {
       console.error('Error toggling feedback like:', error);
       // Revert optimistic UI agar tidak melenceng dari data sebenarnya
-      setLikedReviews(prev => ({
+      setLikedReviews((prev) => ({
         ...prev,
-        [feedbackId]: !prev[feedbackId]
+        [feedbackId]: !prev[feedbackId],
       }));
     }
   };
@@ -133,9 +134,8 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
     setActiveFilter(filter);
   };
 
-  const filteredReviews = activeFilter === 'all'
-    ? reviews
-    : reviews.filter(review => review.rating === activeFilter);
+  const filteredReviews =
+    activeFilter === 'all' ? reviews : reviews.filter((review) => review.rating === activeFilter);
 
   // Helper function to generate avatar URL based on user name
   const generateAvatarUrl = (name: string): string => {
@@ -270,8 +270,12 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
                 <MessageSquare className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">{view === 'reviews' ? 'Ratings & Reviews' : 'Form Feedback'}</h1>
-                <p className="text-xs text-gray-500">{view === 'reviews' ? 'Portal Pengaduan & Masukan' : 'Isi formulir di bawah ini'}</p>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {view === 'reviews' ? 'Ratings & Reviews' : 'Form Feedback'}
+                </h1>
+                <p className="text-xs text-gray-500">
+                  {view === 'reviews' ? 'Portal Pengaduan & Masukan' : 'Isi formulir di bawah ini'}
+                </p>
               </div>
             </div>
           </div>
@@ -289,7 +293,7 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
               })}
             </div>
           )}

@@ -98,8 +98,7 @@ export async function changePortalPassword(opts: {
     return { ok: false, message: 'Tidak ada sesi backend yang aktif.' };
   }
 
-  const path =
-    opts.role === 'teacher' ? 'change-password/teacher' : 'change-password/student';
+  const path = opts.role === 'teacher' ? 'change-password/teacher' : 'change-password/student';
   const body =
     opts.role === 'teacher'
       ? { teacherId: opts.userId, oldPassword: opts.oldPassword, newPassword: opts.newPassword }
