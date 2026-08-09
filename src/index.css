@@ -115,8 +115,10 @@ body,
 }
 
 /* ─── ACCESSIBILITY — Keyboard focus ─── */
-/* Garis fokus jelas untuk navigasi keyboard (tidak mengubah desain hover). */
-:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+/* Garis fokus jelas untuk navigasi keyboard (tidak mengubah desain hover).
+   input/select/textarea tidak disertakan karena sudah punya indikator
+   fokus sendiri (border/focus ring) sehingga outline default malah dobel. */
+:where(button, a, summary, [tabindex]):focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
