@@ -36,6 +36,7 @@ export default defineConfig(({ command }) => ({
     },
     headers: {
       // Security Headers untuk development
+      'Content-Security-Policy': "frame-ancestors 'none'",
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',

@@ -19,7 +19,7 @@ export const THEMES = [
     label: 'Unggul',
     main: 'hijau/Utama.png',
     layers: [
-      ['vase', 'hijau/w96.png'],
+      ['vase', 'hijau/vase.png'],
       ['tea', 'hijau/tea.png'],
       ['slipper', 'hijau/slipper.png'],
       ['picture', 'hijau/picture.png'],

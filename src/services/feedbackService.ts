@@ -38,6 +38,19 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   return body as T;
 };
 
+// Backend dianggap aktif kalau VITE_API_BASE_URL diset. Tapi kalau server-nya
+// mati (mis. belum dijalankan saat development), fetch akan gagal. Supaya fitur
+// feedback tetap berfungsi, semua operasi API di-fallback ke localStorage.
+const withLocalFallback = async <T>(apiCall: () => Promise<T>, localCall: () => T): Promise<T> => {
+  if (!hasApi) return localCall();
+  try {
+    return await apiCall();
+  } catch (error) {
+    console.warn('API tidak tersedia, fallback ke penyimpanan lokal:', error);
+    return localCall();
+  }
+};
+
 // Konversi record backend → bentuk Feedback frontend.
 const toFeedback = (row: Record<string, unknown>): Feedback => {
   const likedBy = (() => {
@@ -70,42 +83,58 @@ const toFeedback = (row: Record<string, unknown>): Feedback => {
 };
 
 export async function fetchFeedbackReviews(): Promise<Feedback[]> {
-  if (!hasApi) return getFeedbacksWithRatingLocal();
-  const body = await request<ApiResponse<Array<Record<string, unknown>>>>('/feedback');
-  return (body.data || []).map(toFeedback).filter((f) => f.rating && f.rating > 0);
+  return withLocalFallback(
+    async () => {
+      const body = await request<ApiResponse<Array<Record<string, unknown>>>>('/feedback');
+      return (body.data || []).map(toFeedback).filter((f) => f.rating && f.rating > 0);
+    },
+    () => getFeedbacksWithRatingLocal()
+  );
 }
 
 export async function fetchFeedbackStats(): Promise<FeedbackStats> {
-  if (!hasApi) return getFeedbackStatsLocal();
-  const body = await request<ApiResponse<FeedbackStats>>('/feedback/stats');
-  return body.data;
+  return withLocalFallback(
+    async () => {
+      const body = await request<ApiResponse<FeedbackStats>>('/feedback/stats');
+      return body.data;
+    },
+    () => getFeedbackStatsLocal()
+  );
 }
 
 export async function submitFeedback(input: FeedbackInput): Promise<Feedback> {
-  if (!hasApi) return addFeedbackLocal(input);
-  const body = await request<ApiResponse<Record<string, unknown>>>('/feedback', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  });
-  return toFeedback(body.data);
+  return withLocalFallback(
+    async () => {
+      const body = await request<ApiResponse<Record<string, unknown>>>('/feedback', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+      return toFeedback(body.data);
+    },
+    () => addFeedbackLocal(input)
+  );
 }
 
 export async function toggleFeedbackLikeApi(
   feedbackId: string,
   userId: string
 ): Promise<LikeResult> {
-  if (!hasApi) {
-    toggleFeedbackLikeLocal(feedbackId, userId);
-    const updated = getFeedbacksWithRatingLocal().find((f) => f.id === feedbackId);
-    return {
-      id: feedbackId,
-      likes: updated?.likes || 0,
-      liked: Boolean(updated?.likedBy?.includes(userId)),
-    };
-  }
-  const body = await request<ApiResponse<LikeResult>>(`/feedback/${encodeURIComponent(feedbackId)}/like`, {
-    method: 'POST',
-    body: JSON.stringify({ userId }),
-  });
-  return body.data;
+  return withLocalFallback(
+    async () => {
+      const body = await request<ApiResponse<LikeResult>>(`/feedback/${encodeURIComponent(feedbackId)}/like`, {
+        method: 'POST',
+        body: JSON.stringify({ userId }),
+      });
+      return body.data;
+    },
+    () => {
+      toggleFeedbackLikeLocal(feedbackId, userId);
+      const updated = getFeedbacksWithRatingLocal().find((f) => f.id === feedbackId);
+      return {
+        id: feedbackId,
+        likes: updated?.likes || 0,
+        liked: Boolean(updated?.likedBy?.includes(userId)),
+      };
+    }
+  );
 }
