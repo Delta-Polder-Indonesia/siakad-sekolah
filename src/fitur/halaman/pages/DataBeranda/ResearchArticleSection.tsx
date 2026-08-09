@@ -1,77 +1,26 @@
 import React from 'react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
+import { DEFAULT_ARTICLES, DEFAULT_SDGS, type ResearchArticle, type SdgsItem } from '../../data/beranda/researchArticle/data';
+import { resolveRisetNav, resolveSdgsNav } from './detailNav';
 
-// Mendefinisikan Tipe Data untuk Artikel Penelitian
-export interface ResearchArticle {
-  id: string;
-  title: string;
-  date: string;
-  category: string;
-  link: string;
-  bgImageSrc: string;
-}
-
-// Mendefinisikan Tipe Data untuk Item SDGs
-export interface SdgsItem {
-  id: string;
-  title: string;
-  imageSrc: string;
-  link: string;
-}
-
-// Mendefinisikan Tipe Data Props untuk Komponen
 export interface ResearchArticleSectionProps {
   onNavigate?: (path: string) => void;
   articles?: ResearchArticle[];
   sdgsList?: SdgsItem[];
 }
 
-// Data Default untuk Artikel Penelitian
-const DEFAULT_ARTICLES: ResearchArticle[] = [
-  {
-    id: '1',
-    title: 'Inovasi Sistem Pengolahan Air Bersih Sekolah Berbasis Karbon Aktif',
-    date: '18 Juni 2026',
-    category: 'Artikel Penelitian',
-    link: 'riset-air-bersih',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
-  },
-  {
-    id: '2',
-    title: 'Pengembangan Bahan Ramah Lingkungan untuk Infrastruktur Sekolah',
-    date: '18 Juni 2026',
-    category: 'Artikel Penelitian',
-    link: 'riset-infrastruktur',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
-  },
-  {
-    id: '3',
-    title: 'Strategi Digitalisasi Pembelajaran Bagi Generasi Muda di Indonesia',
-    date: '18 Juni 2026',
-    category: 'Artikel Penelitian',
-    link: 'riset-digitalisasi',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
-  },
-];
-
-// Data Default untuk Item SDGs (17 Goal)
-const DEFAULT_SDGS: SdgsItem[] = Array.from({ length: 17 }, (_, index) => ({
-  id: `sdgs-${index + 1}`,
-  title: `SDGs ${index + 1}`,
-  imageSrc: `${import.meta.env.BASE_URL}images/HalamanKami/Beranda/icon/sdgs-${index + 1}.png`, // Menggunakan BASE_URL agar muncul di GitHub Pages
-  link: `sdgs-${index + 1}`,
-}));
-
 export default function ResearchArticleSection({
   onNavigate,
   articles = DEFAULT_ARTICLES,
   sdgsList = DEFAULT_SDGS,
 }: ResearchArticleSectionProps) {
-  // Fungsi untuk menangani navigasi jika onNavigate prop disediakan
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+  // Fungsi untuk menangani navigasi jika onNavigate prop disediakan.
+  // path yang null (id out-of-range) dinavigasikan → no-op, tapi preventDefault
+  // tetap dijalankan agar browser tidak pindah ke URL yang tidak ada.
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string | null) => {
     if (onNavigate) {
       e.preventDefault();
-      onNavigate(path);
+      if (path) onNavigate(path);
     }
   };
 
@@ -141,7 +90,7 @@ export default function ResearchArticleSection({
                     <a
                       key={`${sdg.id}-${idx}`}
                       href={`/id/sdgs/${sdg.link}`}
-                      onClick={(e) => handleLinkClick(e, `sdgs/${sdg.link}`)}
+                      onClick={(e) => handleLinkClick(e, resolveSdgsNav(sdg.link))}
                       className="shrink-0 px-1"
                       title={sdg.title}
                     >
@@ -166,7 +115,7 @@ export default function ResearchArticleSection({
               <div className="flex flex-col gap-4 md:w-1/2">
                 <a
                   href={`/id/riset/${primaryArticle.link}`}
-                  onClick={(e) => handleLinkClick(e, `riset/${primaryArticle.link}`)}
+                  onClick={(e) => handleLinkClick(e, resolveRisetNav(primaryArticle.link))}
                   style={{ backgroundImage: `url('${primaryArticle.bgImageSrc}')` }}
                   className="group relative flex aspect-[3/2] w-full flex-col justify-end overflow-hidden rounded-xl bg-cover bg-center p-6 shadow-md transition-all duration-300 hover:shadow-xl"
                 >
@@ -199,7 +148,7 @@ export default function ResearchArticleSection({
                     <a
                       key={article.id}
                       href={`/id/riset/${article.link}`}
-                      onClick={(e) => handleLinkClick(e, `riset/${article.link}`)}
+                      onClick={(e) => handleLinkClick(e, resolveRisetNav(article.link))}
                       style={{ backgroundImage: `url('${article.bgImageSrc}')` }}
                       className="group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-xl bg-cover bg-center p-5 shadow-md transition-all duration-300 hover:shadow-xl"
                     >

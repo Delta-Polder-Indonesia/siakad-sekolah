@@ -7,7 +7,7 @@ import { logger } from '../config/logger.js';
 
 // Login schema
 export const loginSchema = z.object({
-  role: z.enum(['GURU', 'MURID', 'TAMU']),
+  role: z.enum(['GURU', 'MURID', 'WALIS', 'TAMU']),
   id: z.string().optional(),
   password: z.string().min(6, 'Password minimal 6 karakter'),
 });
@@ -62,6 +62,14 @@ export const schoolConfigSchema = z.object({
   mapsDirectUrl: z.string().url('URL maps tidak valid').optional(),
   logoUrl: z.string().url('URL logo tidak valid').optional(),
   profilePdfUrl: z.string().url('URL PDF tidak valid').optional(),
+  heroImageUrl: z.string().optional(),
+  instagram: z.string().optional(),
+  youtube: z.string().optional(),
+  facebook: z.string().optional(),
+  guestAccessCode: z
+    .string()
+    .regex(/^[A-Za-z0-9]{6,16}$/, 'Kode akses tamu hanya huruf/angka 6-16 karakter')
+    .optional(),
   weekdayLabel: z.string().optional(),
   weekdayHours: z.string().optional(),
   weekendLabel: z.string().optional(),
@@ -72,7 +80,10 @@ export const schoolConfigSchema = z.object({
   statAccreditation: z.string().optional(),
   ppdbYear: z.string().optional(),
   ppdbIsOpen: z.boolean().optional(),
-  ppdbQuota: z.number().optional(),
+  ppdbRegistrationUrl: z.string().url('URL pendaftaran PPDB tidak valid').optional(),
+  ppdbQuota: z.number().int().min(0).optional(),
+  ppdbOpenDate: z.string().optional(),
+  ppdbCloseDate: z.string().optional(),
   featureContactForm: z.boolean().optional(),
   featurePpdb: z.boolean().optional(),
   featureLibrary: z.boolean().optional(),

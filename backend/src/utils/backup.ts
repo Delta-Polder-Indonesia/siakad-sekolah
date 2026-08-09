@@ -14,8 +14,39 @@ const BACKUP_CONFIG = {
   directory: process.env.BACKUP_DIR || './backups',
   retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS || '7'),
   prefix: 'absensi_backup',
-  timestampFormat: 'YYYY-MM-DD_HH-mm-ss',
 };
+
+/** Deteksi provider database dari DATABASE_URL. */
+function isSqlite(): boolean {
+  const url = env.DATABASE_URL.toLowerCase();
+  return url.startsWith('file:') || url.startsWith('sqlite:') || url.endsWith('.db');
+}
+
+/**
+ * Resolve lokasi file database SQLite.
+ * URL Prisma sqlite biasanya `file:./dev.db` — resolve relatif ke folder
+ * prisma/ (lokasi schema.prisma) dengan fallback ke CWD.
+ */
+async function resolveSqliteDbPath(): Promise<string> {
+  const raw = env.DATABASE_URL.replace(/^(file|sqlite):/i, '');
+  const candidates = [
+    raw,
+    path.resolve(raw),
+    path.resolve('prisma', raw),
+    path.resolve('prisma', raw.replace(/^\.\//, '')),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      await fs.access(candidate);
+      return candidate;
+    } catch {
+      // Lanjut cek kandidat berikutnya
+    }
+  }
+
+  return candidates[0];
+}
 
 /**
  * Generate backup filename dengan timestamp
@@ -23,7 +54,8 @@ const BACKUP_CONFIG = {
 function generateBackupFilename(): string {
   const now = new Date();
   const timestamp = now.toISOString().replace(/[:.]/g, '-').split('T').join('_');
-  return `${BACKUP_CONFIG.prefix}_${timestamp}.sql`;
+  const ext = isSqlite() ? '.db' : '.sql';
+  return `${BACKUP_CONFIG.prefix}_${timestamp}${ext}`;
 }
 
 /**
@@ -59,15 +91,17 @@ export async function createBackup(): Promise<{
     const backupPath = path.join(BACKUP_CONFIG.directory, filename);
     
     logger.info('Starting database backup', { filename, path: backupPath });
-    
-    // Parse DATABASE_URL untuk pg_dump
-    const dbUrl = new URL(env.DATABASE_URL);
-    const pgDumpCommand = `pg_dump ${env.DATABASE_URL} > "${backupPath}"`;
-    
-    const { stdout, stderr } = await execAsync(pgDumpCommand);
-    
-    if (stderr) {
-      logger.warn('pg_dump stderr output', { stderr });
+
+    if (isSqlite()) {
+      const dbPath = await resolveSqliteDbPath();
+      await fs.copyFile(dbPath, backupPath);
+    } else {
+      const pgDumpCommand = `pg_dump ${env.DATABASE_URL} > "${backupPath}"`;
+      const { stderr } = await execAsync(pgDumpCommand);
+
+      if (stderr) {
+        logger.warn('pg_dump stderr output', { stderr });
+      }
     }
     
     // Check if backup file was created
@@ -106,6 +140,21 @@ export async function createBackup(): Promise<{
 }
 
 /**
+ * Keamanan: hanya nama file backup hasil generate yang boleh dipakai.
+ * Mencegah path traversal (`../../etc/passwd`) lewat parameter URL.
+ */
+const BACKUP_FILENAME_PATTERN = /^absensi_backup_[\w.-]+\.(?:sql|db)$/;
+
+function isSafeBackupFilename(filename: string): boolean {
+  if (typeof filename !== 'string' || !BACKUP_FILENAME_PATTERN.test(filename)) {
+    return false;
+  }
+  const dir = path.resolve(BACKUP_CONFIG.directory);
+  const resolved = path.resolve(dir, filename);
+  return resolved.startsWith(dir + path.sep);
+}
+
+/**
  * Restore database from backup file
  */
 export async function restoreBackup(backupFilename: string): Promise<{
@@ -114,21 +163,33 @@ export async function restoreBackup(backupFilename: string): Promise<{
   duration?: number;
 }> {
   const startTime = Date.now();
-  
+
   try {
+    if (!isSafeBackupFilename(backupFilename)) {
+      return {
+        success: false,
+        error: 'Nama file backup tidak valid.',
+        duration: Date.now() - startTime,
+      };
+    }
+
     const backupPath = path.join(BACKUP_CONFIG.directory, backupFilename);
     
     // Check if backup file exists
     await fs.access(backupPath);
     
     logger.info('Starting database restore', { backupFilename, path: backupPath });
-    
-    const restoreCommand = `psql ${env.DATABASE_URL} < "${backupPath}"`;
-    
-    const { stdout, stderr } = await execAsync(restoreCommand);
-    
-    if (stderr) {
-      logger.warn('psql stderr output', { stderr });
+
+    if (isSqlite()) {
+      const dbPath = await resolveSqliteDbPath();
+      await fs.copyFile(backupPath, dbPath);
+    } else {
+      const restoreCommand = `psql ${env.DATABASE_URL} < "${backupPath}"`;
+      const { stderr } = await execAsync(restoreCommand);
+
+      if (stderr) {
+        logger.warn('psql stderr output', { stderr });
+      }
     }
     
     const duration = Date.now() - startTime;
@@ -175,7 +236,11 @@ export async function listBackups(): Promise<{
 }> {
   try {
     const files = await fs.readdir(BACKUP_CONFIG.directory);
-    const backupFiles = files.filter(file => file.startsWith(BACKUP_CONFIG.prefix) && file.endsWith('.sql'));
+    const backupFiles = files.filter(
+      (file) =>
+        file.startsWith(BACKUP_CONFIG.prefix) &&
+        (file.endsWith('.sql') || file.endsWith('.db'))
+    );
     
     const backups = await Promise.all(
       backupFiles.map(async (filename) => {
@@ -285,6 +350,14 @@ export async function verifyBackup(backupFilename: string): Promise<{
   error?: string;
 }> {
   try {
+    if (!isSafeBackupFilename(backupFilename)) {
+      return {
+        success: false,
+        valid: false,
+        error: 'Nama file backup tidak valid.',
+      };
+    }
+
     const backupPath = path.join(BACKUP_CONFIG.directory, backupFilename);
     const stats = await fs.stat(backupPath);
     
@@ -295,7 +368,16 @@ export async function verifyBackup(backupFilename: string): Promise<{
         error: 'Backup file is empty',
       };
     }
-    
+
+    // File SQLite adalah biner — cukup cek ukuran.
+    if (backupFilename.endsWith('.db') || isSqlite()) {
+      logger.info('Backup verification passed', { filename: backupFilename, size: stats.size });
+      return {
+        success: true,
+        valid: true,
+      };
+    }
+
     // Check if file contains expected SQL content
     const content = await fs.readFile(backupPath, 'utf-8');
     if (!content.includes('CREATE TABLE') && !content.includes('INSERT INTO')) {

@@ -10,6 +10,7 @@ import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { BookOpenCheck, Download, User } from 'lucide-react';
 import { exportRapotPdf, exportRapotCsv } from '../../utils/export';
 import { getBobotNilai, isTuntas, KONFIGURASI_PENILAIAN } from '../../utils/penilaian';
+import { escapeHtml, printViaBlob } from '../../utils/print';
 
 export default function RapotSiswa() {
   const { user } = useAuth();
@@ -71,22 +72,20 @@ export default function RapotSiswa() {
   const handleCetakRapot = () => {
     if (nilaiRapot.length === 0) return;
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
     const rowsHtml = nilaiRapot
       .map((item, idx) => {
         const bobot = getBobotNilai(item.predikat ?? '');
+        const kode = item.id?.substring(0, 5) || `4210${idx + 1}`;
         return `
         <tr style="background: #fff;">
           <td style="border: 2px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
-          <td style="border: 2px solid #000; padding: 4px; text-align: center;">${formatTA}</td>
-          <td style="border: 2px solid #000; padding: 4px; text-align: center; font-family: monospace;">${item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
-          <td style="border: 2px solid #000; padding: 4px 8px; text-align: left;">${item.mataPelajaran}</td>
+          <td style="border: 2px solid #000; padding: 4px; text-align: center;">${escapeHtml(formatTA)}</td>
+          <td style="border: 2px solid #000; padding: 4px; text-align: center; font-family: monospace;">${escapeHtml(kode)}</td>
+          <td style="border: 2px solid #000; padding: 4px 8px; text-align: left;">${escapeHtml(item.mataPelajaran)}</td>
           <td style="border: 2px solid #000; padding: 4px; text-align: center;">${semester === 'ganjil' ? '1' : '2'}</td>
           <td style="border: 2px solid #000; padding: 4px; text-align: center;">3</td>
           <td style="border: 2px solid #000; padding: 4px; text-align: center;">KKNI</td>
-          <td style="border: 2px solid #000; padding: 4px; text-align: center; font-weight: bold;">${item.predikat}</td>
+          <td style="border: 2px solid #000; padding: 4px; text-align: center; font-weight: bold;">${escapeHtml(item.predikat)}</td>
           <td style="border: 2px solid #000; padding: 4px; text-align: center;">${bobot}</td>
           <td style="border: 2px solid #000; padding: 4px; text-align: center; font-weight: bold;">${bobot * 3}</td>
         </tr>
@@ -98,7 +97,7 @@ export default function RapotSiswa() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Portal Mahasiswa UNPAB - KHS</title>
+        <title>Portal Mahasiswa - KHS</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 15px; color: #000; font-size: 11px; }
           .header-blue { background: #2563eb; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; border: 2px solid #000; }
@@ -113,12 +112,13 @@ export default function RapotSiswa() {
       <body>
         <div class="header-blue">
           <div>
-            <h1>PORTAL MAHASISWA UNPAB</h1>
+            <h1>PORTAL SISWA</h1>
             <div style="font-size: 9px; margin-top: 1px; opacity: 0.9;">Kartu Hasil Studi (KHS) Digital</div>
           </div>
           <div style="text-align: right; font-weight: bold; font-size: 9px; line-height: 1.2;">
-            NAMA: ${student?.name?.toUpperCase() || '-'}<br>
-            NPM/NIS: ${student?.nis || '-'} &bull; KELAS: ${className}
+            NAMA: ${escapeHtml(student?.name?.toUpperCase() || '-')}
+            <br>
+            NPM/NIS: ${escapeHtml(student?.nis || '-')} &bull; KELAS: ${escapeHtml(className)}
           </div>
         </div>
         <table>
@@ -127,7 +127,7 @@ export default function RapotSiswa() {
               <th rowspan="2" style="width: 30px;">No.</th>
               <th rowspan="2" style="width: 100px;">TA</th>
               <th rowspan="2" style="width: 60px;">Kode</th>
-              <th rowspan="2">Mata Kuliah</th>
+              <th rowspan="2">Mata Pelajaran</th>
               <th rowspan="2" style="width: 40px;">SMT</th>
               <th rowspan="2" style="width: 40px;">SKS</th>
               <th rowspan="2" style="width: 75px;">Kurikulum</th>
@@ -142,15 +142,13 @@ export default function RapotSiswa() {
           <tbody>${rowsHtml}</tbody>
         </table>
         <div class="summary-strip">
-          TOTAL SKS : ${stats.totalSKS} | Jumlah K x N : ${stats.totalKN} | IP Semester : ${stats.ipSemester} | Beban SKS Berikut : 24
+          TOTAL SKS : ${stats.totalSKS} | Jumlah K x N : ${stats.totalKN} | IP Semester : ${escapeHtml(stats.ipSemester)} | Beban SKS Berikut : 24
         </div>
-        <script>window.print();</script>
       </body>
       </html>
     `;
 
-    printWindow.document.write(html);
-    printWindow.document.close();
+    printViaBlob(html, { width: 'width=1400', height: 'height=800' });
   };
 
   return (

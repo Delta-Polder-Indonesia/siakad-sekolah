@@ -49,9 +49,28 @@ describe('loginPortal', () => {
     expect(result.status).toBe('unreachable');
   });
 
-  it('returns unreachable for the parent role (unsupported by backend) without calling fetch', async () => {
+  it('maps the parent role to WALIS and returns ok on success', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        json: {
+          ok: true,
+          user: {
+            id: 'wali_s1',
+            name: 'Siti Aminah',
+            role: 'WALIS',
+            guardianOf: [{ studentId: 's1', studentName: 'Ani', classId: 'c1' }],
+          },
+          accessToken: 'a',
+          refreshToken: 'r',
+        },
+      })
+    );
+
     const result = await loginPortal('Siti Aminah', 'ortu123', 'parent');
-    expect(result.status).toBe('unreachable');
-    expect(fetchMock).not.toHaveBeenCalled();
+
+    expect(result.status).toBe('ok');
+    expect(result.status === 'ok' && result.user.role).toBe('WALIS');
+    const [, init] = fetchMock.mock.calls[0];
+    expect(JSON.parse((init as RequestInit).body as string).role).toBe('WALIS');
   });
 });

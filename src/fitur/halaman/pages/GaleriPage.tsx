@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { PageProps } from '../types';
-import { galleryItems, type GalleryItem } from '../../DataContent/galeriData';
+import { galleryItems, tabs, tahunAjaran, type GalleryItem } from '../data/galeri/data';
 import { namaSekolahUppercase } from '../components/Profile/dataSekolah';
 
 export default function GaleriPage({ onNavigate: _onNavigate }: PageProps) {
@@ -18,20 +18,6 @@ export default function GaleriPage({ onNavigate: _onNavigate }: PageProps) {
   const handleImageError = useCallback((id: string) => {
     setFailedImages((prev) => ({ ...prev, [id]: true }));
   }, []);
-
-  const tabs = useMemo(
-    () => [
-      { id: 'All Collections', label: 'All Collections' },
-      { id: 'Alumni', label: 'Alumni' },
-      { id: 'Fasilitas', label: 'Fasilitas' },
-      { id: 'Kegiatan Siswa', label: 'Kegiatan Siswa' },
-      { id: 'Prestasi', label: 'Prestasi' },
-      { id: 'Gedung Sekolah', label: 'Gedung Sekolah' },
-    ],
-    []
-  );
-
-  const tahunAjaran = useMemo(() => ['2024/2025', '2025/2026', '2026/2027', '2027/2028'], []);
 
   const safeGalleryItems = useMemo(() => galleryItems || [], []);
   const heroItems = useMemo(() => safeGalleryItems.slice(0, 8), [safeGalleryItems]);

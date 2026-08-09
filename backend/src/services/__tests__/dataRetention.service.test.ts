@@ -5,7 +5,7 @@ import { prisma } from '../../lib/prisma.js';
 // Mock Prisma client
 vi.mock('../../lib/prisma.js', () => ({
   prisma: {
-    tokenBlacklist: {
+    sessionToken: {
       deleteMany: vi.fn(),
       count: vi.fn(),
     },
@@ -42,13 +42,13 @@ describe('DataRetentionService', () => {
   });
 
   describe('cleanupExpiredTokens', () => {
-    it('should delete expired tokens', async () => {
-      (prisma.tokenBlacklist.deleteMany as any).mockResolvedValue({ count: 5 });
+    it('should delete expired tokens and sessions', async () => {
+      (prisma.sessionToken.deleteMany as any).mockResolvedValue({ count: 7 });
       
       const result = await DataRetentionService.cleanupExpiredTokens();
       
-      expect(result).toBe(5);
-      expect(prisma.tokenBlacklist.deleteMany).toHaveBeenCalledWith({
+      expect(result).toBe(7);
+      expect(prisma.sessionToken.deleteMany).toHaveBeenCalledWith({
         where: {
           expiresAt: {
             lt: expect.any(Date),
@@ -57,8 +57,8 @@ describe('DataRetentionService', () => {
       });
     });
 
-    it('should return 0 when no expired tokens', async () => {
-      (prisma.tokenBlacklist.deleteMany as any).mockResolvedValue({ count: 0 });
+    it('should return 0 when no expired tokens/sessions', async () => {
+      (prisma.sessionToken.deleteMany as any).mockResolvedValue({ count: 0 });
       
       const result = await DataRetentionService.cleanupExpiredTokens();
       
@@ -177,7 +177,7 @@ describe('DataRetentionService', () => {
 
   describe('runAllRetentionTasks', () => {
     it('should run all retention tasks and return results', async () => {
-      (prisma.tokenBlacklist.deleteMany as any).mockResolvedValue({ count: 5 });
+      (prisma.sessionToken.deleteMany as any).mockResolvedValue({ count: 5 });
       (prisma.pPDBAuditLog.deleteMany as any).mockResolvedValue({ count: 10 });
       (prisma.pPDBNotification.deleteMany as any).mockResolvedValue({ count: 8 });
       (prisma.attendance.deleteMany as any).mockResolvedValue({ count: 100 });
@@ -201,7 +201,7 @@ describe('DataRetentionService', () => {
 
   describe('getRetentionStats', () => {
     it('should return retention statistics', async () => {
-      (prisma.tokenBlacklist.count as any).mockResolvedValue(5);
+      (prisma.sessionToken.count as any).mockResolvedValue(5);
       (prisma.pPDBAuditLog.count as any).mockResolvedValue(10);
       (prisma.pPDBNotification.count as any).mockResolvedValue(8);
       

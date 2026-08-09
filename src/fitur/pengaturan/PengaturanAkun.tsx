@@ -8,6 +8,8 @@ import {
   saveStudents,
   saveTeachers,
 } from '../../data/services';
+import { changePortalPassword, getPortalAccessToken } from '../../services/authApi';
+import { hasApi } from '../../services/apiConfig';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import {
   validatePassword as validatePasswordStrength,
@@ -20,18 +22,28 @@ export default function PengaturanAkun() {
   const { user, refreshUser } = useAuth();
   const storeVersion = useStoreVersion();
 
-  const teacher = useMemo(
-    () => getTeachers().find((item) => item.id === user?.id),
-    [user, storeVersion]
-  );
-  const student = useMemo(
-    () => getStudents().find((item) => item.id === user?.id),
-    [user, storeVersion]
-  );
+  // Login via backend memakai id database (cuid), sedangkan store lokal memakai
+  // id sendiri (mis. 't1'). Cari juga via email sebagai fallback agar record di
+  // store tetap ketemu.
+  const teacher = useMemo(() => {
+    const list = getTeachers();
+    return (
+      list.find((item) => item.id === user?.id) ??
+      (user?.email ? list.find((item) => item.email === user.email) : undefined)
+    );
+  }, [user, storeVersion]);
+  const student = useMemo(() => {
+    const list = getStudents();
+    return (
+      list.find((item) => item.id === user?.id) ??
+      (user?.email ? list.find((item) => item.email === user.email) : undefined)
+    );
+  }, [user, storeVersion]);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
@@ -115,6 +127,32 @@ export default function PengaturanAkun() {
       return;
     }
 
+    // Kalau user login via backend (ada token), hash password di database juga
+    // harus diubah — kalau tidak, login berikutnya akan gagal. Kalau tidak ada
+    // sesi backend, cukup simpan di store lokal seperti sebelumnya.
+    if (hasApi && password && getPortalAccessToken()) {
+      if (!oldPassword) {
+        setError('Kata Sandi Lama wajib diisi untuk mengganti kata sandi.');
+        return;
+      }
+      const result = await changePortalPassword({
+        role: 'teacher',
+        userId: user.id,
+        oldPassword,
+        newPassword: password,
+      });
+      if (!result.ok) {
+        // Token kedaluwarsa/tidak valid — jangan blokir; simpan lokal & beri tahu.
+        // Kalau bukan masalah autentikasi (password lama salah dll.), blokir simpan.
+        if (result.authFailed) {
+          setMessage('Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.');
+        } else {
+          setError(result.message || 'Gagal mengubah kata sandi di server.');
+          return;
+        }
+      }
+    }
+
     const hashedPassword = password ? await hashPassword(password) : teacher.password;
     const nextTeachers = teachers.map((item) =>
       item.id === teacher.id ? { ...item, nip: nextNip, password: hashedPassword } : item
@@ -124,6 +162,7 @@ export default function PengaturanAkun() {
     refreshUser();
     setPassword('');
     setConfirmPassword('');
+    setOldPassword('');
     setPasswordValidation(null);
     setError('');
     setMessage('Pengaturan akun guru berhasil diperbarui. Data admin ikut terbarui otomatis.');
@@ -149,6 +188,30 @@ export default function PengaturanAkun() {
       return;
     }
 
+    // Kalau user login via backend (ada token), hash password di database juga
+    // harus diubah — kalau tidak, login berikutnya akan gagal.
+    if (hasApi && password && getPortalAccessToken()) {
+      if (!oldPassword) {
+        setError('Kata Sandi Lama wajib diisi untuk mengganti kata sandi.');
+        return;
+      }
+      const result = await changePortalPassword({
+        role: 'student',
+        userId: user.id,
+        oldPassword,
+        newPassword: password,
+      });
+      if (!result.ok) {
+        // Token kedaluwarsa/tidak valid — jangan blokir; simpan lokal & beri tahu.
+        if (result.authFailed) {
+          setMessage('Sesi server kedaluwarsa — kata sandi hanya disimpan lokal. Login ulang untuk menyinkronkan ke server.');
+        } else {
+          setError(result.message || 'Gagal mengubah kata sandi di server.');
+          return;
+        }
+      }
+    }
+
     const hashedPassword = password ? await hashPassword(password) : student.password;
     const nextStudents = students.map((item) =>
       item.id === student.id ? { ...item, nis: nextNis, password: hashedPassword } : item
@@ -158,6 +221,7 @@ export default function PengaturanAkun() {
     refreshUser();
     setPassword('');
     setConfirmPassword('');
+    setOldPassword('');
     setPasswordValidation(null);
     setError('');
     setMessage('Pengaturan akun siswa berhasil diperbarui. Data admin ikut terbarui otomatis.');
@@ -183,6 +247,29 @@ export default function PengaturanAkun() {
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {hasApi && (
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Kata Sandi Lama
+            </label>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(event) => {
+                setOldPassword(event.target.value);
+                setMessage('');
+                setError('');
+              }}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Diperlukan untuk verifikasi di server"
+              autoComplete="current-password"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Wajib diisi jika ingin mengganti kata sandi (server memvalidasi password lama).
+            </p>
+          </div>
+        )}
 
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Kata Sandi Baru</label>

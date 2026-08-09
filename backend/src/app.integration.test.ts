@@ -6,6 +6,7 @@ const mockTeacherFindUnique = vi.fn();
 const mockTeacherCount = vi.fn();
 const mockStudentFindUnique = vi.fn();
 const mockStudentCount = vi.fn();
+const mockStudentFindMany = vi.fn();
 const mockClassRoomCount = vi.fn();
 const mockClassRoomTeacherFindMany = vi.fn();
 const mockClassRoomFindMany = vi.fn();
@@ -15,6 +16,11 @@ const mockTokenCreate = vi.fn();
 const mockLikeCount = vi.fn();
 const mockLikeFindUnique = vi.fn();
 const mockQueryRaw = vi.fn();
+const mockAttendanceCount = vi.fn();
+const mockBookCount = vi.fn();
+const mockLibraryTxCount = vi.fn();
+const mockPPDBCount = vi.fn();
+const mockAnnouncementCount = vi.fn();
 
 vi.mock('./lib/prisma.js', () => ({
   prisma: {
@@ -25,6 +31,7 @@ vi.mock('./lib/prisma.js', () => ({
     },
     student: {
       findUnique: mockStudentFindUnique,
+      findMany: mockStudentFindMany,
       count: mockStudentCount,
     },
     classRoom: {
@@ -37,13 +44,28 @@ vi.mock('./lib/prisma.js', () => ({
     schoolConfig: {
       findFirst: mockSchoolConfigFindFirst,
     },
-    tokenBlacklist: {
+    sessionToken: {
       findUnique: mockTokenFindUnique,
       create: mockTokenCreate,
     },
     like: {
       count: mockLikeCount,
       findUnique: mockLikeFindUnique,
+    },
+    attendance: {
+      count: mockAttendanceCount,
+    },
+    book: {
+      count: mockBookCount,
+    },
+    libraryTransaction: {
+      count: mockLibraryTxCount,
+    },
+    pPDBApplication: {
+      count: mockPPDBCount,
+    },
+    announcement: {
+      count: mockAnnouncementCount,
     },
   },
 }));
@@ -54,12 +76,23 @@ describe('API Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockQueryRaw.mockResolvedValue([{ '?column?': 1 }]);
-    mockTokenFindUnique.mockResolvedValue(null);
+    mockTokenFindUnique.mockResolvedValue({
+      id: 'session-1',
+      token: 't',
+      revoked: false,
+      expiresAt: new Date(Date.now() + 3_600_000),
+    });
+    mockTokenCreate.mockResolvedValue({});
     mockTeacherCount.mockResolvedValue(5);
     mockStudentCount.mockResolvedValue(100);
     mockClassRoomCount.mockResolvedValue(3);
     mockClassRoomTeacherFindMany.mockResolvedValue([]);
     mockClassRoomFindMany.mockResolvedValue([]);
+    mockAttendanceCount.mockResolvedValue(40);
+    mockBookCount.mockResolvedValue(25);
+    mockLibraryTxCount.mockResolvedValue(2);
+    mockPPDBCount.mockResolvedValue(7);
+    mockAnnouncementCount.mockResolvedValue(3);
   });
 
   describe('Root & 404', () => {
@@ -152,6 +185,51 @@ describe('API Integration Tests', () => {
       expect(res.body.user.role).toBe('GURU');
     });
 
+    it('POST /api/auth/login dengan role WALIS valid harus mengembalikan token', async () => {
+      const hash = bcrypt.hashSync('wali123', 10);
+      mockStudentFindMany.mockResolvedValueOnce([
+        {
+          id: 'student-1',
+          name: 'Ani',
+          classId: 'class-1',
+          guardianName: 'Budi Santoso',
+          guardianPhone: '081234567890',
+          guardianPasswordHash: hash,
+        },
+      ]);
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ role: 'WALIS', id: 'Budi Santoso', password: 'wali123' });
+      expect(res.status).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.user.role).toBe('WALIS');
+      expect(res.body.user.guardianOf).toEqual([
+        { studentId: 'student-1', studentName: 'Ani', classId: 'class-1' },
+      ]);
+      expect(res.body.accessToken).toBeDefined();
+    });
+
+    it('POST /api/auth/login dengan role WALIS password salah harus 401', async () => {
+      const hash = bcrypt.hashSync('wali123', 10);
+      mockStudentFindMany.mockResolvedValueOnce([
+        {
+          id: 'student-1',
+          name: 'Ani',
+          classId: 'class-1',
+          guardianName: 'Budi Santoso',
+          guardianPhone: '081234567890',
+          guardianPasswordHash: hash,
+        },
+      ]);
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ role: 'WALIS', id: 'Budi Santoso', password: 'salah123' });
+      expect(res.status).toBe(401);
+      expect(res.body.ok).toBe(false);
+    });
+
     it('POST /api/auth/admin/login dengan kredensial salah harus 401', async () => {
       const res = await request(app)
         .post('/api/auth/admin/login')
@@ -168,6 +246,39 @@ describe('API Integration Tests', () => {
       const res = await request(app).get('/api/likes/program-1');
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({ count: 3, userLiked: false, programId: 'program-1' });
+    });
+  });
+
+  describe('Stats (Dashboard)', () => {
+    it('GET /api/stats/dashboard tanpa token harus 401', async () => {
+      const res = await request(app).get('/api/stats/dashboard');
+      expect(res.status).toBe(401);
+    });
+
+    it('GET /api/stats/dashboard dengan token harus mengembalikan ringkasan', async () => {
+      const jwt = await import('jsonwebtoken');
+      const { env } = await import('./config/env.js');
+      const token = jwt.sign(
+        { userId: 'teacher-1', role: 'GURU', name: 'Pak Budi' },
+        env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      const res = await request(app)
+        .get('/api/stats/dashboard')
+        .set('Authorization', `Bearer ${token}`);
+      expect(res.status).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.data).toMatchObject({
+        teachersActive: 5,
+        studentsTotal: 100,
+        classes: 3,
+        attendanceToday: 40,
+        libraryBooks: 25,
+        libraryActiveLoans: 2,
+        ppdbApplications: 7,
+        announcements: 3,
+      });
     });
   });
 

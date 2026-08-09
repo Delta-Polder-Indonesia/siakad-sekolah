@@ -2,6 +2,10 @@
 // Controller hanya memanggil fungsi dari sini.
 
 import { prisma } from '../../lib/prisma.js';
+import { z } from 'zod';
+import { schoolConfigSchema } from '../../utils/validation.js';
+
+export type SchoolConfigInput = z.infer<typeof schoolConfigSchema>;
 
 export async function getSchoolConfig() {
   // Ambil config pertama — sistem ini hanya untuk 1 sekolah per instance
@@ -9,44 +13,25 @@ export async function getSchoolConfig() {
   return config;
 }
 
-export async function upsertSchoolConfig(data: {
-  name:           string;
-  shortName:      string;
-  type:           string;
-  npsn?:          string;
-  founded?:       number;
-  accreditation?: string;
-  phone?:         string;
-  email?:         string;
-  website?:       string;
-  addressStreet?:   string;
-  addressDistrict?: string;
-  addressCity?:     string;
-  addressProvince?: string;
-  addressZip?:      string;
-  mapsEmbedUrl?:  string;
-  mapsDirectUrl?: string;
-  logoUrl?:       string;
-  profilePdfUrl?: string;
-  weekdayLabel?:  string;
-  weekdayHours?:  string;
-  weekendLabel?:  string;
-  weekendHours?:  string;
-  statStudents?:      string;
-  statTeachers?:      string;
-  statAchievements?:  string;
-  statAccreditation?: string;
-  ppdbYear?:      string;
-  ppdbIsOpen?:    boolean;
-  ppdbQuota?:     number;
-  featureContactForm?:      boolean;
-  featurePpdb?:             boolean;
-  featureLibrary?:          boolean;
-  featureOnlineAssignment?: boolean;
-  featureReportCard?:       boolean;
-  featureBilling?:          boolean;
-  featureElearning?:        boolean;
-}) {
+/**
+ * Versi publik (GET /api/school-config) — field rahasia disamarkan.
+ */
+export function toPublicConfig(config: NonNullable<Awaited<ReturnType<typeof getSchoolConfig>>>) {
+  const {
+    guestAccessCode: _guestAccessCode,
+    ppdbOpenDate,
+    ppdbCloseDate,
+    ...publicConfig
+  } = config;
+
+  return {
+    ...publicConfig,
+    ppdbOpenDate: ppdbOpenDate?.toISOString() ?? null,
+    ppdbCloseDate: ppdbCloseDate?.toISOString() ?? null,
+  };
+}
+
+export async function upsertSchoolConfig(data: SchoolConfigInput) {
   const existing = await prisma.schoolConfig.findFirst();
 
   if (existing) {

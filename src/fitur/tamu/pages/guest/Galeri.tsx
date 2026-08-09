@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { galleryItems, type GalleryItem } from '../../../DataContent/galeriData';
+import { galleryItems, type GalleryItem } from '../../../halaman/data/galeri/data';
 import { namaSekolah } from '../../../halaman/components/Profile/dataSekolah';
 
 export default function Galeri() {

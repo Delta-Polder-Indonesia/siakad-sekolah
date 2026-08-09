@@ -14,7 +14,6 @@ import {
   ADMIN_MAX_ATTEMPTS,
   ADMIN_LOCK_MINUTES,
   ADMIN_SESSION_MINUTES,
-  ADMIN_PIN,
 } from './db';
 import { addStudent, generateStudentNis } from './students';
 import type {
@@ -345,7 +344,17 @@ export const getAdminSecurityState = () => {
   };
 };
 
+// PIN dibaca saat login (lazy), bukan saat modul dimuat — agar deployment
+// tanpa env VITE_ADMIN_PIN otomatis menonaktifkan gerbang admin lokal.
+const readAdminPin = (): string => (import.meta.env.VITE_ADMIN_PIN || '').trim();
+
 export const adminLogin = (username: string, pin: string): boolean => {
+  const configuredPin = readAdminPin();
+  if (!configuredPin) {
+    appendPPDBAuditLog('ADMIN_LOGIN_FAILED', username || 'UNKNOWN', { reason: 'NOT_CONFIGURED' });
+    return false;
+  }
+
   const lock = getAdminLockState();
   if (isLockActive(lock.lockedUntil)) {
     appendPPDBAuditLog('ADMIN_LOGIN_FAILED', username || 'UNKNOWN', { reason: 'LOCKED' });
@@ -353,7 +362,7 @@ export const adminLogin = (username: string, pin: string): boolean => {
   }
 
   const normalized = username.trim();
-  if (!normalized || pin !== ADMIN_PIN) {
+  if (!normalized || pin !== configuredPin) {
     const nextFailed = lock.failedCount + 1;
     const shouldLock = nextFailed >= ADMIN_MAX_ATTEMPTS;
     const lockedUntil = shouldLock

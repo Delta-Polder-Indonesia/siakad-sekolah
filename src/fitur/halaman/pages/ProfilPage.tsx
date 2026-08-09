@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { PageProps } from '../types';
+import { tabs, type TabItem } from '../data/profil/data';
 import {
   SekilasSekolah,
   TonggakSejarah,
@@ -12,27 +13,9 @@ import {
   Operasional,
 } from '../components/Profile';
 
-type TabItem = {
-  id: number;
-  label: string;
-  render: (props: PageProps) => React.JSX.Element;
-};
-
 type ProfilPageProps = PageProps & {
   profilTabRef?: { current: number };
 };
-
-const tabs: TabItem[] = [
-  { id: 1, label: 'Sekilas Sekolah', render: () => <SekilasSekolah /> },
-  { id: 2, label: 'Sejarah', render: () => <TonggakSejarah /> },
-  { id: 3, label: 'Sambutan Kepala Sekolah', render: () => <SambutanKepsek /> },
-  { id: 4, label: 'Visi, Misi & Tata Nilai', render: () => <VisiMisi /> },
-  { id: 5, label: 'Struktur Organisasi', render: () => <StrukturOrganisasi /> },
-  { id: 6, label: 'Guru & Pegawai', render: () => <GuruPegawaiPage /> },
-  { id: 7, label: 'Statistik GTK & Siswa', render: () => <GtkSiswaPage /> },
-  { id: 8, label: 'Akreditasi & Prestasi', render: () => <AkreditasiPrestasi /> },
-  { id: 9, label: 'Operasional & Layanan', render: () => <Operasional /> },
-];
 
 export default function ProfilPage({ onNavigate, profilTabRef }: ProfilPageProps) {
   // Tab terakhir disimpan lewat profilTabRef (dikelola ExpectationModal) supaya saat
@@ -50,6 +33,8 @@ export default function ProfilPage({ onNavigate, profilTabRef }: ProfilPageProps
   };
 
   const active = tabs.find((t) => t.id === activeTab);
+
+  const ActiveComponent = active?.component;
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -122,7 +107,7 @@ export default function ProfilPage({ onNavigate, profilTabRef }: ProfilPageProps
         </div>
       </nav>
 
-      <main>{active?.render({ onNavigate })}</main>
+      <main>{ActiveComponent && <ActiveComponent />}</main>
     </div>
   );
 }

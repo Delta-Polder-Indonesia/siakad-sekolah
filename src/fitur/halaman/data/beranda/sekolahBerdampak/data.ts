@@ -1,0 +1,1 @@
+export const DEFAULT_TAGS = ['Magang Berdampak', 'KKN-T Berdampak', 'Siswa Berdampak'];

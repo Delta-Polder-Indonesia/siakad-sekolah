@@ -6,10 +6,26 @@ import { env } from '../../config/env.js';
 import type { JwtPayload } from '../../middleware/auth.js';
 import { validatePassword, formatPasswordErrors } from '../../utils/passwordValidator.js';
 import { logger, logSecurityEvent, logDatabaseOperation } from '../../config/logger.js';
-import { blacklistToken, blacklistUserTokens, getBlacklistStats } from '../../utils/tokenManager.js';
+import {
+  blacklistToken,
+  blacklistUserTokens,
+  getBlacklistStats,
+  isTokenBlacklisted,
+  isTokenRegistered,
+  registerSessionToken,
+  revokeTokenSession,
+} from '../../utils/tokenManager.js';
 import { AuthenticationError, ValidationError, NotFoundError } from '../../utils/errors.js';
 
-function signTokens(payload: JwtPayload) {
+function getTokenExpiry(token: string): Date {
+  const decoded = jwt.decode(token) as jwt.JwtPayload | null;
+  return new Date((decoded?.exp ?? 0) * 1000);
+}
+
+// Sign token dan daftarkan ke registry sesi (tabel SessionToken).
+// Registry ini dipakai "logout dari semua perangkat" untuk membatalkan semua
+// sesi user sekaligus.
+async function signTokens(payload: JwtPayload) {
   // Validasi environment variables sebelum penggunaan
   if (!env.JWT_SECRET || !env.JWT_REFRESH_SECRET) {
     throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be set in environment variables');
@@ -21,6 +37,12 @@ function signTokens(payload: JwtPayload) {
   const refreshToken = jwt.sign(payload, env.JWT_REFRESH_SECRET, {
     expiresIn: env.JWT_REFRESH_EXPIRES_IN as jwt.SignOptions['expiresIn'],
   });
+
+  await Promise.all([
+    registerSessionToken(payload.userId, accessToken, getTokenExpiry(accessToken), 'access'),
+    registerSessionToken(payload.userId, refreshToken, getTokenExpiry(refreshToken), 'refresh'),
+  ]);
+
   return { accessToken, refreshToken };
 }
 
@@ -71,7 +93,7 @@ export async function loginTeacher(nip: string, password: string) {
       classIds:       classes.map((c) => c.classRoomId),
       homeroomClassIds: homeroomClasses.map((c) => c.id),
     },
-    ...signTokens(payload),
+    ...(await signTokens(payload)),
   };
 }
 
@@ -222,7 +244,74 @@ export async function loginStudent(nis: string, password: string) {
       email:    student.email,
       classId:  student.classId,
     },
-    ...signTokens(payload),
+    ...(await signTokens(payload)),
+  };
+}
+
+// Login Wali Siswa — akun wali menempel pada data siswa (guardian*).
+// Login id = nama wali (tidak case-sensitive) atau nomor HP wali.
+// (filter nama case-insensitive dilakukan di JS karena SQLite tidak
+// mendukung Prisma `mode: 'insensitive'`.)
+export async function loginParent(id: string, password: string) {
+  const candidates = await prisma.student.findMany({
+    where: { guardianName: { not: null } },
+    select: {
+      id: true,
+      name: true,
+      classId: true,
+      guardianName: true,
+      guardianPhone: true,
+      guardianPasswordHash: true,
+    },
+  });
+
+  const normalizedId = id.trim().toLowerCase();
+  const students = candidates.filter((s) =>
+    (s.guardianName?.toLowerCase() === normalizedId) ||
+    (s.guardianPhone === id.trim())
+  );
+
+  if (students.length === 0) {
+    logSecurityEvent('login_failed', { reason: 'parent_not_found', id });
+    return null;
+  }
+
+  // Cek password terhadap semua calon yang nama/nomor HP-nya cocok.
+  // (bisa ada 2+ siswa dgn wali yang sama — satu wali, banyak anak)
+  let match: (typeof students)[number] | null = null;
+  for (const s of students) {
+    if (s.guardianPasswordHash && (await bcrypt.compare(password, s.guardianPasswordHash))) {
+      match = s;
+      break;
+    }
+  }
+
+  if (!match) {
+    logSecurityEvent('login_failed', { reason: 'invalid_password', role: 'WALIS' });
+    return null;
+  }
+
+  const guardianName = match.guardianName || `Orang Tua ${match.name}`;
+  const payload: JwtPayload = {
+    userId: `wali_${match.id}`,
+    role:   'WALIS',
+    name:   guardianName,
+  };
+
+  logSecurityEvent('login_success', { userId: payload.userId, role: 'WALIS', name: guardianName });
+
+  return {
+    user: {
+      id:        payload.userId,
+      name:      guardianName,
+      role:      'WALIS' as const,
+      guardianOf: [{
+        studentId: match.id,
+        studentName: match.name,
+        classId: match.classId,
+      }],
+    },
+    ...(await signTokens(payload)),
   };
 }
 
@@ -243,7 +332,7 @@ export async function loginGuest(accessCode: string) {
     name:   'Tamu Pengunjung',
   };
 
-  const { accessToken } = signTokens(payload);
+  const { accessToken } = await signTokens(payload);
 
   return {
     user: {
@@ -271,7 +360,7 @@ export async function loginAdmin(username: string, password: string) {
 
   return {
     profileName: username,
-    ...signTokens(payload),
+    ...(await signTokens(payload)),
   };
 }
 
@@ -335,7 +424,7 @@ export async function loginGoogle(idToken: string, role: string) {
     name: userName,
   };
 
-  const { accessToken, refreshToken } = signTokens(jwtPayload);
+  const { accessToken, refreshToken } = await signTokens(jwtPayload);
 
   return {
     status: 'ok' as const,
@@ -359,6 +448,16 @@ export async function refreshAccessToken(refreshToken: string) {
       throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be set in environment variables');
     }
 
+    // Jangan izinkan refresh token yang sudah di-revoke (mis. setelah logout
+    // atau logout dari semua perangkat).
+    const blacklisted = await isTokenBlacklisted(refreshToken);
+    if (blacklisted) return null;
+
+    // Refresh token juga harus terdaftar sebagai sesi aktif — kalau user sudah
+    // "logout dari semua perangkat", registry sesinya sudah dihapus.
+    const registered = await isTokenRegistered(refreshToken);
+    if (!registered) return null;
+
     const payload = jwt.verify(
       refreshToken,
       env.JWT_REFRESH_SECRET
@@ -374,30 +473,45 @@ export async function refreshAccessToken(refreshToken: string) {
       expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     });
 
+    // Daftarkan access token baru ke registry sesi aktif.
+    await registerSessionToken(payload.userId, accessToken, getTokenExpiry(accessToken), 'access');
+
     return { accessToken };
   } catch {
     return null;
   }
 }
 
-// Logout - blacklist access token
-export async function logout(accessToken: string, userId?: string) {
+// Logout - blacklist access token (dan refresh token jika dikirim) + hapus dari registry sesi aktif
+export async function logout(accessToken: string, userId?: string, refreshToken?: string | null) {
   const success = await blacklistToken(accessToken, userId, 'User logout');
-  
+
+  // Revoke refresh token juga — tanpa ini refresh token tetap bisa dipakai
+  // untuk mendapatkan access token baru setelah logout.
+  if (refreshToken) {
+    await blacklistToken(refreshToken, userId, 'User logout (refresh)');
+  }
+
+  // Hapus dari registry sesi aktif (aktif meskipun blacklist gagal).
+  await revokeTokenSession(accessToken);
+  if (refreshToken) {
+    await revokeTokenSession(refreshToken);
+  }
+
   if (success) {
     logSecurityEvent('user_logout', { userId });
   }
-  
+
   return { success, message: success ? 'Logout berhasil' : 'Logout gagal' };
 }
 
-// Logout from all devices - blacklist all user tokens
+// Logout from all devices - revoke semua sesi aktif milik user.
+// (revokeAllUserSessions menandai seluruh registry SessionToken milik user,
+// sehingga semua access & refresh token lama otomatis ditolak.)
 export async function logoutAllDevices(userId: string) {
-  // Note: This requires storing userId with tokens or using a different strategy
-  // For now, we'll implement the logging and structure
   const count = await blacklistUserTokens(userId, userId, 'Logout from all devices');
   
-  logSecurityEvent('user_logout_all_devices', { userId, tokensRevoked: count });
+  logSecurityEvent('user_logout_all_devices', { userId, sessionsRevoked: count });
   
   return { 
     success: true, 

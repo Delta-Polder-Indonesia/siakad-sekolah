@@ -96,6 +96,7 @@ describe('PasswordValidator', () => {
       expect(/[A-Z]/.test(password)).toBe(true);
       expect(/[a-z]/.test(password)).toBe(true);
       expect(/\d/.test(password)).toBe(true);
+      // eslint-disable-next-line no-useless-escape
       expect(/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)).toBe(true);
     });
   });

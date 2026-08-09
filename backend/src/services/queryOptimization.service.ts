@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 import { logger } from '../config/logger.js';
+import { env } from '../config/env.js';
 
 /**
  * Query Optimization Service
@@ -7,10 +8,34 @@ import { logger } from '../config/logger.js';
  */
 export class QueryOptimizationService {
   /**
+   * Analisis ini bergantung pada tabel/ekstensi PostgreSQL (pg_stat_statements,
+   * pg_stats, pg_tables). Dengan SQLite query berikut tidak akan pernah jalan —
+   * deteksi provider agar endpoint admin mengembalikan pesan jelas, bukan
+   * error mentah / data kosong yang membingungkan.
+   */
+  static isPostgresSupported(): boolean {
+    const url = env.DATABASE_URL.toLowerCase();
+    return !url.startsWith('file:') && !url.startsWith('sqlite:') && !url.endsWith('.db');
+  }
+
+  /**
    * Analyze query performance and provide optimization recommendations
    */
   static async analyzeQueryPerformance() {
     try {
+      if (!this.isPostgresSupported()) {
+        logger.warn('Query optimization tidak didukung dengan database non-PostgreSQL');
+        return {
+          slowQueries: [],
+          missingIndexes: [],
+          unusedIndexes: [],
+          tableSizes: [],
+          recommendations: [
+            'Analisis query performance hanya didukung untuk database PostgreSQL.',
+          ],
+        };
+      }
+
       logger.info('Starting query performance analysis');
       
       const analysis = {
@@ -282,6 +307,11 @@ export class QueryOptimizationService {
    */
   static async enableQueryStatistics() {
     try {
+      if (!this.isPostgresSupported()) {
+        logger.warn('pg_stat_statements tidak didukung dengan database non-PostgreSQL');
+        return false;
+      }
+
       await prisma.$executeRaw`
         CREATE EXTENSION IF NOT EXISTS pg_stat_statements
       `;
@@ -297,14 +327,51 @@ export class QueryOptimizationService {
   }
   
   /**
+   * Validasi bahwa query yang dikirim admin hanya boleh untuk ANALISIS:
+   * - Satu statement (tanpa titik koma tambahan)
+   * - Tanpa komentar SQL (bisa menyembunyikan statement lain)
+   * - Hanya SELECT, atau WITH-query yang MUDAH tidak berisi DML
+   */
+  static isSafeAnalysisQuery(query: string): boolean {
+    if (typeof query !== 'string') return false;
+
+    const trimmed = query.trim().replace(/;+\s*$/, '');
+    if (!trimmed) return false;
+
+    // Multi-statement memakai titik koma di tengah → tolak
+    if (trimmed.includes(';')) return false;
+
+    // Komentar SQL bisa menyamarkan statement berbahaya → tolak
+    if (/--|\/\*/u.test(trimmed)) return false;
+
+    if (/^WITH\b/i.test(trimmed)) {
+      // WITH ... SELECT boleh, tetapi WITH ... UPDATE/INSERT/DELETE dilarang
+      return !/\b(INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|GRANT|COPY)\b/i.test(trimmed);
+    }
+
+    return /^SELECT\b/i.test(trimmed);
+  }
+
+  /**
    * Get query execution plan
    */
   static async getQueryExecutionPlan(query: string) {
     try {
-      const plan = await prisma.$queryRawUnsafe(`
-        EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${query}
-      `);
-      
+      if (!this.isPostgresSupported()) {
+        throw new Error('Query execution plan hanya didukung untuk database PostgreSQL');
+      }
+
+      const safeQuery = query.trim().replace(/;+\s*$/, '');
+      if (!this.isSafeAnalysisQuery(safeQuery)) {
+        throw new Error('Hanya query SELECT (satu statement) yang boleh dianalisis.');
+      }
+
+      // Keamanan: tanpa ANALYZE (tidak mengeksekusi query target) &
+      // dibungkus transaksi yang di-rollback — mustahil memodifikasi data.
+      const plan = await prisma.$transaction(async (tx) => {
+        return tx.$queryRawUnsafe(`EXPLAIN (FORMAT JSON) ${safeQuery}`);
+      });
+
       return plan;
     } catch (error) {
       logger.error('Failed to get query execution plan', {
@@ -319,6 +386,13 @@ export class QueryOptimizationService {
    */
   static async optimizeQuery(query: string) {
     try {
+      if (!this.isPostgresSupported()) {
+        return {
+          notSupported: true as const,
+          message: 'Fitur ini hanya didukung untuk database PostgreSQL.',
+        };
+      }
+
       const executionPlan = await this.getQueryExecutionPlan(query);
       const tips: string[] = [];
       

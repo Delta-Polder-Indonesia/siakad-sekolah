@@ -1,6 +1,7 @@
 // src/fitur/halaman/pages/DataBeranda/HeroSection.tsx
 import { useEffect, useState } from 'react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
+import { THEMES } from '../../data/beranda/hero/data';
 
 interface HeroSectionProps {
   onRegister: () => void;
@@ -8,56 +9,6 @@ interface HeroSectionProps {
 }
 
 const img = (name: string) => `${import.meta.env.BASE_URL}images/IconPlus/${name}`;
-
-// ── 3 tema warna + layer gambar, meniru template Blogger (kode.txt) ──
-// File gambar dikelompokkan per warna di public/images/IconPlus/{biru,hijau,merah}.
-// "main" = gambar utama besar di tengah-bawah (Utama.png), "layers" = dekoratif.
-// Kelas layer (vase, tea, spoon, dst.) menentukan posisinya di global.css.
-// Ganti urutan/nama file di sini sesukamu.
-const THEMES = [
-  {
-    cls: 'blue',
-    label: 'Inovasi',
-    main: 'biru/Utama.png',
-    layers: [
-      ['drone', 'biru/drone.png'],
-      ['phone1', 'biru/phone1.png'],
-      ['temperature', 'biru/temperature.png'],
-      ['remote', 'biru/remote.png'],
-      ['smartwatch', 'biru/smartwatch.png'],
-      ['actioncam', 'biru/actioncam.png'],
-    ],
-  },
-  {
-    cls: 'green',
-    label: 'Unggul',
-    main: 'hijau/Utama.png',
-    layers: [
-      ['vase', 'hijau/w96.png'],
-      ['tea', 'hijau/tea.png'],
-      ['slipper', 'hijau/slipper.png'],
-      ['picture', 'hijau/picture.png'],
-      ['letter-c', 'hijau/letter-c.png'],
-      ['letter-b', 'hijau/letter-b.png'],
-      ['letter-a', 'hijau/letter-a.png'],
-      ['football', 'hijau/football.png'],
-    ],
-  },
-  {
-    cls: 'red',
-    label: 'Berdampak',
-    main: 'merah/Utama.png',
-    layers: [
-      ['spoon', 'merah/spoon.png'],
-      ['mixer', 'merah/mixer.png'],
-      ['eggs', 'merah/eggs.png'],
-      ['cherries', 'merah/cherries.png'],
-      ['rollover', 'merah/rollover.png'],
-      ['shape', 'merah/shape.png'],
-      ['pie', 'merah/pie.png'],
-    ],
-  },
-] as const;
 
 export default function HeroSection({ onRegister, onShowAgenda }: HeroSectionProps) {
   // Rotasi tema seperti template: 7 detik per siklus (3 tema), jeda 10s

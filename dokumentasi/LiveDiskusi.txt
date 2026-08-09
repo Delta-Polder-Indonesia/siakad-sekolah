@@ -1,16 +1,16 @@
-Repo: Delta-Polder-Indonesia/Siakad-siswa
+E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\data\berita\data.ts
 
-Perbaiki isu keamanan/bug pada alur autentikasi berikut:
+E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BeritaPage.tsx
 
-1. `src/context/AuthContext.tsx` fungsi `login()` (baris ~47-59): hapus pengecekan admin berbasis `import.meta.env.VITE_ADMIN_USERNAME`/`VITE_ADMIN_PASSWORD` karena variabel VITE_* ter-embed ke bundle frontend publik. Arahkan login admin ke endpoint backend `POST /api/auth/admin/login` (lihat `backend/src/modules/auth/auth.controller.ts` dan `loginAdmin` di `backend/src/modules/auth/auth.service.ts`). Tambahkan role `admin` ke `ROLE_MAP`/jalur pemanggil di `src/services/authApi.ts` bila perlu.
+E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Berita
 
-2. `src/context/AuthContext.tsx` fungsi `loginGoogle()` (baris ~199-234): hapus atau gerbang di belakang flag demo eksplisit fallback client-side yang mendekode JWT tanpa verifikasi tanda tangan. Andalkan verifikasi backend `loginGoogle` (`OAuth2Client.verifyIdToken`).
+E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx
 
-3. `src/fitur/pengaturan/PengaturanAkun.tsx`:
-   - Ubah `useEffect` (baris ~45-57) agar TIDAK mengisi field password dengan `teacher.password`/`student.password` (yang sudah ter-hash). Biarkan field password & konfirmasi kosong saat load.
-   - Pada `handleSaveTeacher` dan `handleSaveStudent` (baris ~81-83 dan ~111-113), hash password baru dengan `hashPassword` dari `src/data/services` sebelum disimpan lewat `saveTeachers`/`saveStudents`, agar konsisten dengan perbandingan `t.password === hashedInput` / `s.password === hashedInput` di `AuthContext.login()`.
-   - Jika field password dibiarkan kosong (user tidak ingin ganti password), pertahankan password lama tanpa mengubahnya.
 
-4. Bersihkan komentar path absolut lokal pengembang (mis. `// E:\guthub\...`) di `src/context/AuthContext.tsx` baris 1 dan file lain yang terdampak.
 
-Pastikan `npm run typecheck`, `npm run lint`, dan `npm test` lulus setelah perubahan.
+catatan:
+
+jadi gini saya itu mau berita asli nya itu di  E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BeritaPage.tsx
+dan yang di bagian E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx ini hanya seperti berita klan yang di tampilkan dari E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Berita
+karna bagian E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\DataBeranda\BeritaKegiatanSection.test.tsx dia kan tidak punya halaman jadi mau saya tampilan ini di ambil dari berita 1 2 dan 3 yang untuk di tampilan di E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\BerandaPage.tsx
+paham iyah jadi untuk datanya di perbaiki mau saya itu 1 pintu 2 pungsi 1 di beranda yang satu di berita, agar beritanya memaki narasi yang sama 

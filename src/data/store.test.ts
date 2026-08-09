@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as store from './store';
 import type { PPDBApplication } from './store';
 
@@ -458,6 +458,14 @@ describe('PPDB notifications', () => {
 });
 
 describe('admin authentication', () => {
+  beforeAll(() => {
+    vi.stubEnv('VITE_ADMIN_PIN', '26012026');
+  });
+
+  afterAll(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('logs in with the correct pin and creates a session', () => {
     expect(store.isAdminAuthenticated()).toBe(false);
     expect(store.adminLogin('admin', '26012026')).toBe(true);
@@ -469,6 +477,13 @@ describe('admin authentication', () => {
     expect(store.adminLogin('', '26012026')).toBe(false);
     expect(store.adminLogin('admin', 'wrong')).toBe(false);
     expect(store.isAdminAuthenticated()).toBe(false);
+  });
+
+  it('refuses to authenticate when no PIN is configured', () => {
+    vi.stubEnv('VITE_ADMIN_PIN', '');
+    expect(store.adminLogin('admin', '26012026')).toBe(false);
+    expect(store.isAdminAuthenticated()).toBe(false);
+    vi.stubEnv('VITE_ADMIN_PIN', '26012026');
   });
 
   it('locks the account after the maximum failed attempts', () => {

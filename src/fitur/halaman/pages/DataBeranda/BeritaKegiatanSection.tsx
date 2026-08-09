@@ -1,38 +1,32 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, ArrowRight } from 'lucide-react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
-import { activityItems } from '../../data';
-
-interface ArticleItem {
-  id?: string | number;
-  title: string;
-  desc: string;
-  image: string;
-  date?: string;
-}
+import { news, type NewsItem } from '../../data/berita/data';
+import { resolveBeritaNav } from './detailNav';
 
 interface RelatedArticlesSectionProps {
   onNavigate?: (page: string) => void;
 }
 
+// Bagian ini hanya "wajah" (teaser) dari berita: memakai data `news` yang sama
+// dengan halaman Berita. Klik kartu langsung membuka KONTEN berita (berita-N),
+// dan tombol back akan kembali ke halaman asal (mis. Beranda) karena riwayat
+// navigasi modal disimpan di ExpectationModal.
 export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const items = activityItems as ArticleItem[];
 
-    if (!query) return items;
+    if (!query) return news;
 
-    return items.filter(
-      (art) => art.title.toLowerCase().includes(query) || art.desc.toLowerCase().includes(query)
+    return news.filter(
+      (art) => art.title.toLowerCase().includes(query) || art.excerpt.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 
   const featuredItem = filteredItems[0];
   const secondaryItems = filteredItems.slice(1, 3);
-  // Sisa artikel yang akan ditampilkan berjejer di bagian bawah (mulai dari indeks ke-3 dst)
-  const remainingItems = filteredItems.slice(3);
 
   return (
     <section className="w-full bg-white font-sans">
@@ -102,11 +96,8 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                 <div className="relative z-10 -mt-10 flex flex-col gap-6 md:-mt-16 md:basis-1/2">
                   <div
                     onClick={() => {
-                      const origIdx = (activityItems as ArticleItem[]).findIndex(
-                        (i) => i.title === featuredItem.title
-                      );
-                      const targetId = featuredItem.id ?? (origIdx !== -1 ? origIdx + 1 : 1);
-                      onNavigate?.(`kegiatan-${targetId}`);
+                      const nav = resolveBeritaNav(featuredItem.id);
+                      if (nav) onNavigate?.(nav);
                     }}
                     className="group flex cursor-pointer flex-col gap-4"
                   >
@@ -116,8 +107,10 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                         alt={featuredItem.title}
                         className="h-full w-full object-cover"
                       />
-                      <div>
-                        <span className="inline-flex items-center gap-2 rounded-lg bg-emerald-800/90 px-3 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm backdrop-blur-md"></span>
+                      <div className="absolute top-3 left-3">
+                        <span className="inline-flex items-center gap-2 rounded-lg bg-emerald-800/90 px-3 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm backdrop-blur-md">
+                          {featuredItem.category}
+                        </span>
                       </div>
                     </div>
 
@@ -125,7 +118,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                       <h2 className="sec-card-title text-slate-900 transition-colors group-hover:text-emerald-700">
                         {featuredItem.title}
                       </h2>
-                      <p className="sec-body line-clamp-6 text-slate-600">{featuredItem.desc}</p>
+                      <p className="sec-body line-clamp-6 text-slate-600">{featuredItem.excerpt}</p>
                     </div>
                   </div>
                 </div>
@@ -137,10 +130,10 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                 <div className="-mt-15 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => onNavigate?.('Kegiatan Sekolah')}
+                    onClick={() => onNavigate?.('Berita')}
                     className="sec-btn group relative z-10 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-emerald-800 transition-all hover:text-emerald-900"
                   >
-                    <span>Riset Lainnya</span>
+                    <span>Lihat Semua</span>
                     <ArrowRight
                       size={16}
                       className="transition-transform duration-300 group-hover:translate-x-1"
@@ -149,19 +142,14 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  {secondaryItems.map((art, index) => {
-                    const originalIndex = (activityItems as ArticleItem[]).findIndex(
-                      (item) => item.title === art.title
-                    );
-                    const targetId =
-                      art.id ?? (originalIndex !== -1 ? originalIndex + 1 : index + 2);
-                    const itemKey =
-                      art.id ?? `${art.title}-${originalIndex !== -1 ? originalIndex : index}`;
-
+                  {secondaryItems.map((art: NewsItem) => {
                     return (
                       <div
-                        key={itemKey}
-                        onClick={() => onNavigate?.(`kegiatan-${targetId}`)}
+                        key={art.id}
+                        onClick={() => {
+                          const nav = resolveBeritaNav(art.id);
+                          if (nav) onNavigate?.(nav);
+                        }}
                         className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg bg-transparent transition-all duration-300 ease-out hover:bg-emerald-800"
                       >
                         <div className="h-[160px] w-full overflow-hidden bg-slate-100">
@@ -174,16 +162,14 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
 
                         <div className="flex flex-col gap-2 p-4 transition-all duration-300">
                           <span className="sec-eyebrow text-emerald-600 group-hover:text-emerald-200">
-                            Kegiatan
+                            {art.category}
                           </span>
                           <h3 className="sec-card-title line-clamp-2 text-slate-900 group-hover:text-white">
                             {art.title}
                           </h3>
-                          {art.date && (
-                            <span className="sec-meta pt-1 font-medium text-slate-500 group-hover:text-emerald-100">
-                              {art.date}
-                            </span>
-                          )}
+                          <span className="sec-meta pt-1 font-medium text-slate-500 group-hover:text-emerald-100">
+                            {art.dateLabel}
+                          </span>
                         </div>
                       </div>
                     );
@@ -192,51 +178,11 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
               </div>
             </div>
 
-            {/* 3. Bagian Bawah: Ebook */}
-            {remainingItems.length > 0 && (
-              <div className="border-t border-slate-100 pt-6">
-                <h3 className="sec-subtitle mb-6 text-slate-900">Ebook</h3>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                  {remainingItems.map((art, index) => {
-                    const itemKey = art.id ?? `remaining-${art.title}-${index}`;
-                    const ebookNumber = index + 1;
-
-                    return (
-                      <div
-                        key={itemKey}
-                        onClick={() => onNavigate?.(`ebook-${ebookNumber}`)}
-                        className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-transparent transition-all duration-300 ease-out hover:bg-emerald-800"
-                      >
-                        <div className="aspect-[2/1] w-full overflow-hidden bg-slate-100">
-                          <img
-                            src={`${import.meta.env.BASE_URL}${art.image}`}
-                            alt={art.title}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-
-                        <div className="flex flex-1 flex-col justify-between gap-2 p-4 transition-all duration-300">
-                          <h3 className="sec-card-title line-clamp-2 text-slate-900 group-hover:text-white">
-                            {art.title}
-                          </h3>
-
-                          <p className="sec-card-body line-clamp-5 text-slate-500 group-hover:text-emerald-100">
-                            {art.desc}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Tombol Lihat Semua di Paling Bawah */}
             <div>
               <button
                 type="button"
-                onClick={() => onNavigate?.('Kegiatan Sekolah')}
+                onClick={() => onNavigate?.('Berita')}
                 className="sec-btn inline-block cursor-pointer border-none bg-transparent font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
               >
                 Lihat semua

@@ -7,9 +7,16 @@ import {
   addLoginLog,
   setClassTeacherId,
 } from '../data/services';
-import { loginPortal, loginAdmin, savePortalTokens, clearPortalTokens } from '../services/authApi';
+import {
+  loginPortal,
+  loginAdmin,
+  savePortalTokens,
+  clearPortalTokens,
+  logoutPortal,
+} from '../services/authApi';
 import { type AuthUser, type UserRole } from '../types';
 import { logger } from '../utils/logger';
+import { API_BASE, hasApi } from '../services/apiConfig';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -44,19 +51,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (id: string, password: string, role: UserRole): Promise<boolean> => {
       // Admin login diverifikasi backend (/api/auth/admin/login). Kredensial
       // admin hanya ada di env backend, tidak pernah dibundle ke frontend.
-      const adminResult = await loginAdmin(id, password);
+      // Hanya dipanggil untuk role 'admin' — jangan coba login admin untuk
+      // role lain (sebelumnya ini mengirim request admin login setiap login).
+      if (role === 'admin') {
+        const adminResult = await loginAdmin(id, password);
 
-      if (adminResult.status === 'ok') {
-        savePortalTokens(adminResult.accessToken, adminResult.refreshToken);
-        const authUser: AuthUser = {
-          id: `admin_${adminResult.profileName}`,
-          name: 'Administrator',
-          role: 'admin',
-        };
-        setUser(authUser);
-        simpanSesi(authUser);
-        addLoginLog(authUser.name, 'admin', 'form');
-        return true;
+        if (adminResult.status === 'ok') {
+          savePortalTokens(adminResult.accessToken, adminResult.refreshToken);
+          const authUser: AuthUser = {
+            id: `admin_${adminResult.profileName}`,
+            name: 'Administrator',
+            role: 'admin',
+          };
+          setUser(authUser);
+          simpanSesi(authUser);
+          addLoginLog(authUser.name, 'admin', 'form');
+          return true;
+        }
+
+        // Backend menolak kredensial admin — jangan lanjut ke alur lain.
+        if (adminResult.status === 'invalid') {
+          return false;
+        }
+        // status 'unreachable' → backend tidak aktif; admin butuh backend,
+        // fallback store lokal tidak punya akun admin → login gagal.
+        return false;
       }
 
       // Coba backend dulu
@@ -85,6 +104,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (portalResult.status === 'invalid') {
+        return false;
+      }
+
+      // Backend dikonfigurasi tapi tidak terjangkau — JANGAN fallback ke store
+      // lokal, karena akun & otorisasinya hanya sah di server. Fallback lokal
+      // hanya diperbolehkan dalam mode demo (backend memang tidak dipakai).
+      if (hasApi) {
         return false;
       }
 
@@ -169,8 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Coba verifikasi via backend dulu
       try {
-        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
-        const res = await fetch(`${apiBase}/auth/google`, {
+        const res = await fetch(`${API_BASE}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken: credential, role }),
@@ -209,6 +234,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('absensi_auth');
+    // Revoke token di server (best-effort — jangan blokir logout lokal jika
+    // backend tidak terjangkau). Tanpa ini token tetap valid sampai expiry.
+    void logoutPortal();
     clearPortalTokens();
   }, []);
 

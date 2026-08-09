@@ -1,6 +1,6 @@
 // src/fitur/halaman/pages/DataBeranda/LayananCarousel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { layananItems } from './layananData';
+import { layananItems } from '../../data/beranda/layanan/data';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
 
 interface LayananItem {

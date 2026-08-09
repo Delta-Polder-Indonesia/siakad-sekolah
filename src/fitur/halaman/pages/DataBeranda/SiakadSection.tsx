@@ -21,7 +21,7 @@ export default function SiakadSection({
       */}
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 pt-44 md:pt-48 lg:flex-row lg:gap-12">
         {/* ─── KONTEN ARTIKEL (Sisi Kiri) ─── */}
-        <article className="text-grey-800 flex-1">
+        <article className="flex-1 text-slate-800">
           {/* 'mb-36' diubah kembali ke 'mb-6' agar jarak judul ke paragraf normal */}
           <div className="mb-6 flex items-center gap-3">
             <img
@@ -32,7 +32,7 @@ export default function SiakadSection({
             <h1 className="sec-title text-blue-900">Sistem Informasi Akademik (SIAKAD)</h1>
           </div>
 
-          <div className="text-grey-600 sec-body space-y-4">
+          <div className="sec-body space-y-4 text-slate-600">
             <p>
               <strong className="font-bold text-blue-900">
                 Sistem Informasi Akademik (SIAKAD) adalah
@@ -58,8 +58,8 @@ export default function SiakadSection({
           </div>
 
           <div className="sec-meta mt-8">
-            <p className="text-grey-500 mb-1 font-bold">Sumber:</p>
-            <p className="text-grey-500">www.siakad</p>
+            <p className="mb-1 font-bold text-slate-500">Sumber:</p>
+            <p className="text-slate-500">www.siakad</p>
           </div>
         </article>
 

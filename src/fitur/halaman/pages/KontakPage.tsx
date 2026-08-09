@@ -14,31 +14,12 @@ import {
   emailDomain,
   mapsQuery,
 } from '../components/Profile/dataSekolah';
-
-// ============================================================
-// Konstanta data
-// ============================================================
-const CONTACT_INFO = {
-  address: `${alamat}, ${kecamatan}, ${kota}, ${provinsi} ${kodePos}`,
-  phone: telepon,
-  callCenter: telepon,
-  email,
-  website: emailDomain,
-} as const;
-
-// URL Google Maps diperbarui dari config sekolah
-const MAPS_URL = `https://www.google.com/maps?q=${mapsQuery}&z=17&output=embed`;
-
-const MAPS_EXTERNAL_URL = `https://www.google.com/maps?q=${mapsQuery}`;
-
-const TIM_DAPODIK = [
-  'Pusat Data dan Teknologi Informasi',
-  'Sekretariat Direktorat Jenderal Pendidikan Anak Usia Dini, Pendidikan Dasar, dan Pendidikan Menengah.',
-  'Sekretariat Direktorat Jenderal Vokasi, Pendidikan Khusus, dan Pendidikan Layanan Khusus.',
-  'Sekretariat Direktorat Jenderal Guru, Tenaga Kependidikan, dan Pendidikan Guru.',
-  'Sekretariat Badan Standar, Kurikulum, dan Asesmen Pendidikan.',
-  'Sekretariat Badan Pengembangan dan Pembinaan Bahasa.',
-];
+import {
+  CONTACT_INFO,
+  MAPS_URL,
+  MAPS_EXTERNAL_URL,
+  TIM_DAPODIK,
+} from '../data/kontak/data';
 
 // ============================================================
 // Sub-component: InfoItem

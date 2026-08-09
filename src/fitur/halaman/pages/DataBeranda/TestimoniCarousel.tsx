@@ -1,6 +1,6 @@
 // src/fitur/halaman/pages/DataBeranda/TestimoniCarousel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { testimoniSlides } from './testimoniData';
+import { testimoniSlides } from '../../data/beranda/testimoni/data';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
 
 interface TestimoniSlide {

@@ -118,21 +118,21 @@ export class DataRetentionService {
   }
   
   /**
-   * Clean up expired tokens from blacklist
+   * Clean up expired tokens dari registry sesi (tabel SessionToken tunggal)
    */
   static async cleanupExpiredTokens(): Promise<number> {
     const now = new Date();
-    
-    const result = await prisma.tokenBlacklist.deleteMany({
+
+    const sessionResult = await prisma.sessionToken.deleteMany({
       where: {
         expiresAt: {
           lt: now,
         },
       },
     });
-    
-    logger.info(`Cleaned up ${result.count} expired tokens from blacklist`);
-    return result.count;
+
+    logger.info(`Cleaned up ${sessionResult.count} expired tokens/sessions`);
+    return sessionResult.count;
   }
   
   /**
@@ -278,8 +278,9 @@ export class DataRetentionService {
     const now = new Date();
     
     // Count records that would be cleaned up
-    const tokenBlacklistCount = await prisma.tokenBlacklist.count({
+    const tokenBlacklistCount = await prisma.sessionToken.count({
       where: {
+        revoked: true,
         expiresAt: {
           lt: now,
         },

@@ -1,7 +1,7 @@
 // src/fitur/halaman/ExpectationModal.tsx
 import React, { useRef, useState, useEffect, lazy, Suspense, useCallback, useMemo } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { navItems } from './data';
+import { navItems } from './data/navigation/data';
 import type { ExpectationModalProps, NavItem } from './types';
 import { NavigationContext } from './context/NavigationContext';
 import { namaSekolahUppercase, isSmk } from './components/Profile/dataSekolah';

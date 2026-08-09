@@ -7,6 +7,9 @@ declare global {
   namespace Express {
     interface Request {
       jwtUser?: JwtPayload;
+      validatedBody?: unknown;
+      validatedQuery?: unknown;
+      validatedParams?: unknown;
     }
   }
 }

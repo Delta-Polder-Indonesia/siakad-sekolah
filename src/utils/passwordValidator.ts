@@ -81,8 +81,10 @@ export class PasswordValidator {
     }
 
     // Cek special character
+    // eslint-disable-next-line no-useless-escape
     if (PASSWORD_POLICY.REQUIRE_SPECIAL_CHAR && !/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
       errors.push('Password harus mengandung karakter khusus (!@#$%^&*)');
+      // eslint-disable-next-line no-useless-escape
     } else if (/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
       score += 10;
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
+import { DEFAULT_TAGS } from '../../data/beranda/sekolahBerdampak/data';
 
 export interface KampusBerdampakSectionProps {
   onNavigate?: (path: string) => void;
@@ -11,8 +12,6 @@ export interface KampusBerdampakSectionProps {
   buttonLink?: string;
   imageSrc?: string;
 }
-
-const DEFAULT_TAGS = ['Magang Berdampak', 'KKN-T Berdampak', 'Siswa Berdampak'];
 
 export default function KampusBerdampakSection({
   onNavigate,

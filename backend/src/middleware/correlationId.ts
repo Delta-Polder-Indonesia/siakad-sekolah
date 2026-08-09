@@ -17,10 +17,9 @@ export const correlationId: RequestHandler = (req, res, next) => {
   next();
 };
 
-declare global {
-  namespace Express {
-    interface Request {
-      requestId?: string;
-    }
+// Augmentasi tipe Express.Request (module augmentation, bukan namespace).
+declare module 'express-serve-static-core' {
+  interface Request {
+    requestId?: string;
   }
 }

@@ -13,6 +13,11 @@ export interface Feedback {
   submittedAt: number;
   adminNotes?: string;
   processedAt?: number;
+  // Rating system fields
+  rating?: number; // 1-5 stars for reviews
+  likes?: number; // Number of likes
+  likedBy?: string[]; // Array of user IDs who liked this feedback
+  avatar?: string; // User avatar URL
 }
 
 const STORAGE_KEY = 'feedback_data';
@@ -170,5 +175,50 @@ export function getFeedbackStats() {
       sedang: feedbacks.filter(f => f.priority === 'sedang').length,
       tinggi: feedbacks.filter(f => f.priority === 'tinggi').length,
     },
+    // Rating statistics
+    averageRating: feedbacks.length > 0 && feedbacks.some(f => f.rating) 
+      ? feedbacks.filter(f => f.rating).reduce((sum, f) => sum + (f.rating || 0), 0) / feedbacks.filter(f => f.rating).length 
+      : 0,
+    ratingBreakdown: {
+      5: feedbacks.filter(f => f.rating === 5).length,
+      4: feedbacks.filter(f => f.rating === 4).length,
+      3: feedbacks.filter(f => f.rating === 3).length,
+      2: feedbacks.filter(f => f.rating === 2).length,
+      1: feedbacks.filter(f => f.rating === 1).length,
+    },
   };
+}
+
+// Like/Unlike feedback
+export function toggleFeedbackLike(feedbackId: string, userId: string): void {
+  const feedbacks = getFeedbacks();
+  const index = feedbacks.findIndex(f => f.id === feedbackId);
+  
+  if (index !== -1) {
+    const feedback = feedbacks[index];
+    const likedBy = feedback.likedBy || [];
+    const hasLiked = likedBy.includes(userId);
+    
+    if (hasLiked) {
+      // Unlike
+      feedback.likedBy = likedBy.filter(id => id !== userId);
+      feedback.likes = Math.max(0, (feedback.likes || 0) - 1);
+    } else {
+      // Like
+      feedback.likedBy = [...likedBy, userId];
+      feedback.likes = (feedback.likes || 0) + 1;
+    }
+    
+    saveFeedbacks(feedbacks);
+  }
+}
+
+// Mendapatkan feedback dengan rating (untuk reviews)
+export function getFeedbacksWithRating(): Feedback[] {
+  return getFeedbacks().filter(f => f.rating && f.rating > 0);
+}
+
+// Mendapatkan feedback berdasarkan rating
+export function getFeedbacksByRating(rating: number): Feedback[] {
+  return getFeedbacks().filter(f => f.rating === rating);
 }

@@ -12,6 +12,7 @@ import {
 import QRCode from 'qrcode';
 import { FileUpload, useToast } from '../../components/ui';
 import { ppdbService } from '../../services/ppdbService';
+import { escapeHtml, printViaBlob } from '../../utils/print';
 
 type PPDBFormProps = {
   onBack: () => void;
@@ -238,8 +239,6 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
 
   const handlePrintReceipt = () => {
     if (!submitInfo) return;
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (!win) return;
 
     const formattedDate = new Date(submitInfo.submittedAt).toLocaleString('id-ID', {
       day: '2-digit',
@@ -249,58 +248,17 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
       minute: '2-digit',
     });
 
-    win.document.write(`
-      <html>
-        <head>
-          <title>Bukti Pendaftaran PPDB - ${submitInfo.registrationNo}</title>
-          <style>
-            body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 32px; }
-            .paper { max-width: 800px; margin: 0 auto; }
-            .head { border-bottom: 2px solid #2E86C1; padding-bottom: 12px; margin-bottom: 20px; }
-            .head h1 { margin: 0; font-size: 20px; color: #2E86C1; }
-            .head p { margin: 4px 0 0; font-size: 12px; color: #666; }
-            .title { font-size: 18px; font-weight: bold; margin-bottom: 16px; color: #333; }
-            .row { display: flex; border-bottom: 1px solid #DDD; padding: 10px 0; font-size: 14px; }
-            .label { width: 220px; color: #666; }
-            .value { flex: 1; font-weight: 600; color: #333; }
-            .note { margin-top: 18px; font-size: 12px; color: #666; line-height: 1.5; }
-            .qr-wrap { margin-top: 20px; display: flex; gap: 20px; align-items: center; }
-            .qr-wrap img { width: 120px; height: 120px; border: 1px solid #DDD; }
-            .signature { margin-top: 52px; display: flex; justify-content: space-between; font-size: 13px; color: #333; }
-          </style>
-        </head>
-        <body>
-          <div class="paper">
-            <div class="head">
-              <h1>PPDB NASIONAL - BUKTI PENDAFTARAN RESMI</h1>
-              <p>Kementerian Pendidikan | Sistem Penerimaan Peserta Didik Baru</p>
-            </div>
-            <div class="title">Nomor Registrasi: ${submitInfo.registrationNo}</div>
-            <div class="row"><div class="label">Nama Calon Siswa</div><div class="value">${submitInfo.namaLengkap}</div></div>
-            <div class="row"><div class="label">Jenjang Tujuan</div><div class="value">${submitInfo.jenjangTujuan}</div></div>
-            <div class="row"><div class="label">Sekolah Tujuan</div><div class="value">${submitInfo.sekolahTujuan}</div></div>
-            <div class="row"><div class="label">Jalur Pendaftaran</div><div class="value">${submitInfo.jalurPendaftaran}</div></div>
-            <div class="row"><div class="label">Waktu Pengiriman</div><div class="value">${formattedDate}</div></div>
-            <div class="note">
-               Dokumen ini merupakan bukti pendaftaran awal. Simpan dokumen ini dan nomor registrasi untuk proses verifikasi
-               administrasi di sekolah tujuan.
-            </div>
-            ${
-              submitInfo.qrDataUrl
-                ? `<div class="qr-wrap"><img src="${submitInfo.qrDataUrl}" alt="QR Registrasi" /><div><strong>QR Verifikasi</strong><p style="font-size:12px;color:#666;margin-top:6px;">Dipindai oleh petugas untuk membuka data registrasi.</p></div></div>`
-                : ''
-            }
-            <div class="signature">
-              <div>Orang Tua/Wali</div>
-              <div>Petugas PPDB</div>
-            </div>
-          </div>
-        </body>
-      </html>
-    `);
-    win.document.close();
-    win.focus();
-    win.print();
+    const qrImage = submitInfo.qrDataUrl
+      ? `<div class="qr-wrap"><img src="${escapeHtml(submitInfo.qrDataUrl)}" alt="QR Registrasi" /><div><strong>QR Verifikasi</strong><p style="font-size:12px;color:#666;margin-top:6px;">Dipindai oleh petugas untuk membuka data registrasi.</p></div></div>`
+      : '';
+
+    const html = `<!DOCTYPE html><html><head><title>Bukti Pendaftaran PPDB - ${escapeHtml(submitInfo.registrationNo)}</title><style>body{font-family:Arial,sans-serif;color:#333;margin:0;padding:32px}.paper{max-width:800px;margin:0 auto}.head{border-bottom:2px solid #2E86C1;padding-bottom:12px;margin-bottom:20px}.head h1{margin:0;font-size:20px;color:#2E86C1}.head p{margin:4px 0 0;font-size:12px;color:#666}.title{font-size:18px;font-weight:bold;margin-bottom:16px;color:#333}.row{display:flex;border-bottom:1px solid #DDD;padding:10px 0;font-size:14px}.label{width:220px;color:#666}.value{flex:1;font-weight:600;color:#333}.note{margin-top:18px;font-size:12px;color:#666;line-height:1.5}.qr-wrap{margin-top:20px;display:flex;gap:20px;align-items:center}.qr-wrap img{width:120px;height:120px;border:1px solid #DDD}.signature{margin-top:52px;display:flex;justify-content:space-between;font-size:13px;color:#333}</style></head><body><div class="paper"><div class="head"><h1>PPDB NASIONAL - BUKTI PENDAFTARAN RESMI</h1><p>Kementerian Pendidikan | Sistem Penerimaan Peserta Didik Baru</p></div><div class="title">Nomor Registrasi: ${escapeHtml(submitInfo.registrationNo)}</div><div class="row"><div class="label">Nama Calon Siswa</div><div class="value">${escapeHtml(submitInfo.namaLengkap)}</div></div><div class="row"><div class="label">Jenjang Tujuan</div><div class="value">${escapeHtml(submitInfo.jenjangTujuan)}</div></div><div class="row"><div class="label">Sekolah Tujuan</div><div class="value">${escapeHtml(submitInfo.sekolahTujuan)}</div></div><div class="row"><div class="label">Jalur Pendaftaran</div><div class="value">${escapeHtml(submitInfo.jalurPendaftaran)}</div></div><div class="row"><div class="label">Waktu Pengiriman</div><div class="value">${escapeHtml(formattedDate)}</div></div><div class="note">Dokumen ini merupakan bukti pendaftaran awal. Simpan dokumen ini dan nomor registrasi untuk proses verifikasi administrasi di sekolah tujuan.</div>${qrImage}<div class="signature"><div>Orang Tua/Wali</div><div>Petugas PPDB</div></div></div></body></html>`;
+
+    printViaBlob(html, {
+      title: `Bukti Pendaftaran - ${submitInfo.registrationNo}`,
+      width: 'width=900',
+      height: 'height=700',
+    });
   };
 
   const nextStep = () => {

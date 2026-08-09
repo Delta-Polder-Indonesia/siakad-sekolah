@@ -19,7 +19,8 @@ systemRouter.get('/info', requireAuth, requireAdmin, (_req, res) => {
       hostname: os.hostname(),
       cpuCount: cpus.length,
       cpuModel: cpus[0]?.model ?? 'unknown',
-      cpuLoadPercent: cpuLoad.user + cpuLoad.system,
+      // process.cpuUsage() mengembalikan mikro-detik kumulatif, bukan persen.
+      cpuUsageMicroseconds: cpuLoad.user + cpuLoad.system,
       uptimeSeconds: Math.round(process.uptime()),
       pid: process.pid,
     },

@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import {
   loginTeacher,
   loginStudent,
+  loginParent,
   loginGuest,
   loginAdmin,
   loginGoogle,
@@ -56,6 +57,8 @@ export const handleLogin: RequestHandler = async (req, res, next) => {
       result = await loginTeacher(id!, password);
     } else if (role === 'MURID') {
       result = await loginStudent(id!, password);
+    } else if (role === 'WALIS') {
+      result = await loginParent(id!, password);
     } else if (role === 'TAMU') {
       result = await loginGuest(password);
     } else {
@@ -208,6 +211,7 @@ export const handleValidatePassword: RequestHandler = async (req, res, next) => 
 };
 
 // POST /api/auth/change-password (untuk guru)
+// Route diproteksi requireAuth — user hanya bisa mengubah password akunnya sendiri.
 export const handleChangeTeacherPassword: RequestHandler = async (req, res, next) => {
   try {
     // Validate request body
@@ -222,16 +226,26 @@ export const handleChangeTeacherPassword: RequestHandler = async (req, res, next
     }
 
     const { teacherId, oldPassword, newPassword } = validation.data;
+    const jwtUser = req.jwtUser;
 
-    if (!teacherId) {
-      res.status(400).json({
+    if (!jwtUser) {
+      res.status(401).json({ ok: false, message: 'Harus login terlebih dahulu.' });
+      return;
+    }
+
+    // Ambil ID dari token (sumber kebenaran), bukan dari body — mencegah user
+    // mengubah password guru lain asalkan tahu teacherId.
+    const targetId = teacherId || jwtUser.userId;
+
+    if (jwtUser.role !== 'GURU' || targetId !== jwtUser.userId) {
+      res.status(403).json({
         ok: false,
-        message: 'Teacher ID wajib diisi.',
+        message: 'Akses ditolak. Anda hanya dapat mengubah password akun sendiri.',
       });
       return;
     }
 
-    const result = await changeTeacherPassword(teacherId, oldPassword, newPassword);
+    const result = await changeTeacherPassword(targetId, oldPassword, newPassword);
 
     res.json({ ok: true, message: result.message });
   } catch (err) {
@@ -240,6 +254,7 @@ export const handleChangeTeacherPassword: RequestHandler = async (req, res, next
 };
 
 // POST /api/auth/change-password (untuk siswa)
+// Route diproteksi requireAuth — user hanya bisa mengubah password akunnya sendiri.
 export const handleChangeStudentPassword: RequestHandler = async (req, res, next) => {
   try {
     // Validate request body
@@ -254,16 +269,25 @@ export const handleChangeStudentPassword: RequestHandler = async (req, res, next
     }
 
     const { studentId, oldPassword, newPassword } = validation.data;
+    const jwtUser = req.jwtUser;
 
-    if (!studentId) {
-      res.status(400).json({
+    if (!jwtUser) {
+      res.status(401).json({ ok: false, message: 'Harus login terlebih dahulu.' });
+      return;
+    }
+
+    // Ambil ID dari token (sumber kebenaran), bukan dari body.
+    const targetId = studentId || jwtUser.userId;
+
+    if (jwtUser.role !== 'MURID' || targetId !== jwtUser.userId) {
+      res.status(403).json({
         ok: false,
-        message: 'Student ID wajib diisi.',
+        message: 'Akses ditolak. Anda hanya dapat mengubah password akun sendiri.',
       });
       return;
     }
 
-    const result = await changeStudentPassword(studentId, oldPassword, newPassword);
+    const result = await changeStudentPassword(targetId, oldPassword, newPassword);
 
     res.json({ ok: true, message: result.message });
   } catch (err) {
@@ -276,6 +300,7 @@ export const handleLogout: RequestHandler = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     const userId = req.jwtUser?.userId;
+    const refreshToken = (req.body as { refreshToken?: string | null } | undefined)?.refreshToken;
 
     if (!token) {
       res.status(400).json({
@@ -285,7 +310,7 @@ export const handleLogout: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const result = await logout(token, userId);
+    const result = await logout(token, userId, refreshToken);
 
     res.json({ ok: result.success, message: result.message });
   } catch (err) {

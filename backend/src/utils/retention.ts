@@ -54,16 +54,19 @@ export async function runDataRetention(
 ): Promise<Record<string, number>> {
   const result: Record<string, number> = {};
 
-  // 1. Token blacklist yang sudah kedaluwarsa
+  // 1. Token sesi yang di-revoke dan sudah kedaluwarsa (tabel SessionToken)
   if (config.tokenBlacklistDays >= 0) {
     try {
       const cutoff = cutoffFromDays(config.tokenBlacklistDays);
-      const res = await prisma.tokenBlacklist.deleteMany({
-        where: { expiresAt: { lt: cutoff } },
+      const res = await prisma.sessionToken.deleteMany({
+        where: {
+          revoked: true,
+          expiresAt: { lt: cutoff },
+        },
       });
       result.tokenBlacklist = res.count;
     } catch (error) {
-      logger.error('Retention: gagal bersihkan token blacklist', {
+      logger.error('Retention: gagal bersihkan token sesi', {
         error: (error as Error).message,
       });
     }

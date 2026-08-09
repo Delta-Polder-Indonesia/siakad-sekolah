@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
   // Connection pool configuration
   // connection_limit = 10
@@ -118,6 +118,7 @@ model Student {
   address        String?
   guardianName   String?
   guardianPhone  String?
+  guardianPasswordHash String? // login Wali Siswa (bcrypt); null = wali belum punya akun
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
   submissions    AssignmentSubmission[]
@@ -149,7 +150,7 @@ model ClassRoomTeacher {
 model Attendance {
   id        String           @id @default(cuid())
   date      DateTime
-  status    AttendanceStatus
+  status    String
   note      String?
   studentId String
   teacherId String
@@ -307,13 +308,13 @@ model SuratIzin {
   id             String          @id @default(cuid())
   studentId      String
   classId        String
-  type           SuratIzinType
+  type           String
   subject        String
   message        String
   letterDate     DateTime
   startDate      DateTime?
   endDate        DateTime?
-  status         SuratIzinStatus @default(MENUNGGU)
+  status         String         @default("MENUNGGU")
   attachmentUrl  String?
   attachmentName String?
   createdAt      DateTime        @default(now())
@@ -348,7 +349,7 @@ model Book {
 model LibraryMember {
   id           String               @id @default(cuid())
   name         String
-  memberType   LibraryMemberType
+  memberType   String
   nis          String?
   className    String?
   joinedAt     DateTime             @default(now())
@@ -365,7 +366,7 @@ model LibraryTransaction {
   borrowDate DateTime
   dueDate    DateTime
   returnDate DateTime?
-  status     LibraryTransactionStatus @default(MENUNGGU)
+  status     String @default("MENUNGGU")
   note       String?
   createdAt  DateTime                 @default(now())
   updatedAt  DateTime                 @updatedAt
@@ -381,7 +382,7 @@ model LibraryTransaction {
 model PPDBApplication {
   id             String             @id @default(cuid())
   registrationNo String             @unique
-  status         PPDBStatus         @default(PENDING)
+  status         String         @default("PENDING")
   fullName       String
   nisn           String
   nik            String
@@ -497,61 +498,49 @@ model Like {
   @@index([programId])
 }
 
-model TokenBlacklist {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  revokedBy String?
-  reason    String?
+model Feedback {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  role        String   @default("guest")
+  category    String   @default("saran")
+  subject     String
+  message     String
+  priority    String   @default("sedang")
+  status      String   @default("pending")
+  rating      Int?
+  avatar      String?
+  adminNotes  String?
+  processedAt DateTime?
+  submittedAt DateTime @default(now())
+  likes       Int      @default(0)
+  likedBy     String   @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  @@index([category])
+  @@index([status])
+  @@index([priority])
+  @@index([rating])
+}
+
+// Registry tunggal untuk semua token (access & refresh).
+// Menggabungkan peran TokenBlacklist (revoked) dan ActiveSession (registrasi)
+// dalam SATU tabel, sehingga validasi token di requireAuth cukup SATU query.
+model SessionToken {
+  id            String    @id @default(cuid())
+  userId        String
+  token         String    @unique
+  tokenType     String    @default("access") // 'access' | 'refresh'
+  expiresAt     DateTime
+  revoked       Boolean   @default(false)
+  revokedBy     String?
+  revokedReason String?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
   @@index([expiresAt])
+  @@index([revoked])
   @@index([token])
-}
-
-enum UserRole {
-  ADMIN
-  GURU
-  MURID
-}
-
-enum AttendanceStatus {
-  HADIR
-  IZIN
-  SAKIT
-  ALPHA
-}
-
-enum PPDBStatus {
-  PENDING
-  VERIFIED
-  ACCEPTED
-  REJECTED
-}
-
-enum LibraryTransactionStatus {
-  MENUNGGU
-  DIPINJAM
-  DIKEMBALIKAN
-  TERLAMBAT
-  DITOLAK
-}
-
-enum SuratIzinType {
-  IZIN
-  SAKIT
-  DISPENSASI
-  LAINNYA
-}
-
-enum SuratIzinStatus {
-  MENUNGGU
-  DISETUJUI
-  DITOLAK
-}
-
-enum LibraryMemberType {
-  SISWA
-  GURU
-  STAF
 }

@@ -98,9 +98,12 @@ describe('Schema vs Migration Consistency', () => {
     const enumNames = [...schema.matchAll(/^enum\s+(\w+)\s*\{/gm)]
       .map((m) => m[1]);
 
+    // Schema sekarang tidak lagi memakai enum (diganti String agar kompatibel
+    // dengan SQLite) — kalau memang tidak ada enum, tidak ada yang perlu dicek.
+    if (enumNames.length === 0) return;
+
     const allSql = getAllMigrationSql();
 
-    expect(enumNames.length).toBeGreaterThan(0);
     for (const enumName of enumNames) {
       const pattern = new RegExp(
         `CREATE TYPE\\s+["]?${enumName}["]?`,

@@ -8,6 +8,8 @@ import { metricsRouter }    from './metrics.route.js';
 import { systemRouter }     from './system.route.js';
 import { dataRetentionRouter } from './dataRetention.route.js';
 import { queryOptimizationRouter } from './queryOptimization.route.js';
+import { feedbackRouter } from '../modules/feedback/feedback.route.js';
+import { statsRouter } from '../modules/stats/stats.route.js';
 
 export const apiRouter = Router();
 
@@ -20,3 +22,5 @@ apiRouter.use('/metrics',       metricsRouter);
 apiRouter.use('/system',        systemRouter);
 apiRouter.use('/data-retention', dataRetentionRouter);
 apiRouter.use('/query-optimization', queryOptimizationRouter);
+apiRouter.use('/feedback',      feedbackRouter);
+apiRouter.use('/stats',         statsRouter);

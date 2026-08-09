@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const {
-  mockTokenBlacklistDeleteMany,
+  mockSessionTokenDeleteMany,
   mockPPDBAuditLogDeleteMany,
   mockPPDBNotificationDeleteMany,
   mockLibraryTransactionDeleteMany,
 } = vi.hoisted(() => ({
-  mockTokenBlacklistDeleteMany: vi.fn(),
+  mockSessionTokenDeleteMany: vi.fn(),
   mockPPDBAuditLogDeleteMany: vi.fn(),
   mockPPDBNotificationDeleteMany: vi.fn(),
   mockLibraryTransactionDeleteMany: vi.fn(),
@@ -14,8 +14,8 @@ const {
 
 vi.mock('../lib/prisma.js', () => ({
   prisma: {
-    tokenBlacklist: {
-      deleteMany: mockTokenBlacklistDeleteMany,
+    sessionToken: {
+      deleteMany: mockSessionTokenDeleteMany,
     },
     pPDBAuditLog: {
       deleteMany: mockPPDBAuditLogDeleteMany,
@@ -35,7 +35,7 @@ const { runDataRetention, resolveRetentionConfig, DEFAULT_RETENTION } =
 describe('Data Retention Policy', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTokenBlacklistDeleteMany.mockResolvedValue({ count: 5 });
+    mockSessionTokenDeleteMany.mockResolvedValue({ count: 5 });
     mockPPDBAuditLogDeleteMany.mockResolvedValue({ count: 10 });
     mockPPDBNotificationDeleteMany.mockResolvedValue({ count: 3 });
     mockLibraryTransactionDeleteMany.mockResolvedValue({ count: 8 });
@@ -60,7 +60,7 @@ describe('Data Retention Policy', () => {
       ppdbNotification: 3,
       libraryTransaction: 8,
     });
-    expect(mockTokenBlacklistDeleteMany).toHaveBeenCalledOnce();
+    expect(mockSessionTokenDeleteMany).toHaveBeenCalledOnce();
     expect(mockPPDBAuditLogDeleteMany).toHaveBeenCalledOnce();
     expect(mockPPDBNotificationDeleteMany).toHaveBeenCalledOnce();
     expect(mockLibraryTransactionDeleteMany).toHaveBeenCalledOnce();
@@ -81,7 +81,7 @@ describe('Data Retention Policy', () => {
   });
 
   it('runDataRetention harus tetap jalan walau satu kategori error', async () => {
-    mockTokenBlacklistDeleteMany.mockRejectedValue(new Error('DB down'));
+    mockSessionTokenDeleteMany.mockRejectedValue(new Error('DB down'));
     const result = await runDataRetention();
     expect(result.tokenBlacklist).toBeUndefined();
     expect(result.ppdbAuditLog).toBe(10);

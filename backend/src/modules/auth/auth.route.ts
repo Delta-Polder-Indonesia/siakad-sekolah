@@ -46,8 +46,11 @@ authRouter.post('/refresh',                handleRefresh);
 authRouter.post('/admin/login',            loginLimiter, handleAdminLogin);
 authRouter.post('/admin/refresh',          handleRefresh);
 authRouter.post('/validate-password',      handleValidatePassword);
-authRouter.post('/change-password/teacher', passwordChangeLimiter, handleChangeTeacherPassword);
-authRouter.post('/change-password/student', passwordChangeLimiter, handleChangeStudentPassword);
+// Ganti password WAJIB login — user hanya bisa mengubah password akun sendiri.
+// Sebelumnya route ini tanpa requireAuth sehingga siapa pun yang tahu ID +
+// password lama bisa mengubah password guru/siswa lain.
+authRouter.post('/change-password/teacher', passwordChangeLimiter, requireAuth, handleChangeTeacherPassword);
+authRouter.post('/change-password/student', passwordChangeLimiter, requireAuth, handleChangeStudentPassword);
 authRouter.post('/logout',                 logoutLimiter, requireAuth, handleLogout);
 authRouter.post('/logout-all',             logoutLimiter, requireAuth, handleLogoutAllDevices);
 authRouter.get('/blacklist-stats',          requireAuth, requireAdmin, handleBlacklistStats);

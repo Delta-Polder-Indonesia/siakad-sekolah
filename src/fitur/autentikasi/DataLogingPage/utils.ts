@@ -23,7 +23,8 @@ export function validateLoginInput(role: ValidRole, id: string, password: string
 
   // Validasi password strength (hanya jika password validator tersedia)
   try {
-    // Dynamic import untuk menghindari error saat testing
+    // Dynamic require untuk menghindari error saat testing (disengaja).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { isPasswordValid } = require('../../utils/passwordValidator');
     if (!isPasswordValid(password)) {
       return 'Kata sandi harus minimal 8 karakter dengan kombinasi huruf kapital, huruf kecil, angka, dan karakter khusus.';

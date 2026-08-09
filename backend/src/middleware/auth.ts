@@ -4,12 +4,12 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { isTokenBlacklisted } from '../utils/tokenManager.js';
+import { isTokenBlacklisted, isTokenRegistered } from '../utils/tokenManager.js';
 import { logger, logSecurityEvent } from '../config/logger.js';
 
 export interface JwtPayload {
   userId: string;
-  role:   'ADMIN' | 'GURU' | 'MURID' | 'TAMU';
+  role:   'ADMIN' | 'GURU' | 'MURID' | 'WALIS' | 'TAMU';
   name:   string;
 }
 
@@ -24,6 +24,10 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   const token = header.slice(7);
 
   try {
+    // Verifikasi tanda tangan JWT dulu (tanpa query DB) — token invalid/sampah
+    // langsung ditolak tanpa membebani database.
+    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+
     // Check if token is blacklisted
     const blacklisted = await isTokenBlacklisted(token);
     if (blacklisted) {
@@ -35,7 +39,22 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    // Token harus terdaftar sebagai sesi aktif. "Logout dari semua perangkat"
+    // menghapus registry sesi user, sehingga token lama otomatis ditolak di sini
+    // walau tanda tangan JWT-nya masih valid.
+    const registered = await isTokenRegistered(token);
+    if (!registered) {
+      logSecurityEvent('unregistered_token_used', {
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+      });
+      res.status(401).json({
+        ok: false,
+        message: 'Sesi telah berakhir. Silakan login kembali.',
+      });
+      return;
+    }
+
     req.jwtUser = payload;
     next();
   } catch (error) {
@@ -90,7 +109,7 @@ export const requireStudent: RequestHandler = (req, res, next) => {
 };
 
 // Multiple roles yang boleh akses
-export const requireRoles = (...allowedRoles: ('ADMIN' | 'GURU' | 'MURID' | 'TAMU')[]): RequestHandler => {
+export const requireRoles = (...allowedRoles: ('ADMIN' | 'GURU' | 'MURID' | 'WALIS' | 'TAMU')[]): RequestHandler => {
   return (req, res, next) => {
     if (!req.jwtUser || !allowedRoles.includes(req.jwtUser.role)) {
       logSecurityEvent('unauthorized_access_attempt', {

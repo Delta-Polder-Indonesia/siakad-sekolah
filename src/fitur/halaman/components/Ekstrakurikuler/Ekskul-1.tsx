@@ -1,6 +1,6 @@
 import type { PageProps } from '../../types';
 import { ArticleLayout } from '../shared';
-import { getEkskulById } from '../../data/ekskulData';
+import { getEkskulById } from '../../data/kegiatanSekolah/data';
 import { namaSekolahUppercase } from '../Profile/dataSekolah';
 
 export default function Ekskul1Page({ onNavigate }: PageProps) {

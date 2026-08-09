@@ -151,7 +151,8 @@ const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
 export const ADMIN_MAX_ATTEMPTS = Number(import.meta.env.VITE_ADMIN_MAX_ATTEMPTS || '5');
 export const ADMIN_LOCK_MINUTES = Number(import.meta.env.VITE_ADMIN_LOCK_MINUTES || '15');
 export const ADMIN_SESSION_MINUTES = Number(import.meta.env.VITE_ADMIN_SESSION_MINUTES || '480');
-export const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || '26012026';
+// Tanpa nilai env → PIN kosong → login admin PPDB mode lokal DIMATIKAN.
+export const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || '';
 
 let storeVersion = 0;
 

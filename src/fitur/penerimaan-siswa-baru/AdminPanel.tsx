@@ -24,6 +24,7 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ppdbService } from '../../services/ppdbService';
 import { useToast } from '../../components/ui';
+import { escapeHtml, printViaBlob } from '../../utils/print';
 import {
   type PPDBAuditLog,
   type PPDBApplication,
@@ -393,46 +394,21 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
   };
 
   const printRecap = () => {
-    const win = window.open('', '_blank', 'width=1200,height=800');
-    if (!win) return;
     const rows = filtered
       .map(
         (item, idx) => `
         <tr>
-          <td>${idx + 1}</td><td>${item.registrationNo}</td><td>${item.namaLengkap}</td>
-          <td>${item.nik}</td><td>${item.jenjangTujuan}</td><td>${item.jalurPendaftaran}</td>
-          <td>${statusText(item.status)}</td>
-          <td>${new Date(item.submittedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+          <td>${idx + 1}</td><td>${escapeHtml(item.registrationNo)}</td><td>${escapeHtml(item.namaLengkap)}</td>
+          <td>${escapeHtml(item.nik)}</td><td>${escapeHtml(item.jenjangTujuan)}</td><td>${escapeHtml(item.jalurPendaftaran)}</td>
+          <td>${escapeHtml(statusText(item.status))}</td>
+          <td>${escapeHtml(new Date(item.submittedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))}</td>
         </tr>`
       )
       .join('');
-    win.document.write(`
-      <html><head><title>Rekap PPDB</title>
-      <style>
-        body{font-family:Arial,sans-serif;margin:24px;color:#000}
-        h1{margin:0 0 6px;font-size:22px}
-        p{margin:0 0 12px;color:#666;font-size:12px}
-        .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-        .meta div{border:1px solid #ccc;padding:8px;font-size:12px}
-        table{width:100%;border-collapse:collapse;margin-top:16px;font-size:11px}
-        th,td{border:1px solid #ccc;padding:6px;text-align:left}
-        th{background:#f5f5f5}
-      </style></head>
-      <body>
-        <h1>Rekap Data Pendaftar PPDB</h1>
-        <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
-        <div class="meta">
-          <div>Total Data: <strong>${filtered.length}</strong></div>
-          <div>Menunggu: <strong>${stats.pending}</strong></div>
-          <div>Diterima: <strong>${stats.accepted}</strong></div>
-        </div>
-        <table><thead><tr>
-          <th>No</th><th>No Registrasi</th><th>Nama</th><th>NIK</th><th>Jenjang</th><th>Jalur</th><th>Status</th><th>Tanggal</th>
-        </tr></thead><tbody>${rows || '<tr><td colspan="8">Tidak ada data</td></tr>'}</tbody></table>
-      </body></html>`);
-    win.document.close();
-    win.focus();
-    win.print();
+
+    const html = `<!DOCTYPE html><html><head><title>Rekap PPDB</title><style>body{font-family:Arial,sans-serif;margin:24px;color:#000}h1{margin:0 0 6px;font-size:22px}p{margin:0 0 12px;color:#666;font-size:12px}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.meta div{border:1px solid #ccc;padding:8px;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:16px;font-size:11px}th,td{border:1px solid #ccc;padding:6px;text-align:left}th{background:#f5f5f5}</style></head><body><h1>Rekap Data Pendaftar PPDB</h1><p>Dicetak pada: ${escapeHtml(new Date().toLocaleString('id-ID'))}</p><div class="meta"><div>Total Data: <strong>${filtered.length}</strong></div><div>Menunggu: <strong>${stats.pending}</strong></div><div>Diterima: <strong>${stats.accepted}</strong></div></div><table><thead><tr><th>No</th><th>No Registrasi</th><th>Nama</th><th>NIK</th><th>Jenjang</th><th>Jalur</th><th>Status</th><th>Tanggal</th></tr></thead><tbody>${rows || '<tr><td colspan="8">Tidak ada data</td></tr>'}</tbody></table></body></html>`;
+
+    printViaBlob(html, { width: 'width=1200', height: 'height=800' });
   };
 
   const formatDate = (value: string) =>

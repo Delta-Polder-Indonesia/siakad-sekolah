@@ -1,64 +1,7 @@
 import React, { useState } from 'react';
 import { User, CalendarDays } from 'lucide-react';
 import type { PageProps, NavItem } from '../types';
-
-interface NewsItem {
-  id: string;
-  title: string;
-  date: string;
-  dateLabel: string;
-  category: string;
-  excerpt: string;
-  image: string;
-  author: string;
-}
-
-const news: NewsItem[] = [
-  {
-    id: 'berita-1',
-    title: 'SMKN 1 Cimahi Raih Juara LKS Tingkat Provinsi',
-    date: '2026-06-15',
-    dateLabel: '15 Juni 2026',
-    category: 'Prestasi',
-    excerpt:
-      'Tim siswa SMKN 1 Cimahi berhasil meraih juara pertama dalam Lomba Kompetensi Siswa (LKS) bidang Rekayasa Perangkat Lunak tingkat Provinsi Jawa Barat. Prestasi ini menjadi bukti komitmen sekolah dalam mengembangkan kompetensi siswa.',
-    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-1.webp`,
-    author: 'Tim Redaksi',
-  },
-  {
-    id: 'berita-2',
-    title: 'Kunjungan Industri Kelas XI ke Perusahaan Mitra',
-    date: '2026-06-10',
-    dateLabel: '10 Juni 2026',
-    category: 'Kegiatan',
-    excerpt:
-      'Siswa kelas XI melakukan kunjungan industri ke beberapa perusahaan mitra di Bandung dan Cimahi. Kegiatan ini bertujuan memberikan pengalaman langsung tentang dinamika dunia kerja.',
-    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.webp`,
-    author: 'Tim Redaksi',
-  },
-  {
-    id: 'berita-3',
-    title: 'Seminar Karir dan Beasiswa untuk Siswa Kelas XII',
-    date: '2026-06-05',
-    dateLabel: '5 Juni 2026',
-    category: 'Informasi',
-    excerpt:
-      'Sekolah mengadakan seminar karir yang menghadirkan praktisi industri dan perwakilan perguruan tinggi untuk memberikan arahan jalur karir dan informasi beasiswa kepada siswa kelas XII.',
-    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.webp`,
-    author: 'Tim Redaksi',
-  },
-  {
-    id: 'berita-4',
-    title: 'Pembukaan PPDB Gelombang 1 Tahun Ajaran 2026/2027',
-    date: '2026-06-01',
-    dateLabel: '1 Juni 2026',
-    category: 'Pengumuman',
-    excerpt:
-      'Penerimaan Peserta Didik Baru gelombang pertama telah resmi dibuka. Calon siswa dapat mendaftar secara online melalui portal PPDB resmi sekolah.',
-    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.webp`,
-    author: 'Tim Redaksi',
-  },
-];
+import { news, tabs, tahunAjaran } from '../data/berita/data';
 
 export default function BeritaPage({ onNavigate }: PageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -72,16 +15,6 @@ export default function BeritaPage({ onNavigate }: PageProps) {
   const handleImageError = (id: string) => {
     setFailedImages((prev) => ({ ...prev, [id]: true }));
   };
-
-  const tabs = [
-    { id: 'All', label: 'All' },
-    { id: 'Prestasi', label: 'Prestasi' },
-    { id: 'Kegiatan', label: 'Kegiatan' },
-    { id: 'Informasi', label: 'Informasi' },
-    { id: 'Pengumuman', label: 'Pengumuman' },
-  ];
-
-  const tahunAjaran = ['2024/2025', '2025/2026', '2026/2027', '2027/2028'];
 
   const filteredNews = news.filter((item) => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
@@ -212,7 +145,7 @@ export default function BeritaPage({ onNavigate }: PageProps) {
                     >
                       {!failedImages[item.id] ? (
                         <img
-                          src={item.image}
+                          src={`${import.meta.env.BASE_URL}${item.image}`}
                           alt={item.title}
                           className="aspect-[16/10] h-full w-full object-cover"
                           loading="lazy"

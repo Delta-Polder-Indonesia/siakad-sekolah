@@ -229,6 +229,9 @@ export {
   deleteFeedback,
   sendFeedbackToEmail,
   getFeedbackStats,
+  getFeedbacksWithRating,
+  getFeedbacksByRating,
+  toggleFeedbackLike,
 } from './feedbackService';
 
 export type { Feedback } from './feedbackService';

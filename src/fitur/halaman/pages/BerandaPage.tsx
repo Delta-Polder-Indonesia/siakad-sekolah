@@ -1,5 +1,6 @@
 import HeroSection from './DataBeranda/HeroSection';
 import BeritaKegiatanSection from './DataBeranda/BeritaKegiatanSection';
+import EbookSection from './DataBeranda/EbookSection';
 import TestimoniCarousel from './DataBeranda/TestimoniCarousel';
 import LayananCarousel from './DataBeranda/LayananCarousel';
 import VisiSection from './DataBeranda/VisiSection';
@@ -33,6 +34,7 @@ export default function BerandaPage({ onNavigate, onRegister, onShowAgenda }: Be
 
       <TestimoniCarousel />
       <BeritaKegiatanSection onNavigate={handleSectionNavigate} />
+      <EbookSection onNavigate={handleSectionNavigate} />
     </>
   );
 }
