@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Download, ArrowUpRight, BookOpen, FileText } from 'lucide-react';
 import { ebookData, type EbookItem } from '../../data/beranda/ebook/data';
 import { resolveEbookNav } from './detailNav';
 
@@ -8,29 +8,23 @@ interface EbookSectionProps {
 
 export default function EbookSection({ onNavigate }: EbookSectionProps) {
   return (
-    <section className="w-full bg-white font-serif">
-      <div className="mx-auto max-w-7xl px-4 py-12 md:px-10">
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+    <section className="w-full bg-[#FAF9F6] py-12 font-sans text-slate-900 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-stone-300 pb-6 sm:flex-row sm:items-end">
           <div>
-            <h2 className="sec-title text-slate-900">Ebook Digital</h2>
-            <p className="sec-body mt-1 text-slate-600">
-              Koleksi e-book pembelajaran gratis yang dapat diunduh dan dibaca kapan saja
+            <div className="mb-1.5 flex items-center gap-2"></div>
+            <h2 className="font-serif text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              E-book & Bahan Bacaan
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed font-medium text-slate-700">
+              Koleksi e-book modul pembelajaran gratis yang dapat diunduh kapan saja.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              const nav = resolveEbookNav(1);
-              if (nav) onNavigate?.(nav);
-            }}
-            className="sec-btn inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-emerald-800 transition-all hover:bg-emerald-800 hover:text-white"
-          >
-            <span>Lihat Semua</span>
-            <Download size={16} />
-          </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {/* Ebook Grid */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {ebookData.map((ebook, index) => {
             const ebookNumber = index + 1;
             return (
@@ -65,40 +59,71 @@ function EbookCard({ ebook, ebookNumber, onNavigate }: EbookCardProps) {
     : `${import.meta.env.BASE_URL}images/Ebook/cover-placeholder.png`;
 
   return (
-    <div
+    <article
       onClick={handleOpen}
-      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-2 border-slate-200 bg-white transition-all duration-300 hover:border-emerald-800 hover:shadow-xl"
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-lg border border-stone-300 bg-white p-3.5 transition-colors duration-200 hover:border-emerald-800"
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100">
+      {/* Frame Sampul Ringkas (Tanpa Zoom Gambar) */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-stone-100 ring-1 ring-black/5">
         <img
           src={coverSrc}
           alt={ebook.title}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover"
           loading="lazy"
           draggable="false"
         />
+
+        {/* Category Tag */}
         {ebook.category && (
-          <span className="absolute top-2 left-2 rounded-md bg-emerald-800/90 px-2.5 py-1 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
-            {ebook.category}
-          </span>
+          <div className="absolute top-2 left-2">
+            <span className="inline-block rounded bg-slate-900/90 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase backdrop-blur-sm">
+              {ebook.category}
+            </span>
+          </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="sec-card-title line-clamp-1 text-slate-900 group-hover:text-emerald-700">
-          {ebook.title}
-        </h3>
-        <p className="sec-card-body line-clamp-3 flex-1 text-sm text-slate-600">
-          {ebook.description}
-        </p>
-        <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-500">
-          {ebook.fileSize && <span>{ebook.fileSize}</span>}
-          {ebook.pages && <span>{ebook.pages} hal.</span>}
+      {/* Detail Konten Compact */}
+      <div className="mt-3.5 flex flex-1 flex-col justify-between">
+        <div>
+          {/* Title */}
+          <h3 className="line-clamp-1 font-serif text-base leading-snug font-bold text-slate-900 transition-colors duration-200 group-hover:text-emerald-800">
+            {ebook.title}
+          </h3>
+
+          {/* Description */}
+          {ebook.description && (
+            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed font-semibold text-slate-600">
+              {ebook.description}
+            </p>
+          )}
         </div>
-        <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-          <Download size={14} /> Unduh PDF
+
+        {/* Footer Info & Action */}
+        <div className="mt-3.5 border-t border-stone-200 pt-2.5">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+            <div className="flex items-center gap-3">
+              {ebook.pages && (
+                <span className="flex items-center gap-1">
+                  <BookOpen size={12} strokeWidth={2.2} className="text-slate-500" />
+                  {ebook.pages} hal.
+                </span>
+              )}
+              {ebook.fileSize && (
+                <span className="flex items-center gap-1">
+                  <FileText size={12} strokeWidth={2.2} className="text-slate-500" />
+                  {ebook.fileSize}
+                </span>
+              )}
+            </div>
+
+            <span className="inline-flex items-center gap-1 font-bold text-emerald-800 transition-colors duration-200 group-hover:text-emerald-950">
+              <Download size={13} strokeWidth={2.5} />
+              <span>PDF</span>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

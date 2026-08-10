@@ -397,12 +397,12 @@ graph TD
 
 ```mermaid
 erDiagram
-    STORE_TS ||--o{ AUTH_CONTEXT : "provides user data"
-    AUTH_CONTEXT ||--|| APP_TSX : "drives activePage"
-    APP_TSX ||--o{ SIDEBAR : "configures NAV_ITEMS"
-    PANEL_ADMIN_MODAL ||--o{ TAB_KELOLA_KELAS : "contains"
-    PANEL_ADMIN_MODAL ||--o{ TAB_TAMBAH_SISWA : "contains"
-    DATABASE_TYPE ||--o{ STUDENT_INTERFACE : "defines"
+    STORE_TS ||--o{ AUTH_CONTEXT : provides user data
+    AUTH_CONTEXT ||--|| APP_TSX : drives activePage
+    APP_TSX ||--o{ SIDEBAR : configures NAV_ITEMS
+    PANEL_ADMIN_MODAL ||--o{ TAB_KELOLA_KELAS : contains
+    PANEL_ADMIN_MODAL ||--o{ TAB_TAMBAH_SISWA : contains
+    DATABASE_TYPE ||--o{ STUDENT_INTERFACE : defines
 ```
 
 # BAGIAN 1.1 — Getting Started & Project Setup
@@ -658,18 +658,18 @@ graph TD
 
 ```mermaid
 erDiagram
-    TEACHER ||--o{ CLASSROOM : "manages"
-    CLASSROOM ||--o{ STUDENT : "contains"
-    STUDENT ||--o{ ATTENDANCE_RECORD : "has"
-    STUDENT ||--o{ NILAI_RAPOT : "receives"
-    STUDENT ||--o{ TAGIHAN_SEKOLAH : "owes"
-    TEACHER ||--o{ ONLINE_ASSIGNMENT : "creates"
-    STUDENT ||--o{ ASSIGNMENT_SUBMISSION : "submits"
+    TEACHER ||--o{ CLASSROOM : manages
+    CLASSROOM ||--o{ STUDENT : contains
+    STUDENT ||--o{ ATTENDANCE_RECORD : has
+    STUDENT ||--o{ NILAI_RAPOT : receives
+    STUDENT ||--o{ TAGIHAN_SEKOLAH : owes
+    TEACHER ||--o{ ONLINE_ASSIGNMENT : creates
+    STUDENT ||--o{ ASSIGNMENT_SUBMISSION : submits
 
     TEACHER {
         string nip
         string subject
-        string[] classIds
+        string classIds
     }
     STUDENT {
         string nis

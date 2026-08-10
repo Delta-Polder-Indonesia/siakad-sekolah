@@ -58,13 +58,13 @@ export default function PendidikanSection({
               </div>
             </div>
 
-            <p className="sec-subtitle mt-4 text-emerald-700 md:mt-8">
+            <p className="sec-subtitle mt-4 text-justify text-emerald-700 md:mt-8">
               Pendidikan adalah salah satu kunci terpenting bagi bangsa dan negara untuk bertahan
               dalam persaingan global dan merupakan bidang kesejahteraan nasional yang paling
               strategis.
             </p>
 
-            <p className="sec-body mt-4 text-slate-800 md:mt-8">
+            <p className="sec-body mt-4 text-justify text-slate-800 md:mt-8">
               Sumber daya manusia (SDM) yang cerdas dan berkarakter merupakan prasyarat bagi
               pembangunan peradaban yang tinggi. {namaSekolahUppercase} berusaha memajukan SDM di
               Indonesia melalui pendidikan berkualitas guna menyejahterakan bangsa dan negara.
@@ -99,7 +99,7 @@ export default function PendidikanSection({
                 </span>
               </div>
 
-              <p className="sec-card-body text-slate-600 transition-colors group-hover:text-white">
+              <p className="sec-card-body text-justify text-slate-800 transition-colors group-hover:text-white">
                 {program.description}
               </p>
             </a>

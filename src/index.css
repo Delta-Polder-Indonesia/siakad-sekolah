@@ -388,6 +388,7 @@ main > div {
 
 /* Small uppercase label above section titles */
 .sec-eyebrow {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-xs);
   line-height: var(--leading-normal);
   font-weight: var(--weight-semibold);
@@ -397,6 +398,7 @@ main > div {
 
 /* Main section title (h1/h2) */
 .sec-title {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-2xl);
   line-height: var(--leading-tight);
   font-weight: var(--weight-bold);
@@ -405,6 +407,7 @@ main > div {
 
 /* Subtitle / lead paragraph under the title */
 .sec-subtitle {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-md);
   line-height: var(--leading-relaxed);
   font-weight: var(--weight-semibold);
@@ -412,13 +415,15 @@ main > div {
 
 /* Body paragraph */
 .sec-body {
-  font-size: var(--typo-sm);
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
+  font-size: 0.9375rem; /* 15px — sama dengan text-[15px] di Profile folder */
   line-height: var(--leading-relaxed);
   font-weight: var(--weight-normal);
 }
 
 /* Card title */
 .sec-card-title {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-lg);
   line-height: var(--leading-snug);
   font-weight: var(--weight-semibold);
@@ -426,6 +431,7 @@ main > div {
 
 /* Card description */
 .sec-card-body {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-sm);
   line-height: var(--leading-normal);
   font-weight: var(--weight-normal);
@@ -433,6 +439,7 @@ main > div {
 
 /* Meta / small labels (date, source, tags) */
 .sec-meta {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-xs);
   line-height: var(--leading-normal);
   font-weight: var(--weight-normal);
@@ -440,6 +447,7 @@ main > div {
 
 /* Buttons / links-as-buttons */
 .sec-btn {
+  font-family: var(--font-serif); /* Konsisten dengan Profile folder */
   font-size: var(--typo-sm);
   line-height: var(--leading-normal);
   font-weight: var(--weight-semibold);
@@ -449,21 +457,27 @@ main > div {
 /* Responsive bump — same scale across all sections */
 @media (min-width: 768px) {
   .sec-eyebrow {
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
     font-size: var(--typo-sm);
   }
   .sec-title {
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
     font-size: var(--typo-4xl);
   }
   .sec-subtitle {
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
     font-size: var(--typo-xl);
   }
   .sec-body {
-    font-size: var(--typo-base);
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
+    font-size: 0.9375rem; /* 15px — konsisten dengan Profile folder */
   }
   .sec-card-title {
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
     font-size: var(--typo-xl);
   }
   .sec-btn {
+    font-family: var(--font-serif); /* Konsisten dengan Profile folder */
     font-size: var(--typo-base);
   }
 }

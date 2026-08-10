@@ -148,7 +148,7 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                 <h2 className="sec-subtitle mb-2 font-serif text-white">
                   Kini, kamu bisa mengakses berbagai layanan administratif dengan lebih mudah.
                 </h2>
-                <p className="sec-body mb-3 font-serif font-light text-white">
+                <p className="sec-body mb-3 text-justify font-serif font-light text-white">
                   Dengan Putri (Sistem Informasi Layanan Administrasi) {namaSekolahUppercase},
                   proses administrasi yang sebelumnya rumit kini menjadi lebih mudah dan efisien.
                   Semua kebutuhan administratif siswa terintegrasi dalam satu pintu digital,
@@ -222,7 +222,7 @@ export default function SilaAsaServiceSection({ onNavigate }: SilaAsaServiceSect
                 <h2 className="sec-subtitle mb-2 font-serif text-white">
                   Mengajukan berbagai dokumen akademik sekarang lebih mudah dan efisien.
                 </h2>
-                <p className="sec-body mb-3 font-serif font-light text-white">
+                <p className="sec-body mb-3 text-justify font-serif font-light text-white">
                   Dari pengurusan ujian akhir hingga permohonan magang, Putra (Aplikasi Satu Atap)
                   mengakomodasi semua layanan permohonan dengan mudah melalui satu platform digital.
                   Hilangkan kerumitan dan percepat penyelesaian urusan akademik, memberikan

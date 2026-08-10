@@ -29,37 +29,34 @@ export default function SiakadSection({
               alt="Icon Flower"
               className="flex h-8 w-8 items-center justify-center"
             />
-            <h1 className="sec-title text-blue-900">Sistem Informasi Akademik (SIAKAD)</h1>
+            <h2 className="sec-title tracking-tight text-slate-900">
+              Sistem Informasi Akademik (SIAKAD)
+            </h2>
           </div>
 
-          <div className="sec-body space-y-4 text-slate-600">
-            <p>
-              <strong className="font-bold text-blue-900">
+          <div className="text-[15px] leading-relaxed text-slate-800">
+            <p className="mb-4 text-justify">
+              <strong className="sec-subtitle mt-4 text-justify text-emerald-700 md:mt-8">
                 Sistem Informasi Akademik (SIAKAD) adalah
               </strong>{' '}
               aplikasi berbasis web yang dirancang untuk melakukan proses pengelolaan data akademik
               dan data terkait lainnya, sehingga seluruh kegiatan akademik dapat terkelola menjadi
-              informasi yang bermanfaat dalam pengelolaan manajemen perguruan tinggi, pengambilan
-              keputusan, serta pelaporan di lingkungan perguruan tinggi yang melibatkan mahasiswa,
-              dosen, dan petugas administrasi akademik.
+              informasi yang bermanfaat dalam pengelolaan manajemen sekolah, pengambilan keputusan,
+              serta pelaporan di lingkungan SMA Negeri 1 Medan yang melibatkan siswa, guru, dan
+              petugas administrasi akademik. 
             </p>
-            <p>
+            <p className="mb-4 text-justify">
               SIAKAD bertujuan sebagai penataan data dalam pengelolaan akademik, serta mempercepat
               dan memudahkan penyampaian informasi kegiatan administrasi akademik, seperti proses
-              Penerimaan Mahasiswa Baru (PMB), pembuatan jadwal kuliah, pengisian Kartu Rencana
-              Studi (KRS), pengisian nilai, perwalian, pengelolaan data dosen dan mahasiswa, dan
-              jadwal wisuda mahasiswa.
+              Penerimaan Peserta Didik Baru (PPDB), pembuatan jadwal pelajaran, pengisian rencana
+              belajar, input nilai rapor, perwalian kelas, pengelolaan data guru dan siswa, hingga
+              jadwal kelulusan siswa. 
             </p>
-            <p>
-              Selain menjadi sumber daya informasi di kampus, SIAKAD juga dapat digunakan sebagai
-              sarana media komunikasi antara dosen dan mahasiswa, mahasiswa dengan mahasiswa, serta
-              dosen dengan pejabat kampus.
+            <p className="mb-4 text-justify">
+              Selain menjadi sumber daya informasi di sekolah, SIAKAD juga dapat digunakan sebagai
+              sarana media komunikasi antara guru dan siswa, siswa dengan sesama siswa, serta guru
+              dengan pihak manajemen sekolah.
             </p>
-          </div>
-
-          <div className="sec-meta mt-8">
-            <p className="mb-1 font-bold text-slate-500">Sumber:</p>
-            <p className="text-slate-500">www.siakad</p>
           </div>
         </article>
 

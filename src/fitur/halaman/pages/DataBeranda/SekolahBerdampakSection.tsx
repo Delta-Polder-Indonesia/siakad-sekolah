@@ -54,7 +54,7 @@ export default function KampusBerdampakSection({
                 <h2 className="sec-title font-serif text-white">{headline}</h2>
               </div>
 
-              <p className="sec-body font-serif text-white">{description}</p>
+              <p className="sec-body text-justify font-serif text-white">{description}</p>
 
               {/* Badge/Tags */}
               <div className="flex flex-wrap gap-2">

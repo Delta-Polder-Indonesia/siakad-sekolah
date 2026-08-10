@@ -181,7 +181,7 @@ export default function ResearchArticleSection({
 
                 {/* Deskripsi Tambahan dan Tombol Tautan */}
                 <div className="mt-2 flex flex-col gap-4">
-                  <p className="sec-body font-serif text-slate-800">
+                  <p className="text-justify font-serif text-[15px] leading-relaxed text-slate-800">
                     Kami berperan aktif dalam inovasi yang berdampak melalui berbagai cara, termasuk
                     pengembangan riset dan kolaborasi dengan berbagai pihak. {namaSekolahUppercase}
                     berupaya menghasilkan inovasi yang tidak hanya bermanfaat bagi sivitas
