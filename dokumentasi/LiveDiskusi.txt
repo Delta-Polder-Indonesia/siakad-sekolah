@@ -1,3 +1,171 @@
-tolong lihat bagian font di folder ini E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Profile, jadi saya mau semua markup bagian taxt di bagian ini E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\pages\DataBeranda 
-di sama kan dengan E:\guthub\Folder Baru (2)\projeck-portal-siswa\src\fitur\halaman\components\Profile agar font nya tidak di halaman ini pakai font ini kok di halman ini pakai font ini 
-seperti tidak konsisten, saya mau jangan modif yg tidak di suru jadi saya mau bagian font nya saja di perbaiki agar di semua halaman kami pakai font semuanya sama
+Saya memiliki fitur Feedback / Ratings & Reviews pada aplikasi React + TypeScript + Tailwind CSS.
+
+Fitur ini terdiri dari beberapa komponen utama:
+- FeedbackButton.tsx
+- FeedbackPage.tsx
+- RatingsReviews.tsx
+- FeedbackForm.tsx
+- feedbackService dan tipe Feedback terkait
+
+Saya ingin kamu melakukan code review dan refactor fitur ini secara menyeluruh, tetapi JANGAN mengubah fitur hanya demi terlihat lebih kompleks.
+
+Fokus utama adalah meningkatkan kualitas production code, reliability, UX, accessibility, maintainability, dan konsistensi data.
+
+Tolong analisis kode yang saya berikan dan lakukan perbaikan yang memang relevan.
+
+Prioritas perbaikan:
+
+1. DATA & STATE CONSISTENCY
+- Pastikan daftar review dan statistik rating selalu sinkron.
+- Setelah feedback baru dibuat, overall rating, total review, rating count, dan rating breakdown harus ikut diperbarui.
+- Setelah like/unlike, jumlah like dan status liked harus konsisten dengan backend.
+- Pertahankan optimistic update untuk like jika memang cocok, tetapi pastikan rollback benar ketika API gagal.
+- Hindari race condition ketika user melakukan like/unlike dengan cepat.
+- Hindari state yang bisa menjadi stale.
+- Gunakan functional state update jika lebih aman.
+- Jangan melakukan API request berulang yang sebenarnya tidak diperlukan.
+
+2. SUBMIT FLOW
+- Audit flow setelah feedback berhasil dikirim.
+- Saat ini jangan sampai aplikasi melakukan setView('reviews') lalu langsung navigate ke dashboard sehingga perubahan tidak terlihat.
+- Pilih flow UX yang paling logis dan konsisten.
+- Pastikan timer auto-navigation dibersihkan ketika component unmount atau user keluar dari form.
+- Cegah double submit.
+- Feedback yang sudah berhasil disimpan tidak boleh dianggap gagal hanya karena pengiriman email notifikasi gagal.
+- Ticket ID harus menggunakan ID feedback asli dari backend/store.
+
+3. FORM VALIDATION
+- Perbaiki validasi agar error tidak saling overwrite.
+- Trim input sebelum validasi/submission jika sesuai.
+- Nama wajib diisi.
+- Email opsional, tetapi harus valid jika diisi.
+- Subject wajib diisi.
+- Message wajib diisi dan minimal 10 karakter.
+- Rating harus berada pada range 1–5.
+- Tambahkan batas panjang input yang masuk akal jika diperlukan.
+- Pastikan validasi frontend tidak diasumsikan sebagai pengganti validasi backend.
+
+4. RATINGS & REVIEWS
+- Rating desimal seperti 4.5 harus ditampilkan dengan benar dan jangan dibulatkan menjadi 5.
+- Jika menggunakan half-star, implementasikan secara visual dengan benar; jangan hanya menggunakan opacity 50%.
+- Pastikan rating breakdown menggunakan jumlah review yang memang memiliki rating.
+- Lindungi progress percentage agar selalu berada di range 0–100.
+- Filtering rating harus tetap benar ketika data berubah.
+- Tangani empty state, loading state, dan error state dengan baik.
+- Tangani timestamp invalid atau timestamp masa depan pada fungsi "time ago".
+- Pertimbangkan Intl.RelativeTimeFormat jika membuat implementasi lebih robust tanpa overengineering.
+
+5. ACCESSIBILITY
+- Hubungkan label dengan input menggunakan htmlFor/id.
+- Tambahkan name dan autocomplete yang relevan.
+- Gunakan aria-invalid dan aria-describedby untuk validation error.
+- Rating stars harus bisa digunakan dengan keyboard dan memiliki accessible label.
+- Like button harus memiliki aria-label/aria-pressed yang benar.
+- Filter rating harus memiliki state accessible yang jelas.
+- Floating FeedbackButton harus memiliki accessible name dan focus-visible state.
+- Hindari alt text redundan jika gambar berada dalam button yang sudah memiliki aria-label.
+- Jangan mengorbankan accessibility demi tampilan.
+
+6. ERROR HANDLING
+- Jangan hanya console.error jika kegagalan seharusnya diketahui pengguna.
+- Bedakan initial loading, empty data, dan fetch error.
+- Sediakan mekanisme retry jika load review gagal dan memang berguna.
+- Pastikan refreshReviews menangani error.
+- Jangan membuat UI menampilkan data seolah berhasil diperbarui jika backend sebenarnya gagal.
+
+7. AVATAR
+- Tangani avatar URL yang gagal dimuat.
+- Gunakan fallback avatar yang aman.
+- Evaluasi ketergantungan pada ui-avatars.com karena itu third-party request.
+- Jika ada solusi lebih aman/sederhana untuk fallback initials tanpa layanan eksternal, rekomendasikan.
+
+8. RESPONSIVE UI
+- Pastikan FeedbackButton tidak terlalu besar di mobile dan tidak menutupi konten penting.
+- Pastikan header FeedbackPage tetap baik pada layar kecil.
+- Cek form category, priority, review summary, dan contact information untuk mobile.
+- Hindari fixed sizing yang berpotensi menyebabkan overflow.
+- Pertahankan desain yang sederhana dan profesional.
+
+9. UX & COPY
+- Gunakan Bahasa Indonesia secara konsisten.
+- Hindari campuran seperti "All", "reviews", "Include email", "improvement", dll. jika tidak diperlukan.
+- Gunakan istilah yang natural untuk aplikasi sekolah Indonesia.
+- Pastikan pesan sukses/error informatif tetapi tidak berlebihan.
+- Jika feedback berhasil dibuat, beri user kesempatan melihat hasilnya.
+
+10. TYPESCRIPT
+- Pertahankan strict typing.
+- Hindari `any`.
+- Jangan melakukan type assertion yang tidak diperlukan seperti `as number` jika TypeScript sudah dapat menginferensikannya.
+- Jika memungkinkan, turunkan tipe category/priority langsung dari source of truth agar tidak mudah tidak sinkron.
+- Periksa kemungkinan undefined/null dari data API.
+
+11. CODE QUALITY
+- Kurangi duplikasi fetch logic.
+- Pisahkan business logic dari presentational component jika benar-benar memberikan manfaat.
+- Jangan memecah komponen menjadi terlalu banyak file tanpa alasan.
+- Hindari useMemo/useCallback hanya untuk micro-optimization.
+- Jangan menambahkan library baru jika native React/TypeScript/CSS sudah cukup.
+- Jangan overengineering.
+- Pertahankan struktur:
+  FeedbackButton
+      -> FeedbackPage
+          -> RatingsReviews
+          -> FeedbackForm
+  kecuali ada alasan teknis yang kuat untuk mengubahnya.
+
+12. SECURITY & PRIVACY
+- Jangan expose informasi sensitif lewat frontend environment variable secara tidak tepat.
+- Review bagaimana email dan data pengguna digunakan.
+- Jangan percaya data input hanya karena berasal dari frontend.
+- Escape/render user-generated content dengan cara yang aman.
+- Jangan memperkenalkan dangerouslySetInnerHTML.
+- Pertimbangkan abuse protection/rate limiting pada backend untuk submit feedback dan like jika relevan.
+
+13. PERFORMANCE
+- Hindari fetch seluruh review hanya untuk memperbarui satu like jika API sebenarnya bisa mengembalikan updated feedback.
+- Namun jangan melakukan optimisasi kompleks tanpa kebutuhan nyata.
+- Hindari unnecessary re-render hanya jika memang ada dampak yang jelas.
+- Prioritaskan correctness terlebih dahulu, baru performance.
+
+Yang TIDAK saya inginkan:
+- Rewrite total tanpa alasan.
+- Mengubah UI secara drastis.
+- Menambahkan state-management library baru.
+- Menambahkan dependency hanya untuk masalah kecil.
+- Abstraksi berlebihan.
+- Membuat generic component yang hanya dipakai sekali.
+- Micro-optimization yang membuat kode sulit dibaca.
+- Mengubah API/service contract secara sembarangan.
+- Menghapus fitur yang sudah berjalan.
+
+Cara pengerjaan yang saya inginkan:
+
+Pertama, audit semua file yang saya kirim dan identifikasi masalah berdasarkan severity:
+- Critical
+- High
+- Medium
+- Low
+
+Untuk setiap masalah jelaskan:
+- file/lokasi masalah
+- kenapa itu masalah
+- dampak nyata terhadap user/aplikasi
+- solusi yang direkomendasikan
+
+Setelah audit, prioritaskan perbaikan yang benar-benar memberikan dampak terhadap:
+1. correctness
+2. data consistency
+3. user experience
+4. accessibility
+5. maintainability
+6. performance
+
+Kemudian berikan kode hasil refactor untuk file yang memang perlu diubah.
+
+Jangan sekadar memberi saran. Pastikan implementasi akhirnya konsisten antar-file dan dapat dikompilasi TypeScript.
+
+Jika ada keputusan yang memiliki trade-off, jelaskan secara singkat alasan memilih pendekatan tersebut.
+
+Yang paling penting:
+Jangan menganggap kode saya buruk dan jangan mengubah sesuatu hanya karena ada cara lain untuk menulisnya. Pertahankan bagian yang sudah baik. Fokus hanya pada perubahan yang memberikan peningkatan kualitas nyata untuk aplikasi production.

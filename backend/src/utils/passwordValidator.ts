@@ -76,8 +76,7 @@ export function validatePassword(password: string): {
   // Calculate additional strength score
   if (password.length >= 12) score += 10;
   if (password.length >= 16) score += 10;
-  // eslint-disable-next-line no-useless-escape
-  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 10;
+  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) score += 10;
   if (/[A-Z].*[A-Z]/.test(password)) score += 5; // Multiple uppercase
   if (/[a-z].*[a-z]/.test(password)) score += 5; // Multiple lowercase
   if (/[0-9].*[0-9]/.test(password)) score += 5; // Multiple numbers

@@ -1,14 +1,20 @@
 // Service untuk mengelola feedback dari pengguna
 
+export const FEEDBACK_CATEGORIES = ['bug', 'saran', 'keluhan', 'pertanyaan', 'lainnya'] as const;
+export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
+
+export const FEEDBACK_PRIORITIES = ['rendah', 'sedang', 'tinggi'] as const;
+export type FeedbackPriority = (typeof FEEDBACK_PRIORITIES)[number];
+
 export interface Feedback {
   id: string;
   name: string;
   email?: string;
   role: string;
-  category: 'bug' | 'saran' | 'keluhan' | 'pertanyaan' | 'lainnya';
+  category: FeedbackCategory;
   subject: string;
   message: string;
-  priority: 'rendah' | 'sedang' | 'tinggi';
+  priority: FeedbackPriority;
   status: 'pending' | 'dibaca' | 'diproses' | 'selesai';
   submittedAt: number;
   adminNotes?: string;

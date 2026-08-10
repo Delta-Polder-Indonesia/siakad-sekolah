@@ -15,31 +15,32 @@ import {
   Shield,
   Star,
   MessageSquare,
+  type LucideIcon,
 } from 'lucide-react';
-import type { Feedback } from '../../../data/services';
+import type { FeedbackCategory, FeedbackPriority } from '../../../data/services';
 import { schoolConfig } from '../../../config/school';
 
-const CATEGORIES = [
+const CATEGORIES: ReadonlyArray<{ value: FeedbackCategory; label: string; icon: LucideIcon }> = [
   { value: 'bug', label: 'Bug/Error', icon: Bug },
   { value: 'saran', label: 'Saran Perbaikan', icon: Lightbulb },
   { value: 'keluhan', label: 'Keluhan', icon: AlertTriangle },
   { value: 'pertanyaan', label: 'Pertanyaan', icon: HelpCircle },
   { value: 'lainnya', label: 'Lainnya', icon: MoreHorizontal },
-] as const;
+];
 
-const PRIORITIES = [
+const PRIORITIES: ReadonlyArray<{ value: FeedbackPriority; label: string }> = [
   { value: 'rendah', label: 'Rendah' },
   { value: 'sedang', label: 'Sedang' },
   { value: 'tinggi', label: 'Tinggi' },
-] as const;
+];
 
 export interface FeedbackFormData {
   name: string;
   email: string;
-  category: Feedback['category'];
+  category: FeedbackCategory;
   subject: string;
   message: string;
-  priority: Feedback['priority'];
+  priority: FeedbackPriority;
   rating: number;
 }
 
@@ -53,7 +54,15 @@ interface FeedbackFormProps {
   errorMessage: string | null;
   onSubmit: (e: FormEvent) => void;
   onBack: () => void;
+  onViewReviews: () => void;
 }
+
+const FIELD_LIMITS = {
+  name: 120,
+  email: 254,
+  subject: 200,
+  message: 5000,
+} as const;
 
 export default function FeedbackForm({
   formData,
@@ -65,6 +74,7 @@ export default function FeedbackForm({
   errorMessage,
   onSubmit,
   onBack,
+  onViewReviews,
 }: FeedbackFormProps) {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -88,6 +98,13 @@ export default function FeedbackForm({
               </p>
               <p className="text-xs text-green-600">Simpan nomor ini untuk tracking</p>
             </div>
+            <button
+              type="button"
+              onClick={onViewReviews}
+              className="mt-6 rounded-md bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+            >
+              Lihat Ulasan
+            </button>
           </div>
         ) : (
           <div className="rounded-lg border border-gray-200 bg-white p-6">
@@ -108,14 +125,23 @@ export default function FeedbackForm({
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700">
+                    <label
+                      htmlFor="feedback-name"
+                      className="mb-1 block text-xs font-medium text-gray-700"
+                    >
                       Nama Lengkap *
                     </label>
                     <input
+                      id="feedback-name"
                       type="text"
+                      name="name"
+                      autoComplete="name"
+                      maxLength={FIELD_LIMITS.name}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       disabled={isSubmitting}
+                      aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? 'feedback-name-error' : undefined}
                       className={`w-full rounded-md border px-3 py-2.5 text-sm transition-colors outline-none ${
                         errors.name
                           ? 'border-red-500 bg-red-50 focus:border-red-600'
@@ -123,18 +149,35 @@ export default function FeedbackForm({
                       }`}
                       placeholder="Masukkan nama lengkap"
                     />
-                    {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+                    {errors.name && (
+                      <p id="feedback-name-error" className="mt-1 text-xs text-red-600">
+                        {errors.name}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-gray-700">
+                    <label
+                      htmlFor="feedback-email"
+                      className="mb-1 block text-xs font-medium text-gray-700"
+                    >
                       Email (Opsional)
                     </label>
                     <input
+                      id="feedback-email"
                       type="email"
+                      name="email"
+                      autoComplete="email"
+                      maxLength={FIELD_LIMITS.email}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       disabled={isSubmitting}
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={
+                        errors.email
+                          ? 'feedback-email-error'
+                          : 'feedback-email-hint'
+                      }
                       className={`w-full rounded-md border px-3 py-2.5 text-sm transition-colors outline-none ${
                         errors.email
                           ? 'border-red-500 bg-red-50 focus:border-red-600'
@@ -142,9 +185,13 @@ export default function FeedbackForm({
                       }`}
                       placeholder="email@contoh.com"
                     />
-                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-                    <p className="mt-1 text-[10px] text-gray-500">
-                      Opsional - untuk kami bisa menghubungi Anda jika perlu
+                    {errors.email && (
+                      <p id="feedback-email-error" className="mt-1 text-xs text-red-600">
+                        {errors.email}
+                      </p>
+                    )}
+                    <p id="feedback-email-hint" className="mt-1 text-[10px] text-gray-500">
+                      Opsional - agar kami bisa menghubungi Anda jika perlu
                     </p>
                   </div>
                 </div>
@@ -189,7 +236,9 @@ export default function FeedbackForm({
                             />
                             <Icon
                               className={`h-4 w-4 shrink-0 ${
-                                formData.category === cat.value ? 'text-blue-600' : 'text-gray-500'
+                                formData.category === cat.value
+                                  ? 'text-blue-600'
+                                  : 'text-gray-500'
                               }`}
                             />
                             <span className="text-gray-900">{cat.label}</span>
@@ -241,39 +290,71 @@ export default function FeedbackForm({
 
                 {/* Rating Field */}
                 <div className="mb-4">
-                  <label className="mb-2 block text-xs font-medium text-gray-700">Rating *</label>
-                  <div className="flex items-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, rating: star })}
-                        disabled={isSubmitting}
-                        className="transition-transform hover:scale-110 active:scale-95"
-                      >
-                        <Star
-                          className={`${
-                            star <= formData.rating
-                              ? 'fill-orange-500 text-orange-500'
-                              : 'text-gray-300'
-                          }`}
-                          size={32}
-                        />
-                      </button>
-                    ))}
-                    <span className="ml-2 text-xs font-medium text-gray-700">
-                      {formData.rating} / 5
-                    </span>
-                  </div>
+                  <fieldset>
+                    <legend
+                      id="feedback-rating-label"
+                      className="mb-2 block text-xs font-medium text-gray-700"
+                    >
+                      Rating *
+                    </legend>
+                    <div
+                      className="flex items-center gap-2"
+                      role="radiogroup"
+                      aria-labelledby="feedback-rating-label"
+                    >
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <label
+                          key={star}
+                          className="cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                        >
+                          <input
+                            type="radio"
+                            name="rating"
+                            value={star}
+                            checked={formData.rating === star}
+                            onChange={() => setFormData({ ...formData, rating: star })}
+                            disabled={isSubmitting}
+                            className="sr-only"
+                          />
+                          <Star
+                            className={`${
+                              star <= formData.rating
+                                ? 'fill-orange-500 text-orange-500'
+                                : 'text-gray-300'
+                            }`}
+                            size={32}
+                          />
+                        </label>
+                      ))}
+                      <span className="ml-2 text-xs font-medium text-gray-700">
+                        {formData.rating} / 5
+                      </span>
+                    </div>
+                    {errors.rating && (
+                      <p id="feedback-rating-error" className="mt-1 text-xs text-red-600">
+                        {errors.rating}
+                      </p>
+                    )}
+                  </fieldset>
                 </div>
 
                 <div className="mb-4">
-                  <label className="mb-1 block text-xs font-medium text-gray-700">Subjek *</label>
+                  <label
+                    htmlFor="feedback-subject"
+                    className="mb-1 block text-xs font-medium text-gray-700"
+                  >
+                    Subjek *
+                  </label>
                   <input
+                    id="feedback-subject"
                     type="text"
+                    name="subject"
+                    maxLength={FIELD_LIMITS.subject}
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     disabled={isSubmitting}
+                    aria-invalid={Boolean(errors.subject)}
+                    aria-describedby={errors.subject ? 'feedback-subject-error' : undefined}
                     className={`w-full rounded-md border px-3 py-2.5 text-sm transition-colors outline-none ${
                       errors.subject
                         ? 'border-red-500 bg-red-50 focus:border-red-600'
@@ -281,16 +362,30 @@ export default function FeedbackForm({
                     }`}
                     placeholder="Ringkasan feedback Anda"
                   />
-                  {errors.subject && <p className="mt-1 text-xs text-red-600">{errors.subject}</p>}
+                  {errors.subject && (
+                    <p id="feedback-subject-error" className="mt-1 text-xs text-red-600">
+                      {errors.subject}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-700">Pesan *</label>
+                  <label
+                    htmlFor="feedback-message"
+                    className="mb-1 block text-xs font-medium text-gray-700"
+                  >
+                    Pesan *
+                  </label>
                   <textarea
+                    id="feedback-message"
                     rows={6}
+                    name="message"
+                    maxLength={FIELD_LIMITS.message}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     disabled={isSubmitting}
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? 'feedback-message-error' : undefined}
                     className={`w-full resize-none rounded-md border px-3 py-2.5 text-sm transition-colors outline-none ${
                       errors.message
                         ? 'border-red-500 bg-red-50 focus:border-red-600'
@@ -298,17 +393,26 @@ export default function FeedbackForm({
                     }`}
                     placeholder="Jelaskan feedback Anda secara detail..."
                   />
-                  {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
+                  {errors.message && (
+                    <p id="feedback-message-error" className="mt-1 text-xs text-red-600">
+                      {errors.message}
+                    </p>
+                  )}
                   <div className="mt-2 flex items-center justify-between">
                     <p className="text-[10px] text-gray-500">Minimal 10 karakter</p>
-                    <p className="text-[10px] text-gray-500">{formData.message.length} karakter</p>
+                    <p className="text-[10px] text-gray-500">
+                      {formData.message.length} / {FIELD_LIMITS.message} karakter
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Error Message */}
               {submitStatus === 'error' && (
-                <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-xs font-medium text-red-600">
+                <div
+                  role="alert"
+                  className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-xs font-medium text-red-600"
+                >
                   {errorMessage ||
                     'Terjadi kesalahan saat mengirim feedback. Silakan coba lagi atau hubungi admin secara langsung.'}
                 </div>
@@ -420,17 +524,17 @@ export default function FeedbackForm({
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
               <span>
-                Untuk masukan urgent, gunakan prioritas "{schoolConfig.feedback.urgentPriorityLabel}
-                "
+                Untuk masukan mendesak, gunakan prioritas "
+                {schoolConfig.feedback.urgentPriorityLabel}"
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
-              <span>Include email untuk follow-up yang lebih cepat</span>
+              <span>Sertakan email agar kami bisa menghubungi Anda lebih cepat</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
-              <span>Data Anda aman dan hanya digunakan untuk improvement</span>
+              <span>Data Anda aman dan hanya digunakan untuk perbaikan layanan</span>
             </li>
           </ul>
         </div>

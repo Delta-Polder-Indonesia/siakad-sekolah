@@ -1,5 +1,5 @@
 // src/fitur/halaman/pages/DataBeranda/LayananCarousel.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { layananItems } from '../../data/beranda/layanan/data';
 import { namaSekolahUppercase } from '../../components/Profile/dataSekolah';
 
@@ -128,15 +128,22 @@ export default function LayananCarousel() {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
+  
+  // Refs untuk menyimpan fungsi navigasi agar tidak recreation interval
+  const nextRef = useRef<(() => void) | null>(null);
+  const prevRef = useRef<(() => void) | null>(null);
+  const goToRef = useRef<((idx: number) => void) | null>(null);
+  const isPausedRef = useRef(false);
+  const manualNavigationRef = useRef(false);
 
   // ── Fungsi navigasi ──────────────────────────────────
   const next = useCallback(() => {
-    if (total <= 1) return;
+    if (total <= 1 || isPausedRef.current) return;
     setCurrent((c) => (c === total - 1 ? 0 : c + 1));
   }, [total]);
 
   const prev = useCallback(() => {
-    if (total <= 1) return;
+    if (total <= 1 || isPausedRef.current) return;
     setCurrent((c) => (c === 0 ? total - 1 : c - 1));
   }, [total]);
 
@@ -144,6 +151,11 @@ export default function LayananCarousel() {
     (idx: number) => {
       if (idx >= 0 && idx < total) {
         setCurrent(idx);
+        // Set flag untuk debounce auto-play setelah manual navigation
+        manualNavigationRef.current = true;
+        setTimeout(() => {
+          manualNavigationRef.current = false;
+        }, 3000); // Delay 3 detik sebelum auto-play lanjut
       }
     },
     [total]
@@ -161,13 +173,27 @@ export default function LayananCarousel() {
     [current, total]
   );
 
+  // ── Update refs ───────────────────────────────────────
+  useEffect(() => {
+    nextRef.current = next;
+    prevRef.current = prev;
+    goToRef.current = goTo;
+    isPausedRef.current = isPaused;
+  }, [next, prev, goTo, isPaused]);
+
   // ── Auto play ────────────────────────────────────────
   useEffect(() => {
-    if (total <= 1 || isPaused) return;
+    if (total <= 1) return;
 
-    const timer = setInterval(next, INTERVAL_CAROUSEL);
+    const timer = setInterval(() => {
+      // Cek pause state dan manual navigation flag
+      if (!isPausedRef.current && !manualNavigationRef.current && nextRef.current) {
+        nextRef.current();
+      }
+    }, INTERVAL_CAROUSEL);
+    
     return () => clearInterval(timer);
-  }, [next, total, isPaused]);
+  }, [total]);
 
   // ── Keyboard navigation ──────────────────────────────
   useEffect(() => {
@@ -186,6 +212,20 @@ export default function LayananCarousel() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [prev, next, total]);
+
+  // ── Visibility API untuk tab switching ───────────────
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsPaused(true); // Pause saat tab tidak aktif
+      } else {
+        setIsPaused(false); // Resume saat tab aktif kembali
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // ── Validasi items (Early Return) ───────────────────
   // Dipindahkan ke BAWAH semua Hooks agar mematuhi rules-of-hooks
@@ -210,6 +250,7 @@ export default function LayananCarousel() {
   // ── Touch handlers ───────────────────────────────────
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchStart(e.targetTouches[0].clientX);
+    setIsPaused(true); // Pause saat user mulai touch
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -220,6 +261,11 @@ export default function LayananCarousel() {
       if (selisih > 0) next();
       else prev();
     }
+    
+    // Resume auto-play setelah delay
+    setTimeout(() => {
+      setIsPaused(false);
+    }, 1000); // Delay 1 detik sebelum resume
   };
 
   return (

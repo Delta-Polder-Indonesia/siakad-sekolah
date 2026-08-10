@@ -9,9 +9,7 @@ import { z } from 'zod';
  */
 export function sanitizeString(value: string): string {
   return value
-    // Karakter kontrol memang sengaja dihapus — abaikan peringatan no-control-regex.
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001F\u007F]/g, '') // kontrol chars
+    .replace(/[\p{Cc}]/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
 }

@@ -372,7 +372,7 @@ graph TD
     User["User Browser"] --> Login["LoginPage.tsx"]
     Login --> AuthContext["AuthContext.tsx"]
 
-    subgraph "Authentication Space"
+    subgraph Authentication_Space
         AuthContext --> Validate["validateLoginInput()"]
         Validate --> Store["store.ts (localStorage)"]
         AuthContext -.-> Backend["backend/src/server.ts (Optional)"]
@@ -380,7 +380,7 @@ graph TD
 
     AuthContext --> App["App.tsx (Main Registry)"]
 
-    subgraph "Feature Space (Role-Based)"
+    subgraph Feature_Space
         App --> Teacher["TEACHER_PAGES"]
         App --> Student["STUDENT_PAGES"]
         App --> Parent["PARENT_PAGES"]
@@ -410,27 +410,27 @@ Sertakan diagram "Backend Architecture" dan "Data Flow & Initialization":
 
 ```mermaid
 graph TD
-    subgraph "Request Layer"
+    subgraph Request_Layer
         A["server.ts"] --> B["routes/index.ts"]
         B --> C["auth.route.ts"]
         B --> D["school-config.route.ts"]
     end
 
-    subgraph "Logic Layer"
+    subgraph Logic_Layer
         C --> E["auth.controller.ts"]
         E --> F["auth.service.ts"]
         D --> G["school-config.controller.ts"]
         G --> H["school-config.service.ts"]
     end
 
-    subgraph "Data Layer"
+    subgraph Data_Layer
         F --> I["prisma.ts"]
         H --> I
         I --> J[("PostgreSQL DB")]
         K["schema.prisma"] -.-> J
     end
 
-    subgraph "Middleware"
+    subgraph Middleware
         L["auth.ts (JWT)"]
         M["errorHandler.ts"]
     end
@@ -439,13 +439,13 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant User as Browser
-    participant App as App.tsx
-    participant Store as store.ts
+    participant App as App
+    participant Store as store
     participant LS as LocalStorage
 
     User->>App: Load Application
     App->>Store: initializeData()
-    Store->>LS: Check "absensi_data"
+    Store->>LS: Check absensi_data
     alt Data Exists
         LS-->>Store: Return JSON
     else No Data
@@ -460,11 +460,11 @@ Sertakan diagram "Role-to-Registry Mapping" dan "Data Flow and Persistence":
 
 ```mermaid
 graph TD
-    subgraph "AuthContext Space"
+    subgraph AuthContext_Space
         UserRole["user.role"]
     end
 
-    subgraph "Registry Space (App.tsx)"
+    subgraph Registry_Space
         TEACHER["TEACHER_PAGES"]
         STUDENT["STUDENT_PAGES"]
         PARENT["PARENT_PAGES"]
@@ -472,7 +472,7 @@ graph TD
         ADMIN["ADMIN_PAGES"]
     end
 
-    subgraph "Code Entity Space"
+    subgraph Code_Entity_Space
         DG["DasborGuru"]
         DM["DasborMurid"]
         DOT["DasborOrangTua"]
@@ -480,39 +480,39 @@ graph TD
         AMP["AdminMasterPanel"]
     end
 
-    UserRole -- "teacher" --> TEACHER
-    UserRole -- "student" --> STUDENT
-    UserRole -- "parent" --> PARENT
-    UserRole -- "guest" --> GUEST
-    UserRole -- "admin" --> ADMIN
+    UserRole -- teacher --> TEACHER
+    UserRole -- student --> STUDENT
+    UserRole -- parent --> PARENT
+    UserRole -- guest --> GUEST
+    UserRole -- admin --> ADMIN
 
-    TEACHER -- "dashboard" --> DG
-    STUDENT -- "dashboard" --> DM
-    PARENT -- "dashboard" --> DOT
-    GUEST -- "dashboard" --> GDW
-    ADMIN -- "admin-dashboard" --> AMP
+    TEACHER -- dashboard --> DG
+    STUDENT -- dashboard --> DM
+    PARENT -- dashboard --> DOT
+    GUEST -- dashboard --> GDW
+    ADMIN -- admin-dashboard --> AMP
 ```
 
 ```mermaid
 graph LR
-    subgraph "Frontend SPA"
+    subgraph Frontend_SPA
         App["App.tsx"]
-        Store["store.ts (localStorage)"]
+        Store["store.ts localStorage"]
         Auth["AuthContext.tsx"]
-        API["services/ (API Layer)"]
+        API["services API Layer"]
     end
 
-    subgraph "Persistence Layers"
+    subgraph Persistence_Layers
         LS[("Browser LocalStorage")]
-        BE["Express Backend (Optional)"]
+        BE["Express Backend Optional"]
         DB[("PostgreSQL")]
     end
 
     App --> Store
     Store <--> LS
     App --> Auth
-    Auth -- "Token/Session" --> LS
-    API -- "HTTP Request" --> BE
+    Auth -- Token Session --> LS
+    API -- HTTP Request --> BE
     BE <--> DB
 ```
 
@@ -521,54 +521,54 @@ Sertakan diagram "Authentication Logic Diagram" dan "Role-to-Entity Mapping":
 
 ```mermaid
 graph TD
-    subgraph "UI Layer"
+    subgraph UI_Layer
         LP["LoginPage.tsx"]
     end
 
-    subgraph "Logic Layer (Code Entity Space)"
-        AC["AuthContext.tsx: login()"]
-        GG["AuthContext.tsx: loginGoogle()"]
-        VAL["utils.ts: validateLoginInput()"]
+    subgraph Logic_Layer
+        AC["AuthContext login"]
+        GG["AuthContext loginGoogle"]
+        VAL["utils validateLoginInput"]
     end
 
-    subgraph "Data Layer (Store Space)"
-        ST["store.ts: getStudents()"]
-        TC["store.ts: getTeachers()"]
-        LS[("localStorage: 'absensi_auth'")]
+    subgraph Data_Layer
+        ST["store getStudents"]
+        TC["store getTeachers"]
+        LS[("localStorage absensi_auth")]
     end
 
     LP --> VAL
-    VAL -- "If Valid" --> AC
-    AC -- "Find Teacher" --> TC
-    AC -- "Find Student/Parent" --> ST
-    AC -- "Save Session" --> LS
-    GG -- "Decode JWT" --> LS
+    VAL -- If Valid --> AC
+    AC -- Find Teacher --> TC
+    AC -- Find Student Parent --> ST
+    AC -- Save Session --> LS
+    GG -- Decode JWT --> LS
 ```
 
 ```mermaid
 classDiagram
     class AuthUser {
-        +String id
-        +String name
+        +string id
+        +string name
         +UserRole role
-        +String avatar
+        +string avatar
     }
 
     class Teacher {
-        +String nip
-        +String password
+        +string nip
+        +string password
     }
 
     class Student {
-        +String nis
-        +String password
-        +String parentName
-        +String parentPassword
+        +string nis
+        +string password
+        +string parentName
+        +string parentPassword
     }
 
     AuthUser --|> Teacher : role teacher
     AuthUser --|> Student : role student
-    AuthUser --|> Student : role parent (via parentName)
+    AuthUser --|> Student : role parent via parentName
 ```
 
 # BAGIAN 3 — Data Layer & State Management
@@ -576,14 +576,14 @@ Sertakan diagram "Entity to Code Mapping" dan "Data Flow & Synchronization":
 
 ```mermaid
 graph TD
-    subgraph NaturalLanguage["Natural Language Space"]
-        Student["Student / Murid"]
-        Teacher["Teacher / Guru"]
-        Attendance["Attendance / Absensi"]
-        Library["Library / Perpustakaan"]
+    subgraph NaturalLanguage
+        Student["Student Murid"]
+        Teacher["Teacher Guru"]
+        Attendance["Attendance Absensi"]
+        Library["Library Perpustakaan"]
     end
 
-    subgraph CodeEntity["Code Entity Space (types.ts)"]
+    subgraph CodeEntity
         IStudent["interface Student"]
         ITeacher["interface Teacher"]
         IAttendance["interface AttendanceRecord"]
@@ -591,10 +591,10 @@ graph TD
         ITransaction["interface LibraryTransaction"]
     end
 
-    subgraph StorageLayer["Storage Layer (store.ts)"]
-        S_KEY["STORAGE_KEY: absensi_data"]
-        B_KEY["BOOKS_KEY: perpus_books"]
-        T_KEY["TRANS_KEY: perpus_transactions"]
+    subgraph StorageLayer
+        S_KEY["STORAGE_KEY absensi_data"]
+        B_KEY["BOOKS_KEY perpus_books"]
+        T_KEY["TRANS_KEY perpus_transactions"]
     end
 
     Student -.-> IStudent
@@ -613,21 +613,21 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant UI as React Component
-    participant Hook as useStoreVersion()
-    participant Store as store.ts (LocalStorage)
-    participant API as authApi.ts / ppdbService.ts
+    participant Hook as useStoreVersion
+    participant Store as store LocalStorage
+    participant API as authApi ppdbService
 
-    UI->>Store: Calls getter (e.g., getStudents)
-    Store-->>UI: Returns Student[]
+    UI->>Store: Calls getter e.g. getStudents
+    Store-->>UI: Returns Student
 
-    UI->>Store: Calls setter (e.g., saveStudent)
+    UI->>Store: Calls setter e.g. saveStudent
     Store->>Store: Update LocalStorage
-    Store->>Hook: Trigger Event Bus (subscribeStore)
+    Store->>Hook: Trigger Event Bus subscribeStore
     Hook->>UI: Force Re-render
 
     Note over UI,API: Optional Backend Sync
     UI->>API: Call API Method
-    API->>UI: Return Response & Token
+    API->>UI: Return Response Token
 ```
 
 # BAGIAN 4 — Role-Based Feature Modules
@@ -635,25 +635,25 @@ Sertakan diagram "Page Registry" dan "Shared Domain Objects":
 
 ```mermaid
 graph TD
-    subgraph "App.tsx Navigation Logic"
+    subgraph App_Tsx_Navigation_Logic
         Auth["useAuth()"] -- provides --> Role["UserRole"]
-        Role -- "teacher" --> TP["TEACHER_PAGES"]
-        Role -- "student" --> SP["STUDENT_PAGES"]
-        Role -- "parent" --> PP["PARENT_PAGES"]
-        Role -- "admin" --> AP["ADMIN_PAGES"]
+        Role -- teacher --> TP["TEACHER_PAGES"]
+        Role -- student --> SP["STUDENT_PAGES"]
+        Role -- parent --> PP["PARENT_PAGES"]
+        Role -- admin --> AP["ADMIN_PAGES"]
     end
 
-    subgraph "Feature Modules (src/fitur/)"
+    subgraph Feature_Modules
         TP --> G["/guru/"]
         SP --> M["/murid/"]
         PP --> OT["/orang-tua/"]
         AP --> AD["/admin/PanelAdminModal.tsx"]
     end
 
-    G -- "renders" --> DG["DasborGuru"]
-    M -- "renders" --> DM["DasborMurid"]
-    OT -- "renders" --> DOT["DasborOrangTua"]
-    AD -- "renders" --> PAM["PanelAdminModal"]
+    G -- renders --> DG["DasborGuru"]
+    M -- renders --> DM["DasborMurid"]
+    OT -- renders --> DOT["DasborOrangTua"]
+    AD -- renders --> PAM["PanelAdminModal"]
 ```
 
 ```mermaid
@@ -688,7 +688,7 @@ Sertakan diagram "System Overview" dan "Data Entity Relationship":
 
 ```mermaid
 graph TD
-    subgraph "Student Space (src/fitur/perpustakaan/)"
+    subgraph Student_Space
         A["PerpustakaanApp.tsx"] --> B["LoginPerpustakaan.tsx"]
         A --> C["DashboardPerpustakaan.tsx"]
         C --> D["KatalogPage.tsx"]
@@ -696,24 +696,24 @@ graph TD
         C --> F["KeranjangPage.tsx"]
     end
 
-    subgraph "Admin Space (src/fitur/admin/AdminPerpustakaan/)"
-        G["PanelAdminModal.tsx"] --> H["AdminPerpustakaan/"]
+    subgraph Admin_Space
+        G["PanelAdminModal.tsx"] --> H["AdminPerpustakaan"]
         H --> I["PerpusInventori.tsx"]
         H --> J["PerpusTransaksi.tsx"]
         H --> K["DendaSettings.tsx"]
     end
 
-    subgraph "Data Layer (src/data/)"
+    subgraph Data_Layer
         L[("store.ts")]
-        M["getBooks()"]
-        N["borrowBook()"]
-        O["returnBook()"]
+        M["getBooks"]
+        N["borrowBook"]
+        O["returnBook"]
     end
 
-    D & I -- "Read/Write" --> L
-    E & J -- "Transaction Logic" --> N
-    J -- "Return Logic" --> O
-    C & H -- "Data Fetching" --> M
+    D & I -- Read Write --> L
+    E & J -- Transaction Logic --> N
+    J -- Return Logic --> O
+    C & H -- Data Fetching --> M
 ```
 
 ```mermaid
@@ -751,19 +751,19 @@ Sertakan diagram "Component Relationship" dan "Application Lifecycle":
 
 ```mermaid
 graph TD
-    subgraph "Public Entry (PpdbModal)"
+    subgraph Public_Entry
         LandingPage["LandingPage.tsx"]
         PPDBForm["PPDBForm.tsx"]
         CekKelulusan["CekKelulusanPage.tsx"]
     end
 
-    subgraph "Administrative Management"
+    subgraph Administrative_Management
         AdminPanel["AdminPanel.tsx"]
     end
 
-    subgraph "Data Layer"
+    subgraph Data_Layer
         PPDBService["ppdbService.ts"]
-        Store["store.ts (LocalStorage)"]
+        Store["store.ts LocalStorage"]
     end
 
     LandingPage -->|onOpenForm| PPDBForm
@@ -775,8 +775,8 @@ graph TD
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING : PPDBForm.submitApplication()
-    PENDING --> VERIFIED : AdminPanel.handleUpdateDoc() & handleUpdateStatus()
+    [*] --> PENDING : PPDBForm submitApplication
+    PENDING --> VERIFIED : AdminPanel handleUpdateDoc handleUpdateStatus
     VERIFIED --> ACCEPTED : Final Admission
     VERIFIED --> REJECTED : Insufficient Requirements
     PENDING --> REJECTED : Direct Rejection
@@ -789,14 +789,14 @@ Sertakan diagram "Guest Module Entity Relationship" dan "Guest Navigation and Da
 
 ```mermaid
 graph TD
-    subgraph "UI Layer"
+    subgraph UI_Layer
         GD["GuestDashboard.tsx"]
         AW["AgendaWidget.tsx"]
     end
 
-    subgraph "Data Layer"
-        SD["schoolData.ts"]
-        SM["siteMedia.ts"]
+    subgraph Data_Layer
+        SD["schoolData"]
+        SM["siteMedia"]
         GBC["GuestBookContext"]
     end
 
@@ -812,15 +812,15 @@ graph TD
 sequenceDiagram
     participant G as Guest User
     participant GD as GuestDashboard
-    participant SD as schoolData.ts
-    participant APP as App.tsx (ActivePage State)
+    participant SD as schoolData
+    participant APP as App ActivePage State
 
-    G->>GD: Clicks "Informasi PPDB"
-    GD->>APP: onNavigate('ppdb')
+    G->>GD: Clicks Informasi PPDB
+    GD->>APP: onNavigate ppdb
     APP->>G: Renders PpdbModal
 
-    G->>GD: Clicks "Lihat Profil Lengkap"
-    GD->>APP: onNavigate('tentang-sekolah')
+    G->>GD: Clicks Lihat Profil Lengkap
+    GD->>APP: onNavigate tentang-sekolah
     APP->>SD: Fetch schoolProfile
     SD-->>APP: Return Static Data
     APP->>G: Renders TentangSekolah Page
@@ -831,11 +831,11 @@ Sertakan diagram "Code to UI Mapping" dan classDiagram ExpectationModal:
 
 ```mermaid
 graph TD
-    subgraph "Public Entry Point"
+    subgraph Public_Entry_Point
         EM["ExpectationModal.tsx"]
     end
 
-    subgraph "Main Pages (Lazy Loaded)"
+    subgraph Main_Pages
         BP["BerandaPage.tsx"]
         PR["ProfilPage.tsx"]
         BR["BeritaPage.tsx"]
@@ -843,7 +843,7 @@ graph TD
         SP["SaranaPrasaranaPage.tsx"]
     end
 
-    subgraph "Detail Components"
+    subgraph Detail_Components
         P1["Program-1.tsx"]
         B1["Berita01.tsx"]
         F1["Facility01.tsx"]
@@ -863,22 +863,22 @@ graph TD
 ```mermaid
 classDiagram
     class ExpectationModal {
-        +activeMenu: NavItem
-        +showAgenda: boolean
-        +handleNavigate(menu)
+        +string activeMenu
+        +boolean showAgenda
+        +handleNavigate menu
     }
     class BerandaPage {
-        +onRegister()
-        +onShowAgenda()
+        +onRegister
+        +onShowAgenda
     }
     class PageProps {
-        +onNavigate(item)
+        +onNavigate item
     }
 
     ExpectationModal *-- BerandaPage
     ExpectationModal *-- PageProps
 
-    note for ExpectationModal "Uses lazy() for all sub-pages\nto reduce bundle size."
+    note for ExpectationModal "Uses lazy for all sub pages to reduce bundle size"
 ```
 
 # BAGIAN 9 — Shared Components & Layout
@@ -886,48 +886,48 @@ Sertakan diagram "UI Layout and Navigation Mapping" dan "Asset to Code Entity Ma
 
 ```mermaid
 graph TD
-    subgraph "State Space (App.tsx)"
+    subgraph State_Space
         U["AuthUser Role"]
         AP["activePage State"]
     end
 
-    subgraph "Component Space (src/layout/)"
-        S["Sidebar.tsx"]
-        F["ProgramFooter.tsx"]
+    subgraph Component_Space
+        S["Sidebar"]
+        F["ProgramFooter"]
     end
 
-    subgraph "Feature Space (src/fitur/bersama/)"
+    subgraph Feature_Space
         B1["PengumumanSekolah"]
         B2["PesanMasuk"]
         B3["DaftarNamaGuru"]
     end
 
-    U -->|"Determines Menu"| S
-    AP -->|"Highlights Item"| S
-    S -->|"onNavigate()"| AP
-    F -->|"onNavigate()"| AP
-    B1 & B2 & B3 -->|"Shared across roles"| S
+    U -->|Determines Menu| S
+    AP -->|Highlights Item| S
+    S -->|onNavigate| AP
+    F -->|onNavigate| AP
+    B1 & B2 & B3 -->|Shared across roles| S
 ```
 
 ```mermaid
 graph LR
-    subgraph "public/images/"
-        H["HalamanKami/"]
-        D["Dashboard/"]
-        S["SosialMedia/"]
-        G["GuruPegawai/"]
+    subgraph public_images
+        H["HalamanKami"]
+        D["Dashboard"]
+        S["SosialMedia"]
+        G["GuruPegawai"]
     end
 
-    subgraph "Code References"
-        PF["ProgramFooter.tsx"]
-        BS["BerandaPage.tsx"]
-        GG["GuruPegawaiPage.tsx"]
+    subgraph Code_References
+        PF["ProgramFooter"]
+        BS["BerandaPage"]
+        GG["GuruPegawaiPage"]
     end
 
-    S -->|"icon paths"| PF
-    D -->|"logo paths"| PF
-    H -->|"pancasila.png"| BS
-    G -->|"staff photos"| GG
+    S -->|icon paths| PF
+    D -->|logo paths| PF
+    H -->|pancasila png| BS
+    G -->|staff photos| GG
 ```
 
 # BAGIAN 10 — Glossary
@@ -935,7 +935,7 @@ Sertakan diagram "Concept to Entity Mapping" dan "Auth Data Flow":
 
 ```mermaid
 graph TD
-    subgraph "Natural Language Space"
+    subgraph Natural_Language_Space
         A["NIP / Teacher ID"]
         B["NISN / Student ID"]
         C["Report Card"]
@@ -943,7 +943,7 @@ graph TD
         E["Attendance"]
     end
 
-    subgraph "Code Entity Space"
+    subgraph Code_Entity_Space
         A1["Teacher Interface"]
         B1["Student Interface"]
         C1["NilaiRapot Interface"]
@@ -964,19 +964,19 @@ graph TD
 
 ```mermaid
 sequenceDiagram
-    participant U as User (UI)
+    participant U as User UI
     participant V as validateLoginInput
-    participant AC as AuthContext (login)
-    participant S as Store (localStorage)
-    participant LS as LocalStorage (absensi_auth)
+    participant AC as AuthContext login
+    participant S as Store localStorage
+    participant LS as LocalStorage absensi_auth
 
     U->>V: Enter Credentials
-    V-->>U: Validation Result (Error/Null)
+    V-->>U: Validation Result Error/Null
     U->>AC: Submit Valid Form
     AC->>S: getTeachers() / getStudents()
     S-->>AC: User Data
     AC->>AC: Compare ID & Password
-    AC->>LS: setItem('absensi_auth')
+    AC->>LS: setItem absensi_auth
     AC-->>U: Set User State
 ```
 

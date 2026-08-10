@@ -9,13 +9,14 @@ export default function FeedbackButton({ onNavigate }: FeedbackButtonProps) {
       <button
         type="button"
         onClick={() => onNavigate('feedback')}
-        className="transition-all duration-200 hover:scale-110 active:scale-95"
+        aria-label="Kirim Feedback"
         title="Kirim Feedback"
+        className="transition-all duration-200 hover:scale-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
         <img
           src={`${import.meta.env.BASE_URL}images/Dashboard/hubungikami.png`}
-          alt="Hubungi Kami"
-          className="h-30 w-30 object-contain"
+          alt=""
+          className="h-14 w-14 object-contain sm:h-16 sm:w-16"
         />
       </button>
     </div>

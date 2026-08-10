@@ -43,14 +43,14 @@ export default function SiakadSection({
               dan data terkait lainnya, sehingga seluruh kegiatan akademik dapat terkelola menjadi
               informasi yang bermanfaat dalam pengelolaan manajemen sekolah, pengambilan keputusan,
               serta pelaporan di lingkungan SMA Negeri 1 Medan yang melibatkan siswa, guru, dan
-              petugas administrasi akademik. 
+              petugas administrasi akademik.
             </p>
             <p className="mb-4 text-justify">
               SIAKAD bertujuan sebagai penataan data dalam pengelolaan akademik, serta mempercepat
               dan memudahkan penyampaian informasi kegiatan administrasi akademik, seperti proses
               Penerimaan Peserta Didik Baru (PPDB), pembuatan jadwal pelajaran, pengisian rencana
               belajar, input nilai rapor, perwalian kelas, pengelolaan data guru dan siswa, hingga
-              jadwal kelulusan siswa. 
+              jadwal kelulusan siswa.
             </p>
             <p className="mb-4 text-justify">
               Selain menjadi sumber daya informasi di sekolah, SIAKAD juga dapat digunakan sebagai

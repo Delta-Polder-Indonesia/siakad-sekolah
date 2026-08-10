@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, type FormEvent } from 'react';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { sendFeedbackToEmail, type Feedback } from '../../../data/services';
@@ -7,13 +7,24 @@ import {
   fetchFeedbackStats,
   submitFeedback,
   toggleFeedbackLikeApi,
+  type FeedbackStats,
 } from '../../../services/feedbackService';
+import { useToast } from '../../../components/ui';
 import { PageProps } from '../../../types';
 import RatingsReviews from './RatingsReviews';
 import FeedbackForm, { type FeedbackFormData } from './FeedbackForm';
 
+const FIELD_LIMITS = {
+  name: 120,
+  email: 254,
+  subject: 200,
+  message: 5000,
+} as const;
+
 export default function FeedbackPage({ onNavigate }: PageProps) {
   const { user } = useAuth();
+  const { showToast } = useToast();
+
   const [view, setView] = useState<'reviews' | 'form'>('reviews');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -25,11 +36,11 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   const [formData, setFormData] = useState<FeedbackFormData>({
     name: user?.name || '',
     email: '',
-    category: 'saran' as Feedback['category'],
+    category: 'saran',
     subject: '',
     message: '',
-    priority: 'sedang' as Feedback['priority'],
-    rating: 5 as number, // Default rating
+    priority: 'sedang',
+    rating: 5,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -48,46 +59,40 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
 
   useEffect(() => cancelAutoNavigate, [cancelAutoNavigate]);
 
-  // Load real feedback data (dari backend kalau aktif, else localStorage)
+  // Data feedback (backend kalau aktif, else localStorage)
   const [reviews, setReviews] = useState<Feedback[]>([]);
-  const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
-  const [feedbackStats, setFeedbackStats] = useState<Awaited<
-    ReturnType<typeof fetchFeedbackStats>
-  > | null>(null);
+  const [feedbackStats, setFeedbackStats] = useState<FeedbackStats | null>(null);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
 
-  const refreshReviews = useCallback(async () => {
-    const list = await fetchFeedbackReviews();
-    setReviews(list);
+  const loadFeedback = useCallback(async () => {
+    setReviewsLoading(true);
+    setReviewsError(null);
+    try {
+      const [list, stats] = await Promise.all([fetchFeedbackReviews(), fetchFeedbackStats()]);
+      setReviews(list);
+      setFeedbackStats(stats);
+    } catch (error) {
+      console.error('Error loading feedback:', error);
+      setReviewsError('Gagal memuat ulasan. Silakan coba lagi.');
+    } finally {
+      setReviewsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const [list, stats] = await Promise.all([fetchFeedbackReviews(), fetchFeedbackStats()]);
-        if (!mounted) return;
-        setReviews(list);
-        setFeedbackStats(stats);
-      } catch (error) {
-        console.error('Error loading feedback:', error);
-      } finally {
-        if (mounted) setReviewsLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    void loadFeedback();
+  }, [loadFeedback]);
 
-  // Rekomputasi status like setelah daftar review berubah
-  useEffect(() => {
-    if (!user?.id) return;
+  // Status like diturunkan langsung dari daftar review (single source of truth),
+  // jadi tidak ada state terpisah yang bisa melenceng dari data.
+  const likedReviews = useMemo(() => {
+    if (!user?.id) return {} as Record<string, boolean>;
     const liked: Record<string, boolean> = {};
     reviews.forEach((f) => {
       if (f.likedBy?.includes(user.id)) liked[f.id] = true;
     });
-    setLikedReviews(liked);
+    return liked;
   }, [reviews, user?.id]);
 
   // Calculate rating statistics from real data
@@ -105,30 +110,57 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   // totalReviews (termasuk feedback tanpa rating) angkanya jadi salah.
   const totalRated = ratingCounts.reduce((sum, n) => sum + n, 0);
   const ratingBreakdown =
-    totalRated > 0 ? ratingCounts.map((count) => (count / totalRated) * 100) : [0, 0, 0, 0, 0];
+    totalRated > 0
+      ? ratingCounts.map((count) => Math.min(100, Math.max(0, (count / totalRated) * 100)))
+      : [0, 0, 0, 0, 0];
 
-  const handleLike = async (feedbackId: string) => {
-    if (!user?.id) return;
+  const pendingLikeIds = useRef(new Set<string>());
 
-    // Optimistik UI
-    setLikedReviews((prev) => ({
-      ...prev,
-      [feedbackId]: !prev[feedbackId],
-    }));
+  const handleLike = useCallback(
+    async (feedbackId: string) => {
+      if (!user?.id || pendingLikeIds.current.has(feedbackId)) return;
+      pendingLikeIds.current.add(feedbackId);
 
-    try {
-      await toggleFeedbackLikeApi(feedbackId, user.id);
-      // Refresh reviews to get updated like counts
-      setReviews(await fetchFeedbackReviews());
-    } catch (error) {
-      console.error('Error toggling feedback like:', error);
-      // Revert optimistic UI agar tidak melenceng dari data sebenarnya
-      setLikedReviews((prev) => ({
-        ...prev,
-        [feedbackId]: !prev[feedbackId],
-      }));
-    }
-  };
+      const snapshot = reviews;
+      const wasLiked = Boolean(
+        snapshot.find((r) => r.id === feedbackId)?.likedBy?.includes(user.id)
+      );
+
+      // Optimistik UI — status dan jumlah like diubah dari satu sumber (likedBy).
+      setReviews((prev) =>
+        prev.map((r) => {
+          if (r.id !== feedbackId) return r;
+          const likedBy = wasLiked
+            ? (r.likedBy || []).filter((id) => id !== user.id)
+            : [...(r.likedBy || []), user.id];
+          return { ...r, likedBy, likes: likedBy.length };
+        })
+      );
+
+      try {
+        const result = await toggleFeedbackLikeApi(feedbackId, user.id);
+        // Terapkan hasil dari backend agar jumlah like sinkron tanpa fetch ulang
+        // seluruh review.
+        setReviews((prev) =>
+          prev.map((r) => {
+            if (r.id !== feedbackId) return r;
+            const likedBy = result.liked
+              ? [...new Set([...(r.likedBy || []), user.id])]
+              : (r.likedBy || []).filter((id) => id !== user.id);
+            return { ...r, likedBy, likes: result.likes };
+          })
+        );
+      } catch (error) {
+        console.error('Error toggling feedback like:', error);
+        // Rollback ke kondisi sebelum klik
+        setReviews(snapshot);
+        showToast('error', 'Gagal memperbarui suka. Silakan coba lagi.');
+      } finally {
+        pendingLikeIds.current.delete(feedbackId);
+      }
+    },
+    [reviews, user?.id, showToast]
+  );
 
   const handleFilter = (filter: number | 'all') => {
     setActiveFilter(filter);
@@ -137,45 +169,77 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   const filteredReviews =
     activeFilter === 'all' ? reviews : reviews.filter((review) => review.rating === activeFilter);
 
-  // Helper function to generate avatar URL based on user name
-  const generateAvatarUrl = (name: string): string => {
-    // Using UI Avatars API for generating avatars based on initials
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=150`;
+  const validateForm = (data: FeedbackFormData): Record<string, string> => {
+    const next: Record<string, string> = {};
+
+    const name = data.name.trim();
+    if (!name) {
+      next.name = 'Nama lengkap wajib diisi';
+    } else if (name.length > FIELD_LIMITS.name) {
+      next.name = `Nama maksimal ${FIELD_LIMITS.name} karakter`;
+    }
+
+    const email = data.email.trim();
+    if (email) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        next.email = 'Format email tidak valid';
+      } else if (email.length > FIELD_LIMITS.email) {
+        next.email = `Email maksimal ${FIELD_LIMITS.email} karakter`;
+      }
+    }
+
+    const subject = data.subject.trim();
+    if (!subject) {
+      next.subject = 'Subjek wajib diisi';
+    } else if (subject.length > FIELD_LIMITS.subject) {
+      next.subject = `Subjek maksimal ${FIELD_LIMITS.subject} karakter`;
+    }
+
+    const message = data.message.trim();
+    if (!message) {
+      next.message = 'Pesan wajib diisi';
+    } else if (message.length < 10) {
+      next.message = 'Pesan minimal 10 karakter';
+    } else if (message.length > FIELD_LIMITS.message) {
+      next.message = `Pesan maksimal ${FIELD_LIMITS.message} karakter`;
+    }
+
+    if (!Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5) {
+      next.rating = 'Rating harus antara 1 dan 5';
+    }
+
+    return next;
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const openForm = useCallback(() => {
+    cancelAutoNavigate();
+    setSubmitStatus('idle');
+    setErrors({});
+    setView('form');
+  }, [cancelAutoNavigate]);
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nama lengkap wajib diisi';
-    }
-
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = 'Subjek wajib diisi';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = 'Pesan wajib diisi';
-    }
-
-    if (formData.message.length < 10) {
-      newErrors.message = 'Pesan minimal 10 karakter';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const showReviews = useCallback(() => {
+    cancelAutoNavigate();
+    setSubmitStatus('idle');
+    setView('reviews');
+  }, [cancelAutoNavigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    if (!validateForm()) {
-      return;
-    }
+    // Trim sebelum validasi & dikirim, tanpa mengubah apa yang tampil di form.
+    const trimmedData: FeedbackFormData = {
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+    };
+
+    const nextErrors = validateForm(trimmedData);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
     setSubmitStatus('idle');
@@ -185,15 +249,14 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
     try {
       // Simpan feedback (backend kalau aktif, else localStorage)
       const feedback = await submitFeedback({
-        name: formData.name,
-        email: formData.email || undefined,
+        name: trimmedData.name,
+        email: trimmedData.email || undefined,
         role: user?.role || 'guest',
-        category: formData.category,
-        subject: formData.subject,
-        message: formData.message,
-        priority: formData.priority,
-        rating: formData.rating,
-        avatar: generateAvatarUrl(formData.name),
+        category: trimmedData.category,
+        subject: trimmedData.subject,
+        message: trimmedData.message,
+        priority: trimmedData.priority,
+        rating: trimmedData.rating,
         likes: 0,
         likedBy: [],
       });
@@ -214,6 +277,11 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
       setSubmitStatus('success');
       // Nomor tiket = id feedback asli (bisa dilacak admin)
       setTicketId(feedback.id);
+
+      // Tampilkan feedback baru langsung di daftar, lalu sinkronkan ulasan & statistik.
+      setReviews((prev) => [feedback, ...prev.filter((f) => f.id !== feedback.id)]);
+      void loadFeedback();
+
       // Reset form
       setFormData({
         name: user?.name || '',
@@ -224,16 +292,13 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
         priority: 'sedang',
         rating: 5,
       });
+      setErrors({});
 
-      // Kembali ke halaman sebelumnya setelah 3 detik
+      // Arahkan ke daftar ulasan setelah beberapa detik agar user melihat hasilnya.
       cancelAutoNavigate();
       navigateTimerRef.current = setTimeout(() => {
-        setSubmitStatus('idle');
-        setView('reviews');
-        // Refresh reviews to show the new feedback
-        refreshReviews();
-        onNavigate?.('dashboard');
-      }, 3000);
+        showReviews();
+      }, 4000);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       const errorMsg = error instanceof Error ? error.message : 'Terjadi kesalahan tidak dikenal';
@@ -254,8 +319,7 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
               type="button"
               onClick={() => {
                 if (view === 'form') {
-                  cancelAutoNavigate();
-                  setView('reviews');
+                  showReviews();
                 } else {
                   onNavigate?.('dashboard');
                 }
@@ -282,7 +346,7 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
           {view === 'reviews' ? (
             <button
               type="button"
-              onClick={() => setView('form')}
+              onClick={openForm}
               className="rounded-md bg-orange-500 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-orange-600"
             >
               Tulis Ulasan
@@ -305,6 +369,9 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
         {view === 'reviews' ? (
           <RatingsReviews
             reviewsLoading={reviewsLoading}
+            reviewsError={reviewsError}
+            onRetry={() => void loadFeedback()}
+            hasReviews={reviews.length > 0}
             overallRating={overallRating}
             totalReviews={totalReviews}
             ratingCounts={ratingCounts}
@@ -314,8 +381,7 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
             filteredReviews={filteredReviews}
             likedReviews={likedReviews}
             onLike={handleLike}
-            onWriteReview={() => setView('form')}
-            generateAvatarUrl={generateAvatarUrl}
+            onWriteReview={openForm}
           />
         ) : (
           <FeedbackForm
@@ -327,10 +393,8 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
             ticketId={ticketId}
             errorMessage={errorMessage}
             onSubmit={handleSubmit}
-            onBack={() => {
-              cancelAutoNavigate();
-              setView('reviews');
-            }}
+            onBack={showReviews}
+            onViewReviews={showReviews}
           />
         )}
       </main>

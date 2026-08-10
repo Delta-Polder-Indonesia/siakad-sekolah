@@ -234,7 +234,7 @@ export {
   toggleFeedbackLike,
 } from './feedbackService';
 
-export type { Feedback } from './feedbackService';
+export type { Feedback, FeedbackCategory, FeedbackPriority } from './feedbackService';
 
 export type {
   Student,

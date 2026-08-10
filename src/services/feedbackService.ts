@@ -14,7 +14,7 @@ import {
 type ApiResponse<T> = { ok: boolean; data: T; message?: string };
 type ApiErrorBody = { message?: string; error?: string };
 
-type FeedbackStats = ReturnType<typeof getFeedbackStatsLocal>;
+export type FeedbackStats = ReturnType<typeof getFeedbackStatsLocal>;
 type FeedbackInput = Omit<Feedback, 'id' | 'submittedAt' | 'status'>;
 
 type LikeResult = { id: string; likes: number; liked: boolean };
@@ -72,7 +72,10 @@ const toFeedback = (row: Record<string, unknown>): Feedback => {
     message: String(row.message || ''),
     priority: (row.priority as Feedback['priority']) || 'sedang',
     status: (row.status as Feedback['status']) || 'pending',
-    submittedAt: new Date(String(row.submittedAt)).getTime(),
+    submittedAt: (() => {
+      const ts = new Date(String(row.submittedAt)).getTime();
+      return Number.isFinite(ts) ? ts : Date.now();
+    })(),
     adminNotes: row.adminNotes ? String(row.adminNotes) : undefined,
     processedAt: row.processedAt ? new Date(String(row.processedAt)).getTime() : undefined,
     rating: typeof row.rating === 'number' ? row.rating : undefined,
