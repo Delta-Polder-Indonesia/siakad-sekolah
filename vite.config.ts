@@ -48,7 +48,7 @@ export default defineConfig(({ command }) => ({
   // Build (GitHub Pages) -> /siakad-sekolah/
   // Build (Vercel) -> / (Vercel sets VERCEL env)
   base: command === 'build'
-    ? (process.env.VERCEL ? '/' : '/siakad-sekolah/')
+    ? (process.env.VERCEL ? '/' : '/PortalSiakad/')
     : '/',
 
   define: {

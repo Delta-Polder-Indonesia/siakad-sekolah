@@ -33,7 +33,7 @@ jobs:
         run: npm ci
       
       - name: Build
-        run: npm run build -- --base=/siakad-sekolah/
+        run: npm run build -- --base=/PortalSiakad/
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
