@@ -1,4 +1,5 @@
 import cors    from 'cors';
+import compression from 'compression';
 import express from 'express';
 import helmet  from 'helmet';
 import { env }          from './config/env.js';
@@ -15,6 +16,8 @@ const allowedOrigins = env.CLIENT_ORIGIN
   .split(',')
   .map((o) => o.trim());
 
+// Kompresi gzip untuk respons JSON — kurangi bandwidth & latensi API.
+app.use(compression());
 app.use(helmet());
 app.use(cors({
   origin:         allowedOrigins,
