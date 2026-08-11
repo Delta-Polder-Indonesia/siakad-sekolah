@@ -1,10 +1,11 @@
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, lazy, Suspense } from 'react';
 import { Eye, EyeOff, ChevronDown, X } from 'lucide-react';
 import { LoginPanelProps } from './types';
 import { SCHOOL_CONFIG, Z_INDEX, VALID_ROLES, ROLE_CONFIG } from './constants';
 import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
 import { isValidRole } from './utils';
-import GoogleLoginButton from '../GoogleLoginButton';
+
+const GoogleLoginButton = lazy(() => import('../GoogleLoginButton'));
 
 const LoginPanel = memo<LoginPanelProps>(
   ({
@@ -147,11 +148,13 @@ const LoginPanel = memo<LoginPanelProps>(
                   <div className="flex flex-col items-center gap-4 pt-8 pb-4">
                     <p className="text-sm text-slate-600">Masuk sebagai tamu menggunakan Google</p>
                     <div className="w-full">
-                      <GoogleLoginButton
-                        onGoogleLogin={onGoogleLogin}
-                        disabled={isBlocked}
-                        fullWidth
-                      />
+                      <Suspense fallback={<div className="h-10 w-full animate-pulse rounded bg-slate-100" />}>
+                        <GoogleLoginButton
+                          onGoogleLogin={onGoogleLogin}
+                          disabled={isBlocked}
+                          fullWidth
+                        />
+                      </Suspense>
                     </div>
                     {hasError && (
                       <div

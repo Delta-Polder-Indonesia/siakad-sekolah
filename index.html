@@ -44,25 +44,14 @@
     <link rel="apple-touch-icon" href="/images/logo/logo-sekolah.svg" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Resource Hints -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://accounts.google.com" />
-    <link rel="dns-prefetch" href="https://apis.google.com" />
-
-    <!-- Preload LCP image (BackgroundSlideshow first slide) for faster LCP -->
+    <!-- Preload LCP hero (BASE_URL-aware so GH Pages /siakad-sekolah/ hits the file) -->
     <link
       rel="preload"
       as="image"
-      href="/images/Dashboard/Konoha-1.webp"
-      imagesrcset="/images/Dashboard/Konoha-1.webp 1920w"
+      type="image/webp"
+      href="%BASE_URL%images/Dashboard/Konoha-1-768.webp"
+      imagesrcset="%BASE_URL%images/Dashboard/Konoha-1-768.webp 768w, %BASE_URL%images/Dashboard/Konoha-1-1280.webp 1280w, %BASE_URL%images/Dashboard/Konoha-1.webp 1350w"
       imagesizes="100vw"
-      fetchpriority="high"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="/images/Dashboard/cyber-security-1923446_960_720.webp"
       fetchpriority="high"
     />
 

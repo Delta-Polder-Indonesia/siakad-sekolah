@@ -15,7 +15,9 @@ export const SECURITY_MESSAGE = {
   line3: 'Segera Ganti Password',
 } as const;
 
-export const SLIDESHOW_INTERVAL_MS = 6000;
+/** First slide stays put so LCP is the hero image, not a later caption. */
+export const SLIDESHOW_FIRST_DELAY_MS = 20_000;
+export const SLIDESHOW_INTERVAL_MS = 8000;
 export const MAX_LOGIN_ATTEMPTS = 5;
 export const LOCKOUT_DURATION_MS = 30_000;
 
@@ -36,17 +38,17 @@ export const Z_INDEX = {
 // Semua gambar telah dioptimasi dengan ImageMagick (strip + quality 80) untuk PSI performance
 export const BACKGROUND_IMAGES = [
   {
-    // Konoha-1: WebP 96KB vs JPG 114KB (optimized) — WebP wins 16% smaller
     src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.webp`,
     fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.jpg`,
+    srcSet: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1-768.webp 768w, ${import.meta.env.BASE_URL}images/Dashboard/Konoha-1-1280.webp 1280w, ${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.webp 1350w`,
     caption: 'Fasilitas Pembelajaran Modern',
     description:
       'Ruang kelas berteknologi tinggi yang mendukung proses belajar mengajar untuk mencetak generasi unggul.',
   },
   {
-    // Konoha-2: WebP 89KB vs JPG 135KB — WebP wins 34% smaller
     src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.webp`,
     fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.jpg`,
+    srcSet: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2-768.webp 768w, ${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.webp 1350w`,
     caption: 'Kegiatan Ekstrakurikuler',
     description:
       'Beragam kegiatan pengembangan diri untuk menggali potensi, bakat, dan minat setiap siswa.',
