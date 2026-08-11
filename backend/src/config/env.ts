@@ -31,11 +31,15 @@ const envSchema = z.object({
 
 const parsed = envSchema.safeParse(process.env);
 
+// Catatan: gunakan `throw` (bukan `process.exit`) agar kesalahan konfigurasi
+// bisa ditangkap oleh test runner / caller, bukan mematikan proses secara paksa.
+// Ini penting karena modul ini ikut di-import oleh logger & app — `process.exit`
+// di sini membuat seluruh unit test yang meng-import chain ini gagal total.
 if (!parsed.success) {
-  console.error('Konfigurasi environment tidak valid:',
-    parsed.error.flatten().fieldErrors
+  throw new Error(
+    'Konfigurasi environment tidak valid: ' +
+      JSON.stringify(parsed.error.flatten().fieldErrors)
   );
-  process.exit(1);
 }
 
 export const env = parsed.data;
@@ -47,6 +51,5 @@ if (
   (WEAK_PASSWORDS.includes(env.ADMIN_PASSWORD.toLowerCase()) ||
     env.ADMIN_PASSWORD === env.ADMIN_USERNAME)
 ) {
-  console.error('SECURITY: ADMIN_PASSWORD masih lemah. Ganti dengan password kuat di production!');
-  process.exit(1);
+  throw new Error('SECURITY: ADMIN_PASSWORD masih lemah. Ganti dengan password kuat di production!');
 }
