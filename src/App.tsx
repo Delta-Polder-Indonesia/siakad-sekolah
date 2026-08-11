@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { ComponentType } from 'react';
 import { PageProps } from './types';
 import { useAuth } from './context/AuthContext';
+import { useSchoolIdentity } from './hooks/useSchoolIdentity';
 import { initializeData } from './data/services';
 import LoginPage from './fitur/autentikasi/LoginPage';
 import Sidebar from './layout/Sidebar';
@@ -305,6 +306,12 @@ function AppContent() {
 }
 
 export default function App() {
+  const identity = useSchoolIdentity();
+
+  // Judul browser mengikuti identitas sekolah (dinamis, tanpa build ulang).
+  useEffect(() => {
+    document.title = `Portal SIAKAD │ ${identity.namaSekolah}`;
+  }, [identity.namaSekolah]);
   useEffect(() => {
     initializeData();
   }, []);

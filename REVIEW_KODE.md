@@ -399,4 +399,39 @@ pada heartbeat presence (10 dtk) dan penanda "sudah dibaca".
 
 ---
 
+---
+
+## 11. Template Universal — Setup Sekolah Tanpa Koding ✅
+
+**Latar:** pengguna menjual SIAKAD sebagai template ke banyak sekolah (SD/SMP/SMA/SMK).
+Prioritas bergeser dari "sambungkan backend" → **"gampang di-branding & disetup ulang"**.
+
+### Yang dikerjakan
+1. **`src/config/school.ts` — sumber identitas tunggal + runtime override**
+   - `getSchoolIdentity()` = default + override localStorage (`siakad-school-identity`)
+   - `updateSchoolIdentity()` / `resetSchoolIdentity()` — langsung notify seluruh aplikasi
+   - `schoolConfig` lama dipertahankan (backward compat, dipakai FeedbackForm)
+2. **`src/hooks/useSchoolIdentity.ts`** — hook reaktif (ikut store version)
+3. **Branding reaktif**: Sidebar (nama+logo), ProgramFooter (nama/kontak), LoginPanel &
+   LoginPage (logo), judul browser dinamis di App (`document.title`)
+4. **Hardcode "SMA Negeri 1 Medan" dibersihkan** — SiakadSection, BukuTamuForm,
+   guestData, schoolData (tamu) kini interpolasi dari identitas
+5. **Panel Setup Sekolah** (menu admin → Sistem): form nama/singkatan/jenjang/tahun
+   ajaran/NPSN/telepon/domain email/alamat + **unggah logo** (max 300KB, preview) +
+   simpan/reset. Perubahan langsung berlaku, tanpa build ulang.
+
+### Test baru (+9)
+- `config/school.test.ts` (6): default, update parsial, reset, tolak field kosong,
+  aman dari data rusak, email dari domain
+- `TabSetupSekolah.test.tsx` (3 render): tampil form, simpan identitas, reset
+
+### Verifikasi
+- FE: 279 test (25 file) ✅ · lint 0 error ✅ · build ✅ · dev server semua modul 200 ✅
+
+### Catatan penting (dokumentasi untuk penjualan)
+- Setelan ini = identitas/branding. Isi konten (berita, sejarah, visi-misi, struktur)
+  tetap per-sekolah di file data masing-masing.
+- Perubahan jenjang penuh yang mengubah struktur konten (SD→SMK) tetap butuh build
+  ulang (ubah `jenjang` di `dataSekolah.ts`); setelan jenjang di panel untuk identitas.
+
 *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*

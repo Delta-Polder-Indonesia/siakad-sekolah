@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import { logger } from '../../utils/logger';
 import { ToastProvider } from '../../components/ui';
+import { useSchoolIdentity } from '../../hooks/useSchoolIdentity';
 import { FeedbackButton } from '../halaman/feedback';
 
 const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
@@ -10,7 +11,6 @@ const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
 import {
   BACKGROUND_IMAGES,
   MAIN_NAV,
-  LOGO_SMP,
   SCHOOL_CONFIG,
   SLIDESHOW_INTERVAL_MS,
   MAX_LOGIN_ATTEMPTS,
@@ -30,6 +30,7 @@ const TutorialModal = lazy(() => import('./TutorialModal'));
 const ExpectationModal = lazy(() => import('../halaman/ExpectationModal'));
 
 export default function LoginPage() {
+  const identity = useSchoolIdentity();
   const { login, loginGoogle } = useAuth();
 
   const isMounted = useRef(true);
@@ -265,7 +266,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
-                  src={LOGO_SMP}
+                  src={identity.logo}
                   alt="Logo Sekolah"
                   className="h-11 w-11 object-contain drop-shadow-lg"
                 />

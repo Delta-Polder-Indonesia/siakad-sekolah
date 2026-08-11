@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../fitur/bersama/NotificationProvider';
-import { namaSekolahUppercase } from '../fitur/halaman/components/Profile/dataSekolah';
+import { useSchoolIdentity } from '../hooks/useSchoolIdentity';
 import NotificationBadge from '../fitur/bersama/NotificationBadge';
 import NotificationDropdown from '../fitur/bersama/NotificationDropdown';
 import {
@@ -127,6 +127,7 @@ const Sidebar = memo(function Sidebar({
   onToggleCollapse: setSidebarCollapsed,
 }: SidebarProps) {
   const { user, logout } = useAuth();
+  const identity = useSchoolIdentity();
   const { counts, markRead } = useNotifications();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -431,8 +432,8 @@ const Sidebar = memo(function Sidebar({
               <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-600 bg-slate-800 p-1">
                 <img
                   loading="lazy"
-                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
-                  alt={`Logo ${namaSekolahUppercase}`}
+                  src={identity.logo}
+                  alt={`Logo ${identity.namaSekolah}`}
                   className="h-full w-full object-contain"
                 />
               </div>
@@ -441,7 +442,7 @@ const Sidebar = memo(function Sidebar({
                   PORTAL SISWA
                 </h1>
                 <p className="m-0 p-0 text-[10px] leading-tight text-slate-400">
-                  {namaSekolahUppercase}
+                  {identity.namaSekolah.toUpperCase()}
                 </p>
               </div>
             </div>

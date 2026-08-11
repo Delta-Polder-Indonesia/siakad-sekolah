@@ -1,3 +1,4 @@
+import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
 // NOTE: Profil sekolah, identitas, dan statistik dikelola di satu pintu:
 // `src/fitur/halaman/components/Profile/dataSekolah.ts`
 // (dipakai oleh SekilasSekolah, GtkSiswaPage, dan halaman tamu TentangSekolah)
@@ -126,7 +127,7 @@ export const prestasi = [
   {
     id: 2,
     judul: 'Juara 2 Lomba Cerdas Cermat Tingkat Kabupaten',
-    siswa: 'Tim LCC SMA Negeri 1 Medan',
+    siswa: `Tim LCC ${namaSekolah}`,
     tahun: 2025,
     tingkat: 'Kabupaten',
     kategori: 'Akademik',
@@ -166,7 +167,7 @@ export const prestasi = [
   {
     id: 7,
     judul: 'Sekolah Adiwiyata Tingkat Nasional',
-    siswa: 'SMA Negeri 1 Medan',
+    siswa: `${namaSekolah}`,
     tahun: 2024,
     tingkat: 'Nasional',
     kategori: 'Lingkungan',
@@ -227,7 +228,7 @@ export const ekstrakurikuler = [
 export const beritaList = [
   {
     id: 1,
-    judul: 'Siswa SMA Negeri 1 Medan Raih Juara 1 OSN Matematika',
+    judul: `Siswa ${namaSekolah} Raih Juara 1 OSN Matematika`,
     tanggal: '2025-01-20',
     kategori: 'Prestasi',
     ringkasan:
@@ -258,7 +259,7 @@ export const beritaList = [
     tanggal: '2024-11-25',
     kategori: 'Kegiatan',
     ringkasan:
-      'Seluruh civitas akademika SMA Negeri 1 Medan memperingati Hari Guru Nasional dengan berbagai kegiatan penuh makna.',
+      `Seluruh civitas akademika ${namaSekolah} memperingati Hari Guru Nasional dengan berbagai kegiatan penuh makna.`,
     gambar: '/images/berita/hariguru.jpg',
   },
   {
@@ -314,15 +315,15 @@ export const ppdbInfo = {
 export const faqList = [
   {
     id: 1,
-    pertanyaan: 'Bagaimana cara mendaftar di SMA Negeri 1 Medan?',
+    pertanyaan: `Bagaimana cara mendaftar di ${namaSekolah}?`,
     jawaban:
       'Pendaftaran dilakukan secara online melalui website resmi PPDB. Calon siswa perlu mengisi formulir pendaftaran dan mengunggah dokumen persyaratan yang diminta. Informasi lengkap dapat dilihat di menu Info PPDB.',
   },
   {
     id: 2,
-    pertanyaan: 'Berapa biaya pendidikan di SMA Negeri 1 Medan?',
+    pertanyaan: `Berapa biaya pendidikan di ${namaSekolah}?`,
     jawaban:
-      'Sebagai sekolah negeri, SMA Negeri 1 Medan tidak memungut biaya pendaftaran. SPP bulanan sebesar Rp 150.000. Untuk siswa dari keluarga kurang mampu, tersedia program beasiswa dan keringanan biaya.',
+      `Sebagai sekolah negeri, ${namaSekolah} tidak memungut biaya pendaftaran. SPP bulanan sebesar Rp 150.000. Untuk siswa dari keluarga kurang mampu, tersedia program beasiswa dan keringanan biaya.`,
   },
   {
     id: 3,
@@ -338,7 +339,7 @@ export const faqList = [
   },
   {
     id: 5,
-    pertanyaan: 'Bagaimana jam belajar di SMA Negeri 1 Medan?',
+    pertanyaan: `Bagaimana jam belajar di ${namaSekolah}?`,
     jawaban:
       'Kegiatan belajar mengajar berlangsung dari Senin-Jumat pukul 07:00-15:00 WIB. Hari Sabtu digunakan untuk kegiatan ekstrakurikuler dan pengembangan diri.',
   },

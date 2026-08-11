@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
 import {
   User,
   Building2,
@@ -20,6 +21,7 @@ interface BukuTamuFormProps {
 }
 
 export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
+  const identity = useSchoolIdentity();
   const [formData, setFormData] = useState({
     nama: '',
     instansi: '',
@@ -101,7 +103,7 @@ export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
         </div>
         <h3 className="font-serif text-xl font-bold text-slate-950">Terima Kasih!</h3>
         <p className="max-w-sm text-xs font-semibold text-slate-600">
-          Pesan Anda telah berhasil tercatat dalam buku tamu SMA Negeri 1 Medan. Kami menghargai
+          Pesan Anda telah berhasil tercatat dalam buku tamu {identity.namaSekolah}. Kami menghargai
           kunjungan dan masukan Anda.
         </p>
         <div className="flex gap-3 pt-2">
@@ -253,7 +255,7 @@ export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
         <textarea
           value={formData.pesan}
           onChange={(e) => handleChange('pesan', e.target.value)}
-          placeholder="Tuliskan pesan, kesan, atau saran Anda untuk SMA Negeri 1 Medan..."
+          placeholder="Tuliskan pesan, kesan, atau saran Anda untuk {identity.namaSekolah}..."
           rows={4}
           className="w-full resize-none rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 shadow-2xs transition-colors outline-none hover:border-slate-950 focus:border-slate-950"
         />

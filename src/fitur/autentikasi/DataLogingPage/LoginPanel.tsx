@@ -1,7 +1,8 @@
 import React, { memo, useEffect, useRef } from 'react';
 import { Eye, EyeOff, ChevronDown, X } from 'lucide-react';
 import { LoginPanelProps } from './types';
-import { LOGO_SMP, SCHOOL_CONFIG, Z_INDEX, VALID_ROLES, ROLE_CONFIG } from './constants';
+import { SCHOOL_CONFIG, Z_INDEX, VALID_ROLES, ROLE_CONFIG } from './constants';
+import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
 import { isValidRole } from './utils';
 import GoogleLoginButton from '../GoogleLoginButton';
 
@@ -25,6 +26,7 @@ const LoginPanel = memo<LoginPanelProps>(
     onGoogleLogin,
     disabled = false,
   }) => {
+    const identity = useSchoolIdentity();
     const panelRef = useRef<HTMLDivElement>(null);
     const config = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG] ?? ROLE_CONFIG.student;
     const isBlocked = isLoading || disabled;
@@ -86,7 +88,7 @@ const LoginPanel = memo<LoginPanelProps>(
             {/* Header */}
             <div className="flex flex-shrink-0 items-center justify-between px-8 pt-6">
               <div className="flex items-center gap-4">
-                <img src={LOGO_SMP} alt="Logo Sekolah" className="h-9 w-9 object-contain" />
+                <img src={identity.logo} alt="Logo Sekolah" className="h-9 w-9 object-contain" />
                 <div>
                   <p className="text-[9px] font-semibold tracking-[0.15em] text-slate-500 uppercase">
                     {SCHOOL_CONFIG.systemTitle}

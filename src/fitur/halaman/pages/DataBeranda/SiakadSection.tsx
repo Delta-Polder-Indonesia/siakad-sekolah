@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSchoolIdentity } from '../../../../hooks/useSchoolIdentity';
 
 interface SiakadSectionProps {
   imageSrc?: string;
@@ -9,6 +10,7 @@ export default function SiakadSection({
   imageSrc,
   imageAlt = 'Ilustrasi SIAKAD',
 }: SiakadSectionProps) {
+  const identity = useSchoolIdentity();
   return (
     /* 
       1. '-mt-36' & 'z-20' menjaga agar background biru tetap naik ke atas menimpa section banner.
@@ -41,7 +43,7 @@ export default function SiakadSection({
               aplikasi berbasis web yang dirancang untuk melakukan proses pengelolaan data akademik
               dan data terkait lainnya, sehingga seluruh kegiatan akademik dapat terkelola menjadi
               informasi yang bermanfaat dalam pengelolaan manajemen sekolah, pengambilan keputusan,
-              serta pelaporan di lingkungan SMA Negeri 1 Medan yang melibatkan siswa, guru, dan
+              serta pelaporan di lingkungan {identity.namaSekolah} yang melibatkan siswa, guru, dan
               petugas administrasi akademik.
             </p>
             <p className="mb-4 text-justify">

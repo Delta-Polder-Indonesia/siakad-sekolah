@@ -8,6 +8,8 @@ import {
   namaJenjang,
   jenjang,
 } from '../fitur/halaman/components/Profile/dataSekolah';
+import { useSchoolIdentity } from '../hooks/useSchoolIdentity';
+import { getSchoolEmail } from '../config/school';
 
 interface FooterProps {
   onNavigate?: (page: NavItem) => void;
@@ -44,6 +46,11 @@ const NEWS_TITLES: string[] = [
 ];
 
 export default function ProgramFooter({ onNavigate }: FooterProps) {
+  const identity = useSchoolIdentity();
+  const nameU = identity.namaSekolah.toUpperCase();
+  const identAlamat = identity.alamat;
+  const identTelp = identity.telepon;
+  const identEmail = getSchoolEmail(identity);
   const bottomNavLinks: BottomNavLink[] = [
     { label: 'Beranda', menu: 'Beranda' as NavItem },
     { label: 'Program Keahlian', menu: 'Program Keahlian' as NavItem },
@@ -99,7 +106,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
             Social Media Kami
           </h4>
           <p className="mb-3 text-[11px] text-gray-300">
-            Ayo follow dan ikuti informasi seputar kegiatan {namaSekolahUppercase} di media sosial
+            Ayo follow dan ikuti informasi seputar kegiatan {nameU} di media sosial
             kami.
           </p>
           <ul className="space-y-2 text-[11px] text-amber-300">
@@ -125,18 +132,18 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
         {/* Tentang */}
         <div>
           <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold text-white uppercase">
-            Tentang {namaSekolahUppercase}
+            Tentang {nameU}
           </h4>
           <p className="text-justify text-[11px] leading-relaxed text-gray-300">
-            {namaSekolahUppercase} merupakan salah satu lembaga pendidikan{' '}
+            {nameU} merupakan salah satu lembaga pendidikan{' '}
             {namaJenjang[jenjang].toLowerCase()} negeri yang berkomitmen menghasilkan lulusan
             unggul, berintegritas, dan berdaya saing tinggi melalui penguatan karakter serta
             implementasi teknologi digital.
           </p>
           <p className="mt-3 space-y-1 text-[11px] leading-relaxed text-gray-300">
-            <span className="block">{alamatLengkap}</span>
-            <span className="block">Telepon: {telepon}</span>
-            <span className="block">Email: {email}</span>
+            <span className="block">{identAlamat}</span>
+            <span className="block">Telepon: {identTelp}</span>
+            <span className="block">Email: {identEmail}</span>
           </p>
         </div>
 
@@ -193,7 +200,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
             </span>
           ))}
         </div>
-        <p>Copyright All Rights Reserved TIM ICT 2017 - 2026, {namaSekolahUppercase}</p>
+        <p>Copyright All Rights Reserved TIM ICT 2017 - 2026, {nameU}</p>
         <p className="text-[10px] text-blue-200/60">Proudly powered by React & Tailwind CSS</p>
       </div>
     </footer>

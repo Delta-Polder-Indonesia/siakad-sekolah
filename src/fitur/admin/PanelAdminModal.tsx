@@ -24,6 +24,7 @@ import {
   Printer,
   Archive,
   History,
+  Settings,
 } from 'lucide-react';
 import TabKelolaKelas from './components/TabKelolaKelas';
 import TabTambahGuru from './components/TabTambahGuru';
@@ -33,6 +34,7 @@ import TabTagihanSekolah from './components/TabTagihanSekolah';
 import TabPengumumanAdmin from './components/TabPengumumanAdmin';
 import TabAkunSiswa from './components/TabAkunSiswa';
 import TabAkunOrangTua from './components/TabAkunOrangTua';
+import TabSetupSekolah from './components/TabSetupSekolah';
 import TabKelolaRoster from './components/TabKelolaRoster';
 import TabRiwayatLogin from './components/TabRiwayatLogin';
 import TabMasterAkademik from './components/TabMasterAkademik';
@@ -54,6 +56,7 @@ type TeacherAdminTab =
   | 'pesan-masuk'
   | 'akun-siswa'
   | 'akun-orang-tua'
+  | 'setup-sekolah'
   | 'kelola-roster'
   | 'riwayat-login'
   | 'ppdb-admin'
@@ -88,6 +91,7 @@ const MENU_MASTER = [
   { id: 'riwayat-login', label: 'Riwayat Login', icon: History },
   { id: 'pesan-masuk', label: 'Pesan Masuk', icon: Mail },
   { id: 'akun-orang-tua', label: 'Akun Orang Tua', icon: ShieldCheck },
+  { id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings },
 ] as const;
 
 const MENU_MASTER_GROUPS = [
@@ -123,6 +127,10 @@ const MENU_MASTER_GROUPS = [
       { id: 'pesan-masuk', label: 'Pesan Masuk', icon: Mail },
       { id: 'akun-orang-tua', label: 'Akun Orang Tua', icon: ShieldCheck },
     ],
+  },
+  {
+    title: 'Sistem',
+    items: [{ id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings }],
   },
 ] as const;
 
@@ -376,6 +384,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
                 <AdminPanel onClose={() => setActiveTab('akun-siswa')} embedded />
               )}
               {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
+              {activeTab === 'setup-sekolah' && <TabSetupSekolah setNotice={handleNotice} />}
 
               {/* Menu Perpustakaan */}
               <Suspense

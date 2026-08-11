@@ -1,3 +1,4 @@
+import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
 import { GuestEntry } from '../types';
 
 export const initialGuestEntries: GuestEntry[] = [
@@ -9,7 +10,7 @@ export const initialGuestEntries: GuestEntry[] = [
     noHp: '081234567890',
     tujuan: 'Kunjungan Dinas',
     pesan:
-      'Senang sekali bisa mengunjungi SMAN 1 Medan. Fasilitas dan kualitas pendidikan sangat baik. Semoga terus menjadi sekolah unggulan di Sumatera Utara.',
+      `Senang sekali bisa mengunjungi ${namaSekolah}. Fasilitas dan kualitas pendidikan sangat baik. Semoga terus menjadi sekolah unggulan di Sumatera Utara.`,
     tanggal: '2026-01-15',
     waktu: '09:30',
     rating: 5,
@@ -35,7 +36,7 @@ export const initialGuestEntries: GuestEntry[] = [
     noHp: '082345678901',
     tujuan: 'Kerjasama Akademik',
     pesan:
-      'Kunjungan dalam rangka membahas program kerjasama akademik antara USU dan SMAN 1 Medan. Sangat antusias dengan potensi kolaborasi ke depan.',
+      `Kunjungan dalam rangka membahas program kerjasama akademik antara USU dan ${namaSekolah}. Sangat antusias dengan potensi kolaborasi ke depan.`,
     tanggal: '2026-01-22',
     waktu: '13:00',
     rating: 5,
@@ -61,7 +62,7 @@ export const initialGuestEntries: GuestEntry[] = [
     noHp: '089876543210',
     tujuan: 'Kunjungan Alumni',
     pesan:
-      'Nostalgia mengunjungi almamater tercinta. Banyak perubahan positif yang saya lihat. Bangga menjadi alumni SMAN 1 Medan!',
+      `Nostalgia mengunjungi almamater tercinta. Banyak perubahan positif yang saya lihat. Bangga menjadi alumni ${namaSekolah}!`,
     tanggal: '2026-02-10',
     waktu: '11:00',
     rating: 5,
