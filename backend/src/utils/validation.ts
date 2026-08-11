@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Request, Response, NextFunction } from 'express';
 import { logger } from '../config/logger.js';
 
 /**
@@ -126,7 +127,7 @@ export function validateRequest<T>(schema: z.ZodSchema<T>, data: unknown):
  * Express middleware untuk request validation
  */
 export function validateBody<T>(schema: z.ZodSchema<T>) {
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const result = validateRequest(schema, req.body);
     
     if (!result.success) {
@@ -146,7 +147,7 @@ export function validateBody<T>(schema: z.ZodSchema<T>) {
  * Validate query parameters
  */
 export function validateQuery<T>(schema: z.ZodSchema<T>) {
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const result = validateRequest(schema, req.query);
     
     if (!result.success) {
@@ -166,7 +167,7 @@ export function validateQuery<T>(schema: z.ZodSchema<T>) {
  * Validate route parameters
  */
 export function validateParams<T>(schema: z.ZodSchema<T>) {
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const result = validateRequest(schema, req.params);
     
     if (!result.success) {

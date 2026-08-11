@@ -2,6 +2,46 @@ import { prisma } from '../lib/prisma.js';
 import { logger } from '../config/logger.js';
 import { env } from '../config/env.js';
 
+interface SlowQueryInfo {
+  queryid: string;
+  query: string;
+  calls: number;
+  total_time: number;
+  mean_time: number;
+  max_time: number;
+  optimizationTips: string[];
+}
+
+interface MissingIndexInfo {
+  table: string;
+  column: string;
+  distinctValues: number;
+  correlation: number;
+  recommendation: string;
+}
+
+interface UnusedIndexInfo {
+  schema: string;
+  table: string;
+  index: string;
+  recommendation: string;
+}
+
+interface TableSizeInfo {
+  tablename: string;
+  total_size: string;
+  index_size: string;
+  table_size: string;
+}
+
+interface QueryAnalysis {
+  slowQueries: SlowQueryInfo[];
+  missingIndexes: MissingIndexInfo[];
+  unusedIndexes: UnusedIndexInfo[];
+  tableSizes: TableSizeInfo[];
+  recommendations: string[];
+}
+
 /**
  * Query Optimization Service
  * Identifies and provides recommendations for slow queries
@@ -212,7 +252,7 @@ export class QueryOptimizationService {
   /**
    * Generate optimization recommendations based on analysis
    */
-  static generateRecommendations(analysis: any) {
+  static generateRecommendations(analysis: QueryAnalysis) {
     const recommendations: string[] = [];
     
     // Slow query recommendations
@@ -220,7 +260,7 @@ export class QueryOptimizationService {
       recommendations.push(
         `Found ${analysis.slowQueries.length} slow queries. Consider reviewing and optimizing them.`
       );
-      analysis.slowQueries.forEach((query: any) => {
+      analysis.slowQueries.forEach((query: SlowQueryInfo) => {
         if (query.optimizationTips.length > 0) {
           recommendations.push(...query.optimizationTips);
         }
@@ -242,7 +282,7 @@ export class QueryOptimizationService {
     }
     
     // Table size recommendations
-    const largeTables = analysis.tableSizes.filter((t: any) => 
+    const largeTables = analysis.tableSizes.filter((t) => 
       parseInt(t.total_size) > 1000000000 // > 1GB
     );
     if (largeTables.length > 0) {

@@ -1,5 +1,6 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import type { Request, Response, NextFunction } from 'express';
 import { env } from './env.js';
 
 /**
@@ -87,7 +88,7 @@ export const httpLogStream = {
 /**
  * Log request information
  */
-export function logRequest(req: any, res: any, next: any) {
+export function logRequest(req: Request, res: Response, next: NextFunction) {
   const start = Date.now();
   
   res.on('finish', () => {
@@ -109,7 +110,7 @@ export function logRequest(req: any, res: any, next: any) {
 /**
  * Log error dengan additional context
  */
-export function logError(error: Error, context?: Record<string, any>) {
+export function logError(error: Error, context?: Record<string, unknown>) {
   logger.error('Error occurred', {
     error: error.message,
     stack: error.stack,
@@ -127,7 +128,7 @@ const ALERT_WEBHOOK_URL = process.env.ALERT_WEBHOOK_URL;
 export async function sendErrorAlert(
   alertType: string,
   message: string,
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 ) {
   const payload = {
     alert: alertType,
@@ -161,7 +162,7 @@ export async function sendErrorAlert(
 /**
  * Log security events
  */
-export function logSecurityEvent(event: string, details: Record<string, any>) {
+export function logSecurityEvent(event: string, details: Record<string, unknown>) {
   logger.warn('Security Event', {
     event,
     ...details,
@@ -171,7 +172,7 @@ export function logSecurityEvent(event: string, details: Record<string, any>) {
 /**
  * Log database operations
  */
-export function logDatabaseOperation(operation: string, details: Record<string, any>) {
+export function logDatabaseOperation(operation: string, details: Record<string, unknown>) {
   logger.debug('Database Operation', {
     operation,
     ...details,
@@ -182,11 +183,16 @@ export function logDatabaseOperation(operation: string, details: Record<string, 
  * Custom HTTP Transport untuk Log Aggregation
  * Mengirim logs ke external log aggregation service (ELK, Splunk, dll)
  */
+interface LogInfo {
+  timestamp?: string;
+  [key: string]: unknown;
+}
+
 class HttpLogTransport {
   private endpoint: string;
   private apiKey?: string;
   private batchSize: number;
-  private batch: any[] = [];
+  private batch: LogInfo[] = [];
   private flushInterval: NodeJS.Timeout | null = null;
 
   constructor(options?: {
@@ -212,7 +218,7 @@ class HttpLogTransport {
     }, options?.flushInterval || 30000);
   }
 
-  log(info: any, callback: () => void) {
+  log(info: LogInfo, callback: () => void) {
     if (!this.endpoint) {
       callback();
       return;
@@ -294,25 +300,25 @@ const logAggregationTransport = logAggregationEnabled
  * Enhanced logger wrapper untuk log aggregation
  */
 export const aggregationLogger = {
-  info: (message: any, ...meta: any[]) => {
+  info: (message: string, ...meta: unknown[]) => {
     logger.info(message, ...meta);
     if (logAggregationTransport) {
       logAggregationTransport.log({ level: 'info', message, meta }, () => {});
     }
   },
-  error: (message: any, ...meta: any[]) => {
+  error: (message: string, ...meta: unknown[]) => {
     logger.error(message, ...meta);
     if (logAggregationTransport) {
       logAggregationTransport.log({ level: 'error', message, meta }, () => {});
     }
   },
-  warn: (message: any, ...meta: any[]) => {
+  warn: (message: string, ...meta: unknown[]) => {
     logger.warn(message, ...meta);
     if (logAggregationTransport) {
       logAggregationTransport.log({ level: 'warn', message, meta }, () => {});
     }
   },
-  debug: (message: any, ...meta: any[]) => {
+  debug: (message: string, ...meta: unknown[]) => {
     logger.debug(message, ...meta);
     if (logAggregationTransport) {
       logAggregationTransport.log({ level: 'debug', message, meta }, () => {});

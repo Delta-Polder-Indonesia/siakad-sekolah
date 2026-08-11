@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { logger } from '../config/logger.js';
 
@@ -161,7 +162,7 @@ export class DataRetentionService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - RETENTION_CONFIG.ppdbNotification.retentionDays);
     
-    const whereClause: any = {
+    const whereClause: Prisma.PPDBNotificationWhereInput = {
       createdAt: {
         lt: cutoffDate,
       },
@@ -205,7 +206,7 @@ export class DataRetentionService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - RETENTION_CONFIG.libraryTransaction.retentionDays);
     
-    const whereClause: any = {
+    const whereClause: Prisma.LibraryTransactionWhereInput = {
       updatedAt: {
         lt: cutoffDate,
       },
@@ -232,7 +233,7 @@ export class DataRetentionService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - RETENTION_CONFIG.suratIzin.retentionDays);
     
-    const whereClause: any = {
+    const whereClause: Prisma.SuratIzinWhereInput = {
       updatedAt: {
         lt: cutoffDate,
       },
@@ -299,7 +300,7 @@ export class DataRetentionService {
     
     const ppdbNotificationCutoff = new Date();
     ppdbNotificationCutoff.setDate(ppdbNotificationCutoff.getDate() - RETENTION_CONFIG.ppdbNotification.retentionDays);
-    const ppdbNotificationWhere: any = {
+    const ppdbNotificationWhere: Prisma.PPDBNotificationWhereInput = {
       createdAt: {
         lt: ppdbNotificationCutoff,
       },
@@ -323,7 +324,7 @@ export class DataRetentionService {
    * Archive data before deletion (optional implementation)
    * This would export data to a backup system before deletion
    */
-  static async archiveData(modelName: string, records: any[]) {
+  static async archiveData(modelName: string, records: unknown[]) {
     // Implementation depends on your archival strategy
     // Could export to JSON files, cloud storage, or archival database
     logger.info(`Archiving ${records.length} records from ${modelName}`);

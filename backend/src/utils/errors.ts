@@ -18,14 +18,14 @@ export class AppError extends Error {
   public readonly type: ErrorType;
   public readonly statusCode: number;
   public readonly isOperational: boolean;
-  public readonly context?: Record<string, any>;
+  public readonly context?: Record<string, unknown>;
 
   constructor(
     message: string,
     type: ErrorType,
     statusCode: number = 500,
     isOperational: boolean = true,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -40,19 +40,19 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, context?: Record<string, any>) {
+  constructor(message: string, context?: Record<string, unknown>) {
     super(message, ErrorType.VALIDATION, 400, true, context);
   }
 }
 
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication failed', context?: Record<string, any>) {
+  constructor(message: string = 'Authentication failed', context?: Record<string, unknown>) {
     super(message, ErrorType.AUTHENTICATION, 401, true, context);
   }
 }
 
 export class AuthorizationError extends AppError {
-  constructor(message: string = 'Access denied', context?: Record<string, any>) {
+  constructor(message: string = 'Access denied', context?: Record<string, unknown>) {
     super(message, ErrorType.AUTHORIZATION, 403, true, context);
   }
 }
@@ -67,19 +67,19 @@ export class NotFoundError extends AppError {
 }
 
 export class ConflictError extends AppError {
-  constructor(message: string, context?: Record<string, any>) {
+  constructor(message: string, context?: Record<string, unknown>) {
     super(message, ErrorType.CONFLICT, 409, true, context);
   }
 }
 
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Rate limit exceeded', context?: Record<string, any>) {
+  constructor(message: string = 'Rate limit exceeded', context?: Record<string, unknown>) {
     super(message, ErrorType.RATE_LIMIT, 429, true, context);
   }
 }
 
 export class DatabaseError extends AppError {
-  constructor(message: string, context?: Record<string, any>) {
+  constructor(message: string, context?: Record<string, unknown>) {
     super(message, ErrorType.DATABASE, 500, true, context);
   }
 }
@@ -91,7 +91,7 @@ export class ExternalServiceError extends AppError {
 }
 
 export class InternalError extends AppError {
-  constructor(message: string = 'Internal server error', context?: Record<string, any>) {
+  constructor(message: string = 'Internal server error', context?: Record<string, unknown>) {
     super(message, ErrorType.INTERNAL, 500, false, context);
   }
 }
@@ -136,8 +136,16 @@ export function handleError(error: unknown): AppError {
 /**
  * Format error untuk API response
  */
-export function formatErrorResponse(error: AppError) {
-  const response: any = {
+export interface ErrorResponse {
+  ok: boolean;
+  message: string;
+  type: ErrorType;
+  context?: Record<string, unknown>;
+  stack?: string;
+}
+
+export function formatErrorResponse(error: AppError): ErrorResponse {
+  const response: ErrorResponse = {
     ok: false,
     message: error.message,
     type: error.type,
