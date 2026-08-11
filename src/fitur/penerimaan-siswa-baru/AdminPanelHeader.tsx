@@ -324,7 +324,7 @@ export function AdminPanelEmbeddedBar(props: AdminPanelEmbeddedBarProps) {
         <button
           type="button"
           onClick={onOpenSettings}
-          className="rounded-md border border-black p-1 text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+          className="rounded-md border border-black p-1 text-black transition-colors hover:border-black hover:bg-neutral-100"
           title="Pengaturan Email Admin"
         >
           <Mail className="h-3.5 w-3.5" />
@@ -332,14 +332,14 @@ export function AdminPanelEmbeddedBar(props: AdminPanelEmbeddedBarProps) {
         <button
           type="button"
           onClick={onOpenAudit}
-          className="rounded-md border border-black px-2 py-1 text-[9px] font-black text-black uppercase transition-colors hover:border-blue-600 hover:text-blue-600"
+          className="rounded-md border border-black px-2 py-1 text-[9px] font-black text-black uppercase transition-colors hover:border-black hover:bg-neutral-100"
         >
           Audit
         </button>
         <button
           type="button"
           onClick={onRefresh}
-          className="rounded-md border border-black px-2 py-1 text-[9px] font-black text-black uppercase transition-colors hover:border-blue-600 hover:text-blue-600"
+          className="rounded-md border border-black px-2 py-1 text-[9px] font-black text-black uppercase transition-colors hover:border-black hover:bg-neutral-100"
         >
           Refresh
         </button>

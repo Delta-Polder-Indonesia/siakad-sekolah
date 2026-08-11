@@ -1,0 +1,3256 @@
+From 93caa0c01a0235bfedc806ae0d1f26f93df9ee49 Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 05:43:57 +0000
+Subject: [PATCH 07/19] refactor(fe): pecah DiskusiTugas.tsx (1287 -> 159
+ baris)
+
+- Pola custom hook + komponen presentasional:
+  useDiskusiTugas.ts (logika) + Sidebar/Stream/Composer/Header/Compact
+- Avatar member grup pakai allStudents (bukan hasil filter pencarian)
+  - mencegah avatar berubah saat search aktif
+- +10 test: helper murni (7) & render full/compact/pesan forum (3)
+- Hapus 9 directive eslint-disable usang (react-hooks v5 tidak
+  memeriksa custom hooks)
+
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugas.test.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugas.test.tsx
+new file mode 100644
+index 0000000..ccc6f75
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugas.test.tsx
+@@ -0,0 +1,75 @@
++/**
++ * Smoke test render DiskusiTugas (full & compact) — memastikan komponen
++ * hasil pemecahan (hook + sidebar + stream + composer) bekerja bersama.
++ */
++import { describe, it, expect, beforeEach } from 'vitest';
++import { render, screen } from '@testing-library/react';
++import DiskusiTugas from './DiskusiTugas';
++import { ToastProvider } from '../../../components/ui';
++import { addAssignmentDiscussion } from '../../../data/services';
++import type { OnlineAssignment, AuthUser } from '../../../types';
++
++const ASSIGNMENT: OnlineAssignment = {
++  id: 'asg-1',
++  classId: 'class-1',
++  title: 'Tugas Matematika',
++  description: 'Kerjakan soal',
++  dueDate: '2026-08-20',
++  createdBy: 'guru-1',
++  createdAt: 1750000000000,
++};
++
++const USER: AuthUser = {
++  id: 'student-1',
++  name: 'Budi Santoso',
++  role: 'student',
++};
++
++function renderFull() {
++  return render(
++    <ToastProvider>
++      <DiskusiTugas assignment={ASSIGNMENT} user={USER} />
++    </ToastProvider>
++  );
++}
++
++describe('DiskusiTugas (hasil refactor god-component)', () => {
++  beforeEach(() => {
++    localStorage.clear();
++  });
++
++  it('varian full menampilkan panel forum, pencarian, dan kotak kirim', () => {
++    renderFull();
++    expect(screen.getByPlaceholderText('Cari percakapan...')).toBeTruthy();
++    expect(screen.getByText('Peserta Forum (Semua)')).toBeTruthy();
++    expect(screen.getByText('Forum Diskusi Kelas')).toBeTruthy();
++    expect(screen.getByText('KIRIM')).toBeTruthy();
++  });
++
++  it('varian compact menampilkan daftar diskusi + kotak balasan', () => {
++    render(
++      <ToastProvider>
++        <DiskusiTugas assignment={ASSIGNMENT} user={USER} variant="compact" />
++      </ToastProvider>
++    );
++    expect(screen.getByText(/Diskusi \(0\)/)).toBeTruthy();
++    expect(screen.getByPlaceholderText('Ketik balasan...')).toBeTruthy();
++    expect(screen.getByText('Kirim')).toBeTruthy();
++  });
++
++  it('menampilkan pesan forum yang sudah ada', () => {
++    // Seed satu diskusi via data service (store lokal)
++    addAssignmentDiscussion({
++      id: 'disc-test-1',
++      assignmentId: ASSIGNMENT.id,
++      authorId: 'guru-1',
++      authorName: 'Pak Guru',
++      role: 'guru',
++      message: 'Silakan kerjakan sampai halaman 10',
++      createdAt: Date.now(),
++    });
++    renderFull();
++    expect(screen.getByText('Silakan kerjakan sampai halaman 10')).toBeTruthy();
++    expect(screen.getByText('Pak Guru')).toBeTruthy();
++  });
++});
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugas.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugas.tsx
+index 49bdff3..10033a5 100644
+--- a/src/fitur/bersama/TugasKonten/DiskusiTugas.tsx
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugas.tsx
+@@ -1,121 +1,28 @@
+-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+-import {
+-  MessageSquare,
+-  Send,
+-  Paperclip,
+-  Search,
+-  Plus,
+-  Users,
+-  Globe,
+-  UserPlus,
+-  UserMinus,
+-  X,
+-  MoreVertical,
+-  Pencil,
+-  Trash2,
+-  FileText,
+-  ArrowLeft,
+-} from 'lucide-react';
+-import type { AuthUser } from '../../../types';
+-import {
+-  addAssignmentDiscussion,
+-  getDiscussionsByAssignment,
+-  editAssignmentDiscussion,
+-  deleteAssignmentDiscussion,
+-  addChatGroup,
+-  deleteChatGroup,
+-  getChatGroupsByClass,
+-  addGroupMember,
+-  removeGroupMember,
+-  getGroupMessages,
+-  addGroupMessage,
+-  editGroupMessage,
+-  deleteGroupMessage,
+-  getPrivateMessages,
+-  addPrivateMessage,
+-  editPrivateMessage,
+-  deletePrivateMessage,
+-  getUnreadPrivateCount,
+-  getStudentsByClass,
+-  isStudentOnline,
+-  touchPresence,
+-  touchPresenceSilent,
+-  markScopeRead,
+-  getUnreadCountForScope,
+-  setTyping,
+-  clearTyping,
+-  getTypingUsers,
+-} from '../../../data/services';
+-import type { OnlineAssignment } from '../../../data/services';
+-import { useStoreVersion } from '../../../hooks/useStoreVersion';
+-import { warnaNama } from '../../../codewarna/warnaNama';
+-import { useToast } from '../../../components/ui';
+-import { formatDateTime, formatFileSize, roleLabel } from './tugasKonten';
+-
+-interface DiskusiTugasProps {
+-  assignment: OnlineAssignment;
+-  /** Pengguna yang sedang aktif (guru/murid). Tanpa user, kiriman nonaktif. */
+-  user?: AuthUser | null;
+-  /** `full` = tampilan chat lengkap, `compact` = tampilan ringkas. */
+-  variant?: 'full' | 'compact';
+-  /** Dipanggil setelah komentar terkirim. */
+-  onPosted?: () => void;
+-  /** Isi penuh tinggi induk (`h-full`) alih-alih tinggi tetap 600px. */
+-  fill?: boolean;
+-  /** Konten opsional di bagian bawah panel kiri (kolom peserta). */
+-  leftFooter?: ReactNode;
+-}
+-
+-/** Titik indikator status aktif (online/offline). */
+-function PresenceDot({ online }: { online: boolean }) {
+-  return (
+-    <span
+-      className={`inline-block h-2 w-2 shrink-0 rounded-full ${
+-        online ? 'bg-emerald-500' : 'bg-neutral-300'
+-      }`}
+-      title={online ? 'Aktif' : 'Tidak aktif'}
+-    />
+-  );
+-}
+-
+-/** Avatar inisial bulat — hitam untuk guru, biru muda untuk siswa. */
+-function Avatar({ name, online }: { name: string; online?: boolean }) {
+-  const initial = (name.trim().charAt(0) || '?').toUpperCase();
+-  return (
+-    <div className="relative shrink-0">
+-      <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-black bg-white text-xs font-bold text-black">
+-        {initial}
+-      </div>
+-      {typeof online === 'boolean' && (
+-        <span
+-          className={`absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+-            online ? 'bg-emerald-500' : 'bg-neutral-300'
+-          }`}
+-        />
+-      )}
+-    </div>
+-  );
+-}
+-
+-function getDayKey(ts: number) {
+-  const d = new Date(ts);
+-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+-}
+-
+-function getDayLabel(ts: number) {
+-  const today = new Date();
+-  const yesterday = new Date(today);
+-  yesterday.setDate(today.getDate() - 1);
+-  const day = new Date(ts);
+-  if (getDayKey(ts) === getDayKey(today.getTime())) return 'Hari Ini';
+-  if (getDayKey(ts) === getDayKey(yesterday.getTime())) return 'Kemarin';
+-  return day.toLocaleDateString('id-ID', {
+-    weekday: 'long',
+-    day: 'numeric',
+-    month: 'long',
+-    year: 'numeric',
+-  });
+-}
++/**
++ * DiskusiTugas — forum & chat grup untuk tugas online.
++ *
++ * Dipecah dari satu file 1.287 baris menjadi:
++ *   useDiskusiTugas.ts        → semua state, memo, effect, handler (logika)
++ *   DiskusiTugas.types.ts     → tipe bersama + helper murni (Avatar, hari)
++ *   DiskusiTugasCompact.tsx   → varian ringkas (forum saja)
++ *   DiskusiTugasHeader.tsx    → judul percakapan + toggle Forum/Grup
++ *   DiskusiTugasSidebar.tsx   → panel kiri: peserta forum / grup & anggota
++ *   DiskusiTugasStream.tsx    → alur pesan (bubble, edit, hapus)
++ *   DiskusiTugasComposer.tsx  → input pesan + lampiran + indikator mengetik
++ *
++ * Komponen ini murni presentasional: membaca hasil `useDiskusiTugas`
++ * dan menyusun sub-komponen.
++ */
++import { useDiskusiTugas } from './useDiskusiTugas';
++import { deleteChatGroup } from '../../../data/services';
++import DiskusiTugasCompact from './DiskusiTugasCompact';
++import DiskusiTugasHeader from './DiskusiTugasHeader';
++import DiskusiTugasSidebar from './DiskusiTugasSidebar';
++import DiskusiTugasStream from './DiskusiTugasStream';
++import DiskusiTugasComposer from './DiskusiTugasComposer';
++import type { DiskusiTugasProps } from './DiskusiTugas.types';
++
++export type { DiskusiTugasProps } from './DiskusiTugas.types';
+ 
+ export default function DiskusiTugas({
+   assignment,
+@@ -125,489 +32,39 @@ export default function DiskusiTugas({
+   fill = false,
+   leftFooter,
+ }: DiskusiTugasProps) {
+-  const storeVersion = useStoreVersion();
+-  const { showToast } = useToast();
+-  const [draft, setDraft] = useState('');
+-  const [mode, setMode] = useState<'forum' | 'group'>('forum');
+-  const [selectedGroupId, setSelectedGroupId] = useState('');
+-  const [searchQuery, setSearchQuery] = useState('');
+-  const [addingMembers, setAddingMembers] = useState(false);
+-  const streamRef = useRef<HTMLDivElement | null>(null);
+-  const [presenceTick, setPresenceTick] = useState(0);
+-  // C14: target chat privat 1-1 (siswa yang dipilih)
+-  const [privateTarget, setPrivateTarget] = useState<{ id: string; name: string } | null>(null);
+-  // C13: id pesan yang sedang diedit + isi editan
+-  const [editingId, setEditingId] = useState<string | null>(null);
+-  const [editingText, setEditingText] = useState('');
+-  // C13: id pesan yang menunya terbuka
+-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+-  // C12: lampiran yang menunggu dikirim
+-  const [pendingAttachment, setPendingAttachment] = useState<{
+-    name: string;
+-    type: string;
+-    dataUrl: string;
+-    size: number;
+-  } | null>(null);
+-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+-  // C15: daftar user yang sedang mengetik di percakapan aktif
+-  const [typingUsers, setTypingUsers] = useState<
+-    Array<{ userId: string; name: string; role: string }>
+-  >([]);
+-  const typingRef = useRef<string | null>(null);
+-
+-  const isTeacher = user?.role === 'teacher';
+-
+-  // Tandai siswa aktif saat membuka + heartbeat berkala (tulis senyap agar
+-  // tidak me-render ulang seluruh app; komponen ini re-render via presenceTick).
+-  useEffect(() => {
+-    if (user?.role !== 'student') return;
+-    touchPresence(user.id);
+-    const id = window.setInterval(() => {
+-      touchPresenceSilent(user.id);
+-      setPresenceTick((t) => t + 1);
+-    }, 60_000);
+-    return () => window.clearInterval(id);
+-  }, [user?.id, user?.role]);
+-
+-  const discussions = useMemo(
+-    () => getDiscussionsByAssignment(assignment.id),
+-    [assignment.id, storeVersion]
+-  );
+-
+-  const groups = useMemo(
+-    () => getChatGroupsByClass(assignment.classId),
+-    [assignment.classId, storeVersion]
+-  );
+-
+-  // Guru melihat semua grup kelas; murid melihat semua grup agar bisa join/keluar sendiri (C11).
+-  const visibleGroups = useMemo(() => groups, [groups]);
+-
+-  const students = useMemo(
+-    () => getStudentsByClass(assignment.classId),
+-    [assignment.classId, storeVersion]
+-  );
+-
+-  const selectedGroup = useMemo(
+-    () => groups.find((group) => group.id === selectedGroupId) ?? null,
+-    [groups, selectedGroupId]
+-  );
+-
+-  // C11: apakah user aktif adalah anggota grup yang sedang dipilih.
+-  const isMemberOfSelected = useMemo(
+-    () => (selectedGroup ? selectedGroup.memberIds.includes(user?.id ?? '') : false),
+-    [selectedGroup, user?.id]
+-  );
+-
+-  const groupMessages = useMemo(
+-    () => (selectedGroupId ? getGroupMessages(selectedGroupId) : []),
+-    [selectedGroupId, storeVersion]
+-  );
+-
+-  // C14: pesan privat antara user aktif dan target siswa.
+-  const privateMessages = useMemo(
+-    () => (privateTarget && user ? getPrivateMessages(user.id, privateTarget.id) : []),
+-    [privateTarget, user, storeVersion]
+-  );
+-
+-  // C14: jumlah pesan privat belum dibaca dari target (badge di daftar siswa).
+-  const privateUnreadMap = useMemo(() => {
+-    if (!user) return {};
+-    const map: Record<string, number> = {};
+-    for (const student of students) {
+-      map[student.id] = getUnreadPrivateCount(user.id, student.id);
+-    }
+-    return map;
+-  }, [students, user, storeVersion]);
+-
+-  const streamLength =
+-    mode === 'forum'
+-      ? discussions.length
+-      : privateTarget
+-        ? privateMessages.length
+-        : groupMessages.length;
+-
+-  // Auto-scroll pesan ke paling bawah saat buka chat / kirim pesan / ganti mode.
+-  useEffect(() => {
+-    const el = streamRef.current;
+-    if (el) el.scrollTop = el.scrollHeight;
+-  }, [streamLength, mode, selectedGroupId, privateTarget?.id]);
+-
+-  // Tandai forum sudah dibaca saat aktif melihatnya.
+-  useEffect(() => {
+-    if (mode === 'forum' && user?.id && discussions.length > 0) {
+-      markScopeRead(`forum:${assignment.id}`, user.id);
+-    }
+-  }, [mode, assignment.id, user?.id, discussions.length]);
+-
+-  // Tandai grup sudah dibaca saat dipilih.
+-  useEffect(() => {
+-    if (mode === 'group' && user?.id && selectedGroupId && groupMessages.length > 0) {
+-      markScopeRead(`group:${selectedGroupId}`, user.id);
+-    }
+-  }, [mode, selectedGroupId, user?.id, groupMessages.length]);
+-
+-  // C14: tandai chat privat sudah dibaca saat dibuka.
+-  useEffect(() => {
+-    if (privateTarget && user?.id && privateMessages.length > 0) {
+-      markScopeRead(`private:${user.id}|${privateTarget.id}`, user.id);
+-    }
+-  }, [privateTarget, user?.id, privateMessages.length]);
+-
+-  // C13: tutup menu opsi pesan saat klik di luar.
+-  useEffect(() => {
+-    if (!menuOpenId) return;
+-    const close = () => setMenuOpenId(null);
+-    window.addEventListener('click', close);
+-    return () => window.removeEventListener('click', close);
+-  }, [menuOpenId]);
+-
+-  // C15: scope percakapan aktif (forum / grup / private).
+-  const activeScopeKey = privateTarget
+-    ? `private:${user?.id ?? ''}|${privateTarget.id}`
+-    : mode === 'forum'
+-      ? `forum:${assignment.id}`
+-      : selectedGroupId
+-        ? `group:${selectedGroupId}`
+-        : '';
+-
+-  // C15: polling user yang sedang mengetik di percakapan aktif (cross-tab via store).
+-  useEffect(() => {
+-    if (!activeScopeKey) {
+-      setTypingUsers([]);
+-      return;
+-    }
+-    const refresh = () => setTypingUsers(getTypingUsers(activeScopeKey, user?.id ?? ''));
+-    refresh();
+-    const id = window.setInterval(refresh, 1500);
+-    return () => window.clearInterval(id);
+-  }, [activeScopeKey, user?.id]);
+-
+-  // C15: hentikan status ketikan saat meninggalkan percakapan.
+-  useEffect(() => {
+-    return () => {
+-      if (typingRef.current) {
+-        clearTyping(typingRef.current, user?.id ?? '');
+-        typingRef.current = null;
+-      }
+-    };
+-  }, [user?.id]);
+-
+-  // C15: tandai user sedang mengetik (throttle via timestamp di store) + beri jeda hidup.
+-  const handleTyping = () => {
+-    if (!activeScopeKey || !user) return;
+-    typingRef.current = activeScopeKey;
+-    setTyping(activeScopeKey, user.id, user.name || 'Pengguna', user.role || 'guest');
+-  };
+-
+-  // C15: bersihkan status ketikan setelah kirim.
+-  const handleStopTyping = () => {
+-    if (typingRef.current && user) {
+-      clearTyping(typingRef.current, user.id);
+-      typingRef.current = null;
+-    }
+-    setTypingUsers([]);
+-  };
+-
+-  // Auto-pilih grup pertama saat masuk mode grup.
+-  useEffect(() => {
+-    if (
+-      mode === 'group' &&
+-      visibleGroups.length > 0 &&
+-      !visibleGroups.some((group) => group.id === selectedGroupId)
+-    ) {
+-      setSelectedGroupId(visibleGroups[0].id);
+-    }
+-  }, [mode, visibleGroups, selectedGroupId]);
+-
+-  const handleSendForum = () => {
+-    if (!user) return;
+-    const text = draft.trim();
+-    const hasContent = text || pendingAttachment;
+-    if (!hasContent) return;
+-    addAssignmentDiscussion({
+-      id: `disc_${Date.now()}`,
+-      assignmentId: assignment.id,
+-      authorId: user.id,
+-      authorName: user.name || 'Pengguna',
+-      role: user.role || 'guest',
+-      message: text,
+-      createdAt: Date.now(),
+-      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
+-    });
+-    setDraft('');
+-    setPendingAttachment(null);
+-    handleStopTyping();
+-    onPosted?.();
+-  };
+-
+-  const handleSendGroup = () => {
+-    if (!user || !selectedGroup) return;
+-    const text = draft.trim();
+-    const hasContent = text || pendingAttachment;
+-    if (!hasContent) return;
+-    const isMember = selectedGroup.memberIds.includes(user.id);
+-    if (!isMember && !isTeacher) return;
+-    addGroupMessage({
+-      id: `gm_${Date.now()}`,
+-      groupId: selectedGroup.id,
+-      authorId: user.id,
+-      authorName: user.name || 'Pengguna',
+-      role: user.role || 'guest',
+-      message: text,
+-      createdAt: Date.now(),
+-      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
+-    });
+-    setDraft('');
+-    setPendingAttachment(null);
+-    handleStopTyping();
+-    onPosted?.();
+-  };
+-
+-  const handleSendPrivate = () => {
+-    if (!user || !privateTarget) return;
+-    const text = draft.trim();
+-    const hasContent = text || pendingAttachment;
+-    if (!hasContent) return;
+-    addPrivateMessage({
+-      id: `pm_${Date.now()}`,
+-      senderId: user.id,
+-      receiverId: privateTarget.id,
+-      authorName: user.name || 'Pengguna',
+-      role: user.role || 'guest',
+-      message: text,
+-      createdAt: Date.now(),
+-      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
+-    });
+-    setDraft('');
+-    setPendingAttachment(null);
+-    handleStopTyping();
+-    onPosted?.();
+-  };
+-
+-  const handleSend = () => {
+-    if (privateTarget) return handleSendPrivate();
+-    return mode === 'forum' ? handleSendForum() : handleSendGroup();
+-  };
+-
+-  // C12: baca file yang dipilih → dataUrl (batasi ~1.5MB).
+-  const handlePickFile = (file: File | undefined | null) => {
+-    if (!file) return;
+-    if (file.size > 1.5 * 1024 * 1024) {
+-      showToast('error', 'Ukuran file maksimal 1.5MB.');
+-      return;
+-    }
+-    const reader = new FileReader();
+-    reader.onload = () => {
+-      setPendingAttachment({
+-        name: file.name,
+-        type: file.type || 'application/octet-stream',
+-        dataUrl: String(reader.result ?? ''),
+-        size: file.size,
+-      });
+-    };
+-    reader.readAsDataURL(file);
+-  };
+-
+-  // C13: mulai edit pesan.
+-  const handleStartEdit = (id: string, message: string) => {
+-    setEditingId(id);
+-    setEditingText(message);
+-    setMenuOpenId(null);
+-  };
+-
+-  const handleSaveEdit = () => {
+-    if (!editingId) return;
+-    const text = editingText.trim();
+-    if (!text) return;
+-    if (privateTarget) {
+-      editPrivateMessage(editingId, text);
+-    } else if (mode === 'forum') {
+-      editAssignmentDiscussion(editingId, text);
+-    } else {
+-      editGroupMessage(editingId, text);
+-    }
+-    setEditingId(null);
+-    setEditingText('');
+-    onPosted?.();
+-  };
+-
+-  // C13: hapus pesan (dengan konfirmasi).
+-  const handleDeleteMessage = (id: string) => {
+-    if (!window.confirm('Hapus pesan ini?')) return;
+-    if (privateTarget) {
+-      deletePrivateMessage(id);
+-    } else if (mode === 'forum') {
+-      deleteAssignmentDiscussion(id);
+-    } else {
+-      deleteGroupMessage(id);
+-    }
+-    setMenuOpenId(null);
+-    onPosted?.();
+-  };
+-
+-  const handleCreateGroup = () => {
+-    if (!isTeacher || !user) return;
+-    const name = window.prompt('Nama grup baru:');
+-    if (name && name.trim()) {
+-      addChatGroup({
+-        id: `cg_${Date.now()}`,
+-        classId: assignment.classId,
+-        name: name.trim(),
+-        memberIds: [],
+-        createdBy: user.id,
+-        createdAt: Date.now(),
+-      });
+-    }
+-  };
+-
+-  const handleToggleMember = (studentId: string) => {
+-    if (!isTeacher || !selectedGroup) return;
+-    if (selectedGroup.memberIds.includes(studentId)) {
+-      removeGroupMember(selectedGroup.id, studentId);
+-    } else {
+-      addGroupMember(selectedGroup.id, studentId);
+-    }
+-  };
+-
+-  // C11: murid join/keluar grup sendiri.
+-  const handleJoinLeaveGroup = (groupId: string) => {
+-    if (isTeacher || !user) return;
+-    const group = groups.find((g) => g.id === groupId);
+-    if (!group) return;
+-    if (group.memberIds.includes(user.id)) {
+-      removeGroupMember(groupId, user.id);
+-      if (selectedGroupId === groupId) setSelectedGroupId('');
+-    } else {
+-      addGroupMember(groupId, user.id);
+-      setSelectedGroupId(groupId);
+-    }
+-  };
+-
+-  const stream = privateTarget ? privateMessages : mode === 'forum' ? discussions : groupMessages;
+-
+-  const q = searchQuery.trim().toLowerCase();
+-
+-  // A1: filter pencarian — daftar siswa, daftar grup, dan alur pesan.
+-  const filteredStudents = useMemo(() => {
+-    if (!q) return students;
+-    return students.filter((s) => s.name.toLowerCase().includes(q));
+-  }, [students, q]);
+-
+-  // Daftar anggota grup terpilih (hanya yang benar-benar anggota) vs kandidat.
+-  const groupMembers = useMemo(
+-    () => (selectedGroup ? students.filter((s) => selectedGroup.memberIds.includes(s.id)) : []),
+-    [students, selectedGroup]
+-  );
+-  const groupCandidates = useMemo(
+-    () => (selectedGroup ? students.filter((s) => !selectedGroup.memberIds.includes(s.id)) : []),
+-    [students, selectedGroup]
+-  );
+-  const shownMembers = useMemo(() => {
+-    if (!q) return groupMembers;
+-    return groupMembers.filter((s) => s.name.toLowerCase().includes(q));
+-  }, [groupMembers, q]);
+-  const shownCandidates = useMemo(() => {
+-    if (!q) return groupCandidates;
+-    return groupCandidates.filter((s) => s.name.toLowerCase().includes(q));
+-  }, [groupCandidates, q]);
+-
+-  const filteredGroups = useMemo(() => {
+-    if (!q) return visibleGroups;
+-    return visibleGroups.filter((g) => g.name.toLowerCase().includes(q));
+-  }, [visibleGroups, q]);
+-
+-  const filteredStream = useMemo(() => {
+-    if (!q) return stream;
+-    return stream.filter(
+-      (m) => m.message.toLowerCase().includes(q) || (m.authorName || '').toLowerCase().includes(q)
+-    );
+-  }, [stream, q]);
+-
+-  // B6: jumlah pesan belum dibaca per forum & per grup.
+-  const forumScopeKey = `forum:${assignment.id}`;
+-  const forumUnread = useMemo(
+-    () => getUnreadCountForScope(forumScopeKey, user?.id ?? '', discussions),
+-    [forumScopeKey, user?.id, discussions, storeVersion]
+-  );
+-  const groupUnreadMap = useMemo(() => {
+-    const map: Record<string, number> = {};
+-    for (const group of groups) {
+-      map[group.id] = getUnreadCountForScope(
+-        `group:${group.id}`,
+-        user?.id ?? '',
+-        getGroupMessages(group.id)
+-      );
+-    }
+-    return map;
+-  }, [groups, user?.id, storeVersion]);
++  const h = useDiskusiTugas(assignment, user, onPosted);
+ 
++  // ── Varian compact: hanya forum + kotak balasan ──
+   if (variant === 'compact') {
+     return (
+-      <div className="mt-4 border-t-2 border-black pt-3">
+-        <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wider text-black uppercase">
+-          <MessageSquare className="h-3.5 w-3.5" />
+-          <span>Diskusi ({discussions.length})</span>
+-        </div>
+-
+-        <div className="max-h-[200px] space-y-2 overflow-y-auto overscroll-contain pr-1">
+-          {discussions.length === 0 && (
+-            <p className="text-xs text-black/50 italic">Belum ada diskusi pada tugas ini.</p>
+-          )}
+-          {discussions.map((d) => (
+-            <div key={d.id} className="border-b border-black/10 pb-2">
+-              <div className="flex items-center justify-between text-xs">
+-                <span className="font-bold" style={{ color: warnaNama(d.authorName) }}>
+-                  {d.authorName}{' '}
+-                  <span className="text-[10px] text-black/50">({roleLabel(d.role)})</span>
+-                </span>
+-                <span className="text-[10px] text-black/40">{formatDateTime(d.createdAt)}</span>
+-              </div>
+-              <p className="mt-1 text-xs whitespace-pre-line text-black">{d.message}</p>
+-            </div>
+-          ))}
+-        </div>
+-
+-        <div className="mt-2 flex items-center gap-2 border-t border-black/10 pt-2">
+-          <input
+-            value={draft}
+-            onChange={(e) => setDraft(e.target.value)}
+-            onKeyDown={(e) => {
+-              if (e.key === 'Enter') handleSendForum();
+-            }}
+-            placeholder="Ketik balasan..."
+-            className="flex-1 bg-transparent text-xs text-black outline-none placeholder:text-black/40"
+-          />
+-          <button
+-            type="button"
+-            onClick={handleSendForum}
+-            disabled={!draft.trim() || !user}
+-            className="rounded-md border-2 border-black bg-black px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
+-          >
+-            Kirim
+-          </button>
+-        </div>
+-      </div>
++      <DiskusiTugasCompact
++        discussions={h.discussions}
++        draft={h.draft}
++        onDraftChange={h.setDraft}
++        onSend={h.handleSendForum}
++        user={user}
++      />
+     );
+   }
+ 
+-  const activeTitle = privateTarget
++  const activeTitle = h.privateTarget
+     ? `Chat Privat`
+-    : mode === 'forum'
++    : h.mode === 'forum'
+       ? 'Forum Diskusi Kelas'
+-      : (selectedGroup?.name ?? 'Grup');
+-  const activeSubtitle = privateTarget
+-    ? `Dengan ${privateTarget.name}`
+-    : mode === 'forum'
+-      ? `${discussions.length} pesan · terlihat semua murid`
+-      : selectedGroup
+-        ? `${selectedGroup.memberIds.length} anggota`
++      : (h.selectedGroup?.name ?? 'Grup');
++  const activeSubtitle = h.privateTarget
++    ? `Dengan ${h.privateTarget.name}`
++    : h.mode === 'forum'
++      ? `${h.discussions.length} pesan · terlihat semua murid`
++      : h.selectedGroup
++        ? `${h.selectedGroup.memberIds.length} anggota`
+         : '';
+ 
+-  const canSend = privateTarget
++  const canSend = h.privateTarget
+     ? !!user
+-    : mode === 'forum'
++    : h.mode === 'forum'
+       ? !!user
+-      : !!user && !!selectedGroup && (isTeacher || selectedGroup.memberIds.includes(user.id));
++      : !!user && !!h.selectedGroup && (h.isTeacher || h.selectedGroup.memberIds.includes(user.id));
+ 
+   return (
+     <div
+@@ -616,671 +73,86 @@ export default function DiskusiTugas({
+       }`}
+     >
+       {/* ----------------- PANEL KIRI: FORUM / GRUP ----------------- */}
+-      <aside className="flex w-72 flex-col border-r-2 border-black">
+-        {/* Search Input */}
+-        <div className="flex items-center gap-2 border-b-2 border-black px-3 py-2.5">
+-          <Search className="h-4 w-4 shrink-0 text-black/50" />
+-          <input
+-            type="text"
+-            placeholder="Cari percakapan..."
+-            value={searchQuery}
+-            onChange={(e) => setSearchQuery(e.target.value)}
+-            className="w-full bg-transparent text-xs outline-none placeholder:text-black/40"
+-          />
+-        </div>
+-
+-        {mode === 'forum' ? (
+-          /* ---------- MODE FORUM (terlihat semua murid) ---------- */
+-          <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain">
+-            <div className="border-b-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold tracking-wider text-black uppercase">
+-              Peserta Forum (Semua)
+-            </div>
+-            {filteredStudents.length === 0 && (
+-              <div className="px-3 py-6 text-center">
+-                <Search className="mx-auto h-6 w-6 text-black/30" />
+-                <p className="mt-2 text-[11px] text-black/50 italic">
+-                  {q
+-                    ? 'Tidak ada siswa yang cocok dengan pencarian.'
+-                    : 'Belum ada siswa di kelas ini.'}
+-                </p>
+-              </div>
+-            )}
+-            <div>
+-              {filteredStudents.map((student) => {
+-                const online = isStudentOnline(student.id);
+-                const unread = privateUnreadMap[student.id] ?? 0;
+-                const isTarget = privateTarget?.id === student.id;
+-                return (
+-                  <div
+-                    key={student.id}
+-                    onClick={() => setPrivateTarget({ id: student.id, name: student.name })}
+-                    className={`flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2.5 last:border-0 ${
+-                      isTarget
+-                        ? 'bg-neutral-100 text-black shadow-[inset_3px_0_0_0_#2563eb]'
+-                        : 'hover:bg-neutral-100'
+-                    }`}
+-                  >
+-                    <div className="flex min-w-0 items-center gap-2">
+-                      <PresenceDot online={online} />
+-                      <p className="truncate text-xs" style={{ color: warnaNama(student.name) }}>
+-                        {student.name}
+-                      </p>
+-                      {unread > 0 && (
+-                        <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+-                          {unread}
+-                        </span>
+-                      )}
+-                    </div>
+-                    <span
+-                      className={`shrink-0 text-[10px] ${isTarget ? 'text-black/60' : 'text-black/40'}`}
+-                    >
+-                      {online ? 'Aktif' : 'Offline'}
+-                    </span>
+-                  </div>
+-                );
+-              })}
+-            </div>
+-          </div>
+-        ) : (
+-          /* ---------- MODE GRUP (chat privat per grup) ---------- */
+-          <div className="flex flex-1 flex-col overflow-hidden">
+-            {/* Kotak GRUP (bingkai terpisah, scroll sendiri) */}
+-            <div className="flex min-h-0 flex-1 flex-col border-b-2 border-black">
+-              <div className="flex items-center justify-between border-b-2 border-black bg-white px-3 py-1.5">
+-                <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+-                  Grup
+-                </span>
+-                {isTeacher && (
+-                  <button
+-                    type="button"
+-                    onClick={handleCreateGroup}
+-                    title="Buat grup baru"
+-                    className="inline-flex cursor-pointer items-center gap-0.5 text-[11px] font-bold text-black hover:text-black/60"
+-                  >
+-                    <Plus className="h-3.5 w-3.5" /> Grup
+-                  </button>
+-                )}
+-              </div>
+-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+-                {filteredGroups.length === 0 && (
+-                  <div className="px-3 py-6 text-center">
+-                    {q ? (
+-                      <Search className="mx-auto h-6 w-6 text-black/30" />
+-                    ) : (
+-                      <Users className="mx-auto h-6 w-6 text-black/30" />
+-                    )}
+-                    <p className="mt-2 text-[11px] text-black/50 italic">
+-                      {q
+-                        ? 'Tidak ada grup yang cocok dengan pencarian.'
+-                        : isTeacher
+-                          ? 'Belum ada grup. Klik "+ Grup" untuk membuat.'
+-                          : 'Belum ada grup di kelas ini. Gabung ke grup yang dibuat guru untuk mulai berdiskusi.'}
+-                    </p>
+-                  </div>
+-                )}{' '}
+-                {filteredGroups.map((group) => {
+-                  const isSelected = group.id === selectedGroupId;
+-                  const isMember = user ? group.memberIds.includes(user.id) : false;
+-                  const unread = groupUnreadMap[group.id] ?? 0;
+-                  return (
+-                    <div
+-                      key={group.id}
+-                      onClick={() => setSelectedGroupId(group.id)}
+-                      className={`flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2.5 transition-colors last:border-0 ${
+-                        isSelected
+-                          ? 'bg-neutral-100 text-black shadow-[inset_3px_0_0_0_#2563eb]'
+-                          : 'hover:bg-neutral-100'
+-                      }`}
+-                    >
+-                      <div className="min-w-0 flex-1 pr-2">
+-                        <p className="flex items-center gap-1.5 truncate text-xs font-bold">
+-                          <span className="truncate" style={{ color: warnaNama(group.name) }}>
+-                            {group.name}
+-                          </span>
+-                          {isMember && unread > 0 && (
+-                            <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+-                              {unread}
+-                            </span>
+-                          )}
+-                        </p>
+-                        <div className="mt-1 flex items-center gap-1.5">
+-                          {group.memberIds.length > 0 && (
+-                            <span className="flex shrink-0 -space-x-1.5">
+-                              {group.memberIds.slice(0, 4).map((mid) => {
+-                                const member = students.find((s) => s.id === mid);
+-                                return (
+-                                  <span
+-                                    key={mid}
+-                                    className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-[8px] font-bold text-blue-800 ring-1 ring-white"
+-                                  >
+-                                    {(member?.name?.trim().charAt(0) || '?').toUpperCase()}
+-                                  </span>
+-                                );
+-                              })}
+-                            </span>
+-                          )}
+-                          <p className="truncate text-[10px] text-black/40">
+-                            {group.memberIds.length} anggota
+-                            {isMember ? ' · Anda anggota' : ' · Anda belum bergabung'}
+-                          </p>
+-                        </div>
+-                      </div>
+-                      {isTeacher ? (
+-                        <button
+-                          type="button"
+-                          onClick={(e) => {
+-                            e.stopPropagation();
+-                            deleteChatGroup(group.id);
+-                            if (selectedGroupId === group.id) setSelectedGroupId('');
+-                          }}
+-                          title="Hapus grup"
+-                          className="shrink-0 rounded p-0.5 hover:bg-white/20"
+-                        >
+-                          <X className="h-3.5 w-3.5" />
+-                        </button>
+-                      ) : (
+-                        <button
+-                          type="button"
+-                          onClick={(e) => {
+-                            e.stopPropagation();
+-                            handleJoinLeaveGroup(group.id);
+-                          }}
+-                          title={isMember ? 'Keluar dari grup' : 'Gabung ke grup'}
+-                          className={`inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[10px] font-bold transition-colors ${
+-                            isMember
+-                              ? 'border-black/10 text-black/50 hover:bg-neutral-100'
+-                              : 'border-black text-black hover:bg-black hover:text-white'
+-                          }`}
+-                        >
+-                          {isMember ? (
+-                            <UserMinus className="h-3 w-3" />
+-                          ) : (
+-                            <UserPlus className="h-3 w-3" />
+-                          )}
+-                          {isMember ? 'Keluar' : 'Gabung'}
+-                        </button>
+-                      )}
+-                    </div>
+-                  );
+-                })}
+-              </div>
+-            </div>
+-
+-            {/* Kotak ANGGOTA (hanya anggota grup; bingkai terpisah, scroll sendiri) */}
+-            <div className="flex min-h-0 flex-1 flex-col">
+-              <div className="flex items-center justify-between border-b-2 border-black bg-white px-3 py-1.5">
+-                <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+-                  Anggota {selectedGroup ? `(${selectedGroup.memberIds.length})` : ''}
+-                </span>
+-                {isTeacher && (
+-                  <button
+-                    type="button"
+-                    onClick={() => setAddingMembers((v) => !v)}
+-                    disabled={!selectedGroup}
+-                    title={addingMembers ? 'Tutup daftar calon anggota' : 'Tambah anggota ke grup'}
+-                    className="inline-flex cursor-pointer items-center gap-0.5 text-[11px] font-bold text-black hover:text-black/60 disabled:cursor-not-allowed disabled:opacity-40"
+-                  >
+-                    {addingMembers ? (
+-                      <X className="h-3.5 w-3.5" />
+-                    ) : (
+-                      <Plus className="h-3.5 w-3.5" />
+-                    )}
+-                    {addingMembers ? 'Selesai' : '+ Tambah'}
+-                  </button>
+-                )}
+-              </div>
+-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+-                {!selectedGroup && (
+-                  <div className="px-3 py-6 text-center">
+-                    <Users className="mx-auto h-6 w-6 text-black/30" />
+-                    <p className="mt-2 text-[11px] text-black/50 italic">
+-                      Pilih grup dari daftar untuk melihat anggotanya.
+-                    </p>
+-                  </div>
+-                )}
+-
+-                {selectedGroup && !isTeacher && !isMemberOfSelected && (
+-                  <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
+-                    <p className="text-[11px] text-black/50 italic">
+-                      Anda belum menjadi anggota grup ini.
+-                    </p>
+-                    <button
+-                      type="button"
+-                      onClick={() => handleJoinLeaveGroup(selectedGroup.id)}
+-                      className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black px-2.5 py-1 text-[10px] font-bold transition-colors hover:bg-neutral-100"
+-                    >
+-                      <UserPlus className="h-3 w-3" /> Gabung Grup
+-                    </button>
+-                  </div>
+-                )}
+-
+-                {selectedGroup && isTeacher && !addingMembers && shownMembers.length === 0 && (
+-                  <div className="px-3 py-6 text-center">
+-                    <Users className="mx-auto h-6 w-6 text-black/30" />
+-                    <p className="mt-2 text-[11px] text-black/50 italic">
+-                      {q
+-                        ? 'Tidak ada siswa yang cocok dengan pencarian.'
+-                        : 'Belum ada anggota di grup ini. Klik "+ Tambah" untuk menambah siswa.'}
+-                    </p>
+-                  </div>
+-                )}
+-
+-                {selectedGroup && addingMembers && shownCandidates.length === 0 && (
+-                  <div className="px-3 py-6 text-center">
+-                    <UserPlus className="mx-auto h-6 w-6 text-black/30" />
+-                    <p className="mt-2 text-[11px] text-black/50 italic">
+-                      {q ? 'Tidak ada siswa yang cocok.' : 'Semua siswa sudah menjadi anggota.'}
+-                    </p>
+-                  </div>
+-                )}
+-
+-                {selectedGroup &&
+-                  !addingMembers &&
+-                  shownMembers.map((student) => {
+-                    const online = isStudentOnline(student.id);
+-                    const unread = privateUnreadMap[student.id] ?? 0;
+-                    return (
+-                      <div
+-                        key={student.id}
+-                        onClick={() => setPrivateTarget({ id: student.id, name: student.name })}
+-                        className="flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2 last:border-0 hover:bg-neutral-100"
+-                      >
+-                        <div className="flex min-w-0 items-center gap-2">
+-                          <PresenceDot online={online} />
+-                          <p
+-                            className="truncate text-xs"
+-                            style={{ color: warnaNama(student.name) }}
+-                          >
+-                            {student.name}
+-                          </p>
+-                          {unread > 0 && (
+-                            <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+-                              {unread}
+-                            </span>
+-                          )}
+-                        </div>
+-                        {isTeacher && (
+-                          <button
+-                            type="button"
+-                            onClick={(e) => {
+-                              e.stopPropagation();
+-                              handleToggleMember(student.id);
+-                            }}
+-                            title="Keluarkan dari grup"
+-                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 text-[10px] font-bold transition-colors hover:bg-neutral-100"
+-                          >
+-                            <UserMinus className="h-3 w-3" /> Keluar
+-                          </button>
+-                        )}
+-                      </div>
+-                    );
+-                  })}
+-
+-                {selectedGroup &&
+-                  addingMembers &&
+-                  shownCandidates.map((student) => {
+-                    const online = isStudentOnline(student.id);
+-                    return (
+-                      <div
+-                        key={student.id}
+-                        className="flex items-center justify-between border-b border-black/10 px-3 py-2 last:border-0"
+-                      >
+-                        <div className="flex min-w-0 items-center gap-2">
+-                          <PresenceDot online={online} />
+-                          <p
+-                            className="truncate text-xs"
+-                            style={{ color: warnaNama(student.name) }}
+-                          >
+-                            {student.name}
+-                          </p>
+-                        </div>
+-                        {isTeacher && (
+-                          <button
+-                            type="button"
+-                            onClick={() => handleToggleMember(student.id)}
+-                            title="Tambahkan ke grup"
+-                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 text-[10px] font-bold transition-colors hover:bg-neutral-100"
+-                          >
+-                            <UserPlus className="h-3 w-3" /> + Grup
+-                          </button>
+-                        )}
+-                      </div>
+-                    );
+-                  })}
+-              </div>
+-            </div>
+-          </div>
+-        )}
+-
+-        {leftFooter && <div className="border-t-2 border-black p-3">{leftFooter}</div>}
+-      </aside>
++      <DiskusiTugasSidebar
++        mode={h.mode}
++        searchQuery={h.searchQuery}
++        onSearchQueryChange={h.setSearchQuery}
++        q={h.q}
++        user={user}
++        isTeacher={h.isTeacher}
++        filteredStudents={h.filteredStudents}
++        allStudents={h.students}
++        privateUnreadMap={h.privateUnreadMap}
++        privateTarget={h.privateTarget}
++        onSelectPrivateTarget={h.setPrivateTarget}
++        filteredGroups={h.filteredGroups}
++        selectedGroupId={h.selectedGroupId}
++        onSelectGroup={h.setSelectedGroupId}
++        groupUnreadMap={h.groupUnreadMap}
++        onCreateGroup={h.handleCreateGroup}
++        onDeleteGroup={(id) => {
++          deleteChatGroup(id);
++          if (h.selectedGroupId === id) h.setSelectedGroupId('');
++        }}
++        onJoinLeaveGroup={h.handleJoinLeaveGroup}
++        selectedGroup={h.selectedGroup}
++        isMemberOfSelected={h.isMemberOfSelected}
++        addingMembers={h.addingMembers}
++        onToggleAddingMembers={() => h.setAddingMembers(!h.addingMembers)}
++        shownMembers={h.shownMembers}
++        shownCandidates={h.shownCandidates}
++        onToggleMember={h.handleToggleMember}
++        leftFooter={leftFooter}
++      />
+ 
+       {/* ----------------- PANEL KANAN: WORKSPACE CHAT ----------------- */}
+       <div className="flex flex-1 flex-col justify-between">
+-        {/* Workspace Header */}
+-        <div className="flex items-center justify-between border-b-2 border-black px-4 py-3">
+-          <div className="flex min-w-0 items-center gap-2">
+-            {privateTarget && (
+-              <button
+-                type="button"
+-                onClick={() => setPrivateTarget(null)}
+-                title="Kembali ke forum/grup"
+-                className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-2 py-1 text-[10px] font-bold transition-colors hover:bg-neutral-100"
+-              >
+-                <ArrowLeft className="h-3 w-3" /> Kembali
+-              </button>
+-            )}
+-            <div className="min-w-0">
+-              <h3 className="truncate text-xs font-bold tracking-wide text-black uppercase">
+-                {activeTitle}
+-              </h3>
+-              <p className="truncate text-[10px] text-black/50">{activeSubtitle}</p>
+-            </div>
+-          </div>
+-
+-          {!privateTarget && (
+-            <div className="flex shrink-0 items-center rounded-md border-2 border-black">
+-              <button
+-                type="button"
+-                onClick={() => setMode('forum')}
+-                className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors ${
+-                  mode === 'forum'
+-                    ? 'bg-black text-white'
+-                    : 'bg-white text-black hover:bg-neutral-100'
+-                }`}
+-              >
+-                <Globe className="h-3.5 w-3.5" /> Forum
+-                {forumUnread > 0 && (
+-                  <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+-                    {forumUnread}
+-                  </span>
+-                )}
+-              </button>
+-              <button
+-                type="button"
+-                onClick={() => setMode('group')}
+-                className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors ${
+-                  mode === 'group'
+-                    ? 'bg-black text-white'
+-                    : 'bg-white text-black hover:bg-neutral-100'
+-                }`}
+-              >
+-                <Users className="h-3.5 w-3.5" /> Grup
+-              </button>
+-            </div>
+-          )}
+-        </div>
+-
+-        {/* Message Stream */}
+-        <div ref={streamRef} className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
+-          {filteredStream.length === 0 && (
+-            <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+-              {q ? (
+-                <MessageSquare className="h-8 w-8 text-black/30" />
+-              ) : privateTarget ? (
+-                <Users className="h-8 w-8 text-black/30" />
+-              ) : mode === 'forum' ? (
+-                <Globe className="h-8 w-8 text-black/30" />
+-              ) : (
+-                <Users className="h-8 w-8 text-black/30" />
+-              )}
+-              <p className="text-xs font-semibold text-black/50">
+-                {q
+-                  ? 'Tidak ada pesan yang cocok'
+-                  : privateTarget
+-                    ? 'Belum ada percakapan'
+-                    : mode === 'forum'
+-                      ? 'Belum ada diskusi di forum'
+-                      : 'Belum ada pesan di grup ini'}
+-              </p>
+-              <p className="text-[11px] text-black/40">
+-                {q
+-                  ? 'Coba kata kunci lain.'
+-                  : privateTarget
+-                    ? 'Kirim sapaan pertama untuk memulai chat privat.'
+-                    : mode === 'forum'
+-                      ? 'Jadilah yang pertama menulis pertanyaan atau tanggapan.'
+-                      : 'Kirim pesan pertama untuk memulai diskusi grup.'}
+-              </p>
+-            </div>
+-          )}
+-
+-          {filteredStream.map((item, index) => {
+-            const isMe =
+-              'senderId' in item ? user?.id === item.senderId : user?.id === item.authorId;
+-            const prev = index > 0 ? filteredStream[index - 1] : null;
+-            const showDate = !prev || getDayKey(item.createdAt) !== getDayKey(prev.createdAt);
+-            const isEditing = editingId === item.id;
+-            return (
+-              <div key={item.id}>
+-                {showDate && (
+-                  <div className="my-3 flex items-center justify-center">
+-                    <span className="rounded-full border-2 border-black bg-white px-3 py-0.5 text-[10px] font-bold text-black">
+-                      {getDayLabel(item.createdAt)}
+-                    </span>
+-                  </div>
+-                )}
+-
+-                <div className={`flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
+-                  <Avatar name={item.authorName} />
+-                  <div
+-                    className={`flex max-w-[calc(100%-2rem)] flex-col ${isMe ? 'items-end' : 'items-start'}`}
+-                  >
+-                    <div className="mb-0.5 flex items-center gap-2 text-[10px]">
+-                      <span className="font-bold" style={{ color: warnaNama(item.authorName) }}>
+-                        {item.authorName}
+-                      </span>
+-                      <span className="text-black/50">[{roleLabel(item.role)}]</span>
+-                      <span className="text-black/40">{formatDateTime(item.createdAt)}</span>
+-                      {isMe && (
+-                        <span className="relative">
+-                          <button
+-                            type="button"
+-                            onClick={() => setMenuOpenId(menuOpenId === item.id ? null : item.id)}
+-                            title="Opsi pesan"
+-                            className="flex cursor-pointer items-center rounded p-0.5 text-black/50 hover:bg-neutral-100 hover:text-black"
+-                          >
+-                            <MoreVertical className="h-3.5 w-3.5" />
+-                          </button>
+-                          {menuOpenId === item.id && (
+-                            <span
+-                              onClick={(e) => e.stopPropagation()}
+-                              className="absolute top-full right-0 z-20 mt-1 flex flex-col border border-black bg-white py-1 text-[10px] font-bold text-black shadow-lg"
+-                            >
+-                              <button
+-                                type="button"
+-                                onClick={() => handleStartEdit(item.id, item.message)}
+-                                className="flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 text-left hover:bg-neutral-100"
+-                              >
+-                                <Pencil className="h-3 w-3" /> Edit
+-                              </button>
+-                              <button
+-                                type="button"
+-                                onClick={() => handleDeleteMessage(item.id)}
+-                                className="flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 text-left text-red-600 hover:bg-neutral-100"
+-                              >
+-                                <Trash2 className="h-3 w-3" /> Hapus
+-                              </button>
+-                            </span>
+-                          )}
+-                        </span>
+-                      )}
+-                    </div>
+-
+-                    <div
+-                      className={`max-w-[80%] px-3 py-2 text-xs leading-relaxed ${
+-                        isMe
+-                          ? 'rounded-md rounded-br-sm border-2 border-black bg-white text-black'
+-                          : 'rounded-md rounded-bl-sm border-2 border-black bg-white text-black'
+-                      }`}
+-                    >
+-                      {isEditing ? (
+-                        <div className="flex w-64 flex-col gap-1.5">
+-                          <input
+-                            autoFocus
+-                            value={editingText}
+-                            onChange={(e) => setEditingText(e.target.value)}
+-                            onKeyDown={(e) => {
+-                              if (e.key === 'Enter') handleSaveEdit();
+-                              if (e.key === 'Escape') {
+-                                setEditingId(null);
+-                                setEditingText('');
+-                              }
+-                            }}
+-                            className="bg-transparent text-xs text-black outline-none placeholder:text-black/40"
+-                          />
+-                          <div className="flex justify-end gap-1.5">
+-                            <button
+-                              type="button"
+-                              onClick={() => {
+-                                setEditingId(null);
+-                                setEditingText('');
+-                              }}
+-                              className="rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold text-black hover:bg-neutral-100"
+-                            >
+-                              Batal
+-                            </button>
+-                            <button
+-                              type="button"
+-                              onClick={handleSaveEdit}
+-                              disabled={!editingText.trim()}
+-                              className="rounded-md border-2 border-black bg-black px-2 py-0.5 text-[10px] font-bold text-white hover:bg-neutral-800 disabled:opacity-40"
+-                            >
+-                              Simpan
+-                            </button>
+-                          </div>
+-                        </div>
+-                      ) : (
+-                        <>
+-                          {item.message && <p className="whitespace-pre-line">{item.message}</p>}
+-                          {item.attachment && (
+-                            <a
+-                              href={item.attachment.dataUrl}
+-                              download={item.attachment.name}
+-                              target="_blank"
+-                              rel="noopener noreferrer"
+-                              onClick={(e) => e.stopPropagation()}
+-                              className={`mt-1.5 flex items-center gap-2 rounded-md border-2 p-2 text-[11px] font-semibold ${
+-                                isMe
+-                                  ? 'border-blue-600 bg-white text-black hover:bg-neutral-100'
+-                                  : 'border-black bg-white text-black hover:bg-neutral-100'
+-                              }`}
+-                            >
+-                              <FileText className="h-4 w-4 shrink-0" />
+-                              <span className="min-w-0">
+-                                <span className="block max-w-[180px] truncate">
+-                                  {item.attachment.name}
+-                                </span>
+-                                <span className="block text-[9px] opacity-60">
+-                                  {formatFileSize(item.attachment.size)} · buka
+-                                </span>
+-                              </span>
+-                            </a>
+-                          )}
+-                        </>
+-                      )}
+-                    </div>
+-                  </div>
+-                </div>
+-              </div>
+-            );
+-          })}
+-        </div>
+-
+-        {/* Action Footer / Input Box */}
+-        <div className="border-t-2 border-black p-4">
+-          {typingUsers.length > 0 && (
+-            <div className="mb-2 flex items-center gap-2 px-1 text-[11px] text-black/50 italic">
+-              <span className="relative flex h-1.5 w-1.5">
+-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+-              </span>
+-              <span className="truncate">
+-                {typingUsers.length === 1
+-                  ? `${typingUsers[0].name} sedang mengetik…`
+-                  : `${typingUsers
+-                      .map((u) => u.name)
+-                      .slice(0, 2)
+-                      .join(
+-                        ', '
+-                      )}${typingUsers.length > 2 ? ` +${typingUsers.length - 2} lainnya` : ''} sedang mengetik…`}
+-              </span>
+-            </div>
+-          )}
+-          {pendingAttachment && (
+-            <div className="mb-2 flex items-center gap-2 rounded-md border-2 border-black bg-white px-2 py-1.5">
+-              <FileText className="h-3.5 w-3.5 shrink-0" />
+-              <span className="min-w-0 flex-1">
+-                <span className="block truncate text-[11px] font-bold">
+-                  {pendingAttachment.name}
+-                </span>
+-                <span className="block text-[9px] text-black/50">
+-                  {formatFileSize(pendingAttachment.size)}
+-                </span>
+-              </span>
+-              <button
+-                type="button"
+-                onClick={() => setPendingAttachment(null)}
+-                title="Hapus lampiran"
+-                className="flex shrink-0 cursor-pointer items-center rounded p-0.5 text-black/50 hover:bg-neutral-100"
+-              >
+-                <X className="h-3.5 w-3.5" />
+-              </button>
+-            </div>
+-          )}
+-
+-          <div className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-600">
+-            <input
+-              ref={fileInputRef}
+-              type="file"
+-              className="hidden"
+-              onChange={(e) => {
+-                handlePickFile(e.target.files?.[0]);
+-                e.target.value = '';
+-              }}
+-            />
+-            <button
+-              type="button"
+-              title="Lampirkan File (maks. 1.5MB)"
+-              onClick={() => fileInputRef.current?.click()}
+-              className="flex cursor-pointer items-center text-black hover:opacity-60"
+-            >
+-              <Paperclip className="h-4 w-4" />
+-            </button>
++        <DiskusiTugasHeader
++          mode={h.mode}
++          privateTarget={h.privateTarget}
++          activeTitle={activeTitle}
++          activeSubtitle={activeSubtitle}
++          forumUnread={h.forumUnread}
++          onSetMode={h.setMode}
++          onBackFromPrivate={() => h.setPrivateTarget(null)}
++        />
+ 
+-            <input
+-              type="text"
+-              value={draft}
+-              onChange={(e) => {
+-                setDraft(e.target.value);
+-                handleTyping();
+-              }}
+-              onKeyDown={(e) => {
+-                if (e.key === 'Enter') handleSend();
+-                else handleTyping();
+-              }}
+-              onBlur={handleStopTyping}
+-              placeholder={
+-                privateTarget
+-                  ? `Tulis pesan untuk ${privateTarget.name}...`
+-                  : mode === 'forum'
+-                    ? 'Tulis pesan forum (terlihat semua murid)...'
+-                    : 'Tulis pesan grup...'
+-              }
+-              className="flex-1 bg-transparent text-xs text-black outline-none placeholder:text-black/40"
+-            />
++        <DiskusiTugasStream
++          streamRef={h.streamRef}
++          messages={h.filteredStream}
++          q={h.q}
++          user={user}
++          mode={h.mode}
++          privateTarget={h.privateTarget}
++          editingId={h.editingId}
++          editingText={h.editingText}
++          menuOpenId={h.menuOpenId}
++          onEditingTextChange={h.setEditingText}
++          onStartEdit={h.handleStartEdit}
++          onCancelEdit={() => {
++            h.setEditingId(null);
++            h.setEditingText('');
++          }}
++          onSaveEdit={h.handleSaveEdit}
++          onDeleteMessage={h.handleDeleteMessage}
++          onToggleMenu={(id) => h.setMenuOpenId(h.menuOpenId === id ? null : id)}
++        />
+ 
+-            <button
+-              type="button"
+-              onClick={handleSend}
+-              disabled={(!draft.trim() && !pendingAttachment) || !canSend}
+-              className="flex items-center gap-1 rounded-md border-2 border-black bg-black px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
+-            >
+-              <span>KIRIM</span>
+-              <Send className="h-3 w-3" />
+-            </button>
+-          </div>
+-        </div>
++        <DiskusiTugasComposer
++          draft={h.draft}
++          onDraftChange={h.setDraft}
++          onSend={h.handleSend}
++          canSend={canSend}
++          typingUsers={h.typingUsers}
++          pendingAttachment={h.pendingAttachment}
++          onRemoveAttachment={() => h.setPendingAttachment(null)}
++          onPickFile={h.handlePickFile}
++          fileInputRef={h.fileInputRef}
++          onTyping={h.handleTyping}
++          onStopTyping={h.handleStopTyping}
++          mode={h.mode}
++          privateTarget={h.privateTarget}
++        />
+       </div>
+     </div>
+   );
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugas.types.test.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugas.types.test.tsx
+new file mode 100644
+index 0000000..a714b46
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugas.types.test.tsx
+@@ -0,0 +1,71 @@
++/**
++ * Unit test helper murni DiskusiTugas (dipecah dari DiskusiTugas.tsx).
++ */
++import { describe, expect, it } from 'vitest';
++import { render } from '@testing-library/react';
++import {
++  getDayKey,
++  getDayLabel,
++  PresenceDot,
++  Avatar,
++  isPrivateMessage,
++} from './DiskusiTugas.types';
++import type { PrivateMessage, GroupChatMessage } from '../../../types';
++
++describe('DiskusiTugas helpers (dipisah dari DiskusiTugas.tsx)', () => {
++  it('getDayKey memakai format Y-M-D (bulan 0-indexed, persis implementasi asli)', () => {
++    const ts = new Date(2026, 7, 11, 10, 30).getTime(); // 11 Agustus 2026
++    expect(getDayKey(ts)).toBe('2026-7-11');
++  });
++
++  it('getDayLabel menampilkan "Hari Ini" untuk tanggal hari ini', () => {
++    expect(getDayLabel(Date.now())).toBe('Hari Ini');
++  });
++
++  it('getDayLabel menampilkan "Kemarin" untuk tanggal kemarin', () => {
++    const yesterday = new Date();
++    yesterday.setDate(yesterday.getDate() - 1);
++    expect(getDayLabel(yesterday.getTime())).toBe('Kemarin');
++  });
++
++  it('getDayLabel menampilkan tanggal lokal untuk hari lain', () => {
++    const ts = new Date(2026, 0, 5, 9, 0).getTime();
++    const label = getDayLabel(ts);
++    expect(label).toMatch(/2026/);
++  });
++
++  it('isPrivateMessage membedakan pesan privat (senderId) vs grup (authorId)', () => {
++    const privateMsg: PrivateMessage = {
++      id: 'p1',
++      senderId: 's1',
++      receiverId: 's2',
++      authorName: 'A',
++      role: 'murid',
++      message: 'halo',
++      createdAt: 1,
++    };
++    const groupMsg: GroupChatMessage = {
++      id: 'g1',
++      groupId: 'g1',
++      authorId: 's1',
++      authorName: 'A',
++      role: 'murid',
++      message: 'halo',
++      createdAt: 1,
++    };
++    expect(isPrivateMessage(privateMsg)).toBe(true);
++    expect(isPrivateMessage(groupMsg)).toBe(false);
++  });
++
++  it('PresenceDot menampilkan indikator online/offline', () => {
++    const { container: dotOn } = render(<PresenceDot online />);
++    expect(dotOn.querySelector('span')?.className).toContain('bg-emerald-500');
++    const { container: dotOff } = render(<PresenceDot online={false} />);
++    expect(dotOff.querySelector('span')?.className).toContain('bg-neutral-300');
++  });
++
++  it('Avatar menampilkan inisial nama', () => {
++    const { container } = render(<Avatar name="Budi" />);
++    expect(container.textContent).toBe('B');
++  });
++});
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugas.types.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugas.types.tsx
+new file mode 100644
+index 0000000..b1c6797
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugas.types.tsx
+@@ -0,0 +1,116 @@
++/**
++ * Shared types & pure helpers untuk DiskusiTugas (dipecah dari DiskusiTugas.tsx).
++ */
++import type { ReactNode } from 'react';
++import type { AuthUser, OnlineAssignment } from '../../../types';
++import type {
++  AssignmentDiscussion,
++  ChatGroup,
++  GroupChatMessage,
++  PrivateMessage,
++  Student,
++} from '../../../types';
++
++export interface DiskusiTugasProps {
++  assignment: OnlineAssignment;
++  /** Pengguna yang sedang aktif (guru/murid). Tanpa user, kiriman nonaktif. */
++  user?: AuthUser | null;
++  /** `full` = tampilan chat lengkap, `compact` = tampilan ringkas. */
++  variant?: 'full' | 'compact';
++  /** Dipanggil setelah komentar terkirim. */
++  onPosted?: () => void;
++  /** Isi penuh tinggi induk (`h-full`) alih-alih tinggi tetap 600px. */
++  fill?: boolean;
++  /** Konten opsional di bagian bawah panel kiri (kolom peserta). */
++  leftFooter?: ReactNode;
++}
++
++export type ChatMode = 'forum' | 'group';
++
++/** Tipe gabungan pesan yang tampil di alur chat (forum / grup / privat). */
++export type ChatStreamItem = AssignmentDiscussion | GroupChatMessage | PrivateMessage;
++
++export interface PrivateTarget {
++  id: string;
++  name: string;
++}
++
++export interface PendingAttachment {
++  name: string;
++  type: string;
++  dataUrl: string;
++  size: number;
++}
++
++export interface TypingUser {
++  userId: string;
++  name: string;
++  role: string;
++}
++
++export function isPrivateMessage(item: ChatStreamItem): item is PrivateMessage {
++  return 'senderId' in item;
++}
++
++/** Titik indikator status aktif (online/offline). */
++export function PresenceDot({ online }: { online: boolean }) {
++  return (
++    <span
++      className={`inline-block h-2 w-2 shrink-0 rounded-full ${
++        online ? 'bg-emerald-500' : 'bg-neutral-300'
++      }`}
++      title={online ? 'Aktif' : 'Tidak aktif'}
++    />
++  );
++}
++
++/** Avatar inisial bulat — hitam untuk guru, biru muda untuk siswa. */
++export function Avatar({ name, online }: { name: string; online?: boolean }) {
++  const initial = (name.trim().charAt(0) || '?').toUpperCase();
++  return (
++    <div className="relative shrink-0">
++      <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-black bg-white text-xs font-bold text-black">
++        {initial}
++      </div>
++      {typeof online === 'boolean' && (
++        <span
++          className={`absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
++            online ? 'bg-emerald-500' : 'bg-neutral-300'
++          }`}
++        />
++      )}
++    </div>
++  );
++}
++
++/** Kunci hari (YYYY-M-D) — format persis implementasi asli (bulan 0-indexed). */
++export function getDayKey(ts: number) {
++  const d = new Date(ts);
++  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
++}
++
++/** Label hari: "Hari Ini", "Kemarin", atau tanggal lokal. */
++export function getDayLabel(ts: number) {
++  const today = new Date();
++  const yesterday = new Date(today);
++  yesterday.setDate(today.getDate() - 1);
++  const day = new Date(ts);
++  if (getDayKey(ts) === getDayKey(today.getTime())) return 'Hari Ini';
++  if (getDayKey(ts) === getDayKey(yesterday.getTime())) return 'Kemarin';
++  return day.toLocaleDateString('id-ID', {
++    weekday: 'long',
++    day: 'numeric',
++    month: 'long',
++    year: 'numeric',
++  });
++}
++
++export type {
++  AuthUser,
++  OnlineAssignment,
++  AssignmentDiscussion,
++  ChatGroup,
++  GroupChatMessage,
++  PrivateMessage,
++  Student,
++};
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugasCompact.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugasCompact.tsx
+new file mode 100644
+index 0000000..cd1a3a2
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugasCompact.tsx
+@@ -0,0 +1,71 @@
++/**
++ * Varian ringkas DiskusiTugas — hanya forum + kotak balasan.
++ * Dipecah dari DiskusiTugas.tsx.
++ */
++import { MessageSquare } from 'lucide-react';
++import type { AuthUser, AssignmentDiscussion } from '../../../types';
++import { warnaNama } from '../../../codewarna/warnaNama';
++import { formatDateTime, roleLabel } from './tugasKonten';
++
++interface DiskusiTugasCompactProps {
++  discussions: AssignmentDiscussion[];
++  draft: string;
++  onDraftChange: (v: string) => void;
++  onSend: () => void;
++  user?: AuthUser | null;
++}
++
++export default function DiskusiTugasCompact({
++  discussions,
++  draft,
++  onDraftChange,
++  onSend,
++  user,
++}: DiskusiTugasCompactProps) {
++  return (
++    <div className="mt-4 border-t-2 border-black pt-3">
++      <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wider text-black uppercase">
++        <MessageSquare className="h-3.5 w-3.5" />
++        <span>Diskusi ({discussions.length})</span>
++      </div>
++
++      <div className="max-h-[200px] space-y-2 overflow-y-auto overscroll-contain pr-1">
++        {discussions.length === 0 && (
++          <p className="text-xs text-black/50 italic">Belum ada diskusi pada tugas ini.</p>
++        )}
++        {discussions.map((d) => (
++          <div key={d.id} className="border-b border-black/10 pb-2">
++            <div className="flex items-center justify-between text-xs">
++              <span className="font-bold" style={{ color: warnaNama(d.authorName) }}>
++                {d.authorName}{' '}
++                <span className="text-[10px] text-black/50">({roleLabel(d.role)})</span>
++              </span>
++              <span className="text-[10px] text-black/40">{formatDateTime(d.createdAt)}</span>
++            </div>
++            <p className="mt-1 text-xs whitespace-pre-line text-black">{d.message}</p>
++          </div>
++        ))}
++      </div>
++
++      <div className="mt-2 flex items-center gap-2 border-t border-black/10 pt-2">
++        <input
++          value={draft}
++          onChange={(e) => onDraftChange(e.target.value)}
++          onKeyDown={(e) => {
++            if (e.key === 'Enter') onSend();
++          }}
++          placeholder="Ketik balasan..."
++          className="flex-1 bg-transparent text-xs text-black outline-none placeholder:text-black/40"
++        />
++        <button
++          type="button"
++          onClick={onSend}
++          disabled={!draft.trim() || !user}
++          className="rounded-md border-2 border-black bg-black px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
++        >
++          Kirim
++        </button>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugasComposer.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugasComposer.tsx
+new file mode 100644
+index 0000000..f01b99f
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugasComposer.tsx
+@@ -0,0 +1,136 @@
++/**
++ * Kotak input pesan DiskusiTugas: indikator "sedang mengetik", lampiran file,
++ * input teks, dan tombol kirim. Dipecah dari DiskusiTugas.tsx.
++ */
++import type { RefObject } from 'react';
++import { Paperclip, Send, X, FileText } from 'lucide-react';
++import { formatFileSize } from './tugasKonten';
++import type { ChatMode, PendingAttachment, PrivateTarget, TypingUser } from './DiskusiTugas.types';
++
++interface DiskusiTugasComposerProps {
++  draft: string;
++  onDraftChange: (v: string) => void;
++  onSend: () => void;
++  canSend: boolean;
++  typingUsers: TypingUser[];
++  pendingAttachment: PendingAttachment | null;
++  onRemoveAttachment: () => void;
++  onPickFile: (file: File | undefined | null) => void;
++  fileInputRef: RefObject<HTMLInputElement | null>;
++  onTyping: () => void;
++  onStopTyping: () => void;
++  mode: ChatMode;
++  privateTarget: PrivateTarget | null;
++}
++
++export default function DiskusiTugasComposer(props: DiskusiTugasComposerProps) {
++  const {
++    draft,
++    onDraftChange,
++    onSend,
++    canSend,
++    typingUsers,
++    pendingAttachment,
++    onRemoveAttachment,
++    onPickFile,
++    fileInputRef,
++    onTyping,
++    onStopTyping,
++    mode,
++    privateTarget,
++  } = props;
++
++  return (
++    <div className="border-t-2 border-black p-4">
++      {typingUsers.length > 0 && (
++        <div className="mb-2 flex items-center gap-2 px-1 text-[11px] text-black/50 italic">
++          <span className="relative flex h-1.5 w-1.5">
++            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
++            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
++          </span>
++          <span className="truncate">
++            {typingUsers.length === 1
++              ? `${typingUsers[0].name} sedang mengetik…`
++              : `${typingUsers
++                  .map((u) => u.name)
++                  .slice(0, 2)
++                  .join(
++                    ', '
++                  )}${typingUsers.length > 2 ? ` +${typingUsers.length - 2} lainnya` : ''} sedang mengetik…`}
++          </span>
++        </div>
++      )}
++      {pendingAttachment && (
++        <div className="mb-2 flex items-center gap-2 rounded-md border-2 border-black bg-white px-2 py-1.5">
++          <FileText className="h-3.5 w-3.5 shrink-0" />
++          <span className="min-w-0 flex-1">
++            <span className="block truncate text-[11px] font-bold">{pendingAttachment.name}</span>
++            <span className="block text-[9px] text-black/50">
++              {formatFileSize(pendingAttachment.size)}
++            </span>
++          </span>
++          <button
++            type="button"
++            onClick={onRemoveAttachment}
++            title="Hapus lampiran"
++            className="flex shrink-0 cursor-pointer items-center rounded p-0.5 text-black/50 hover:bg-neutral-100"
++          >
++            <X className="h-3.5 w-3.5" />
++          </button>
++        </div>
++      )}
++
++      <div className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-600">
++        <input
++          ref={fileInputRef}
++          type="file"
++          className="hidden"
++          onChange={(e) => {
++            onPickFile(e.target.files?.[0]);
++            e.target.value = '';
++          }}
++        />
++        <button
++          type="button"
++          title="Lampirkan File (maks. 1.5MB)"
++          onClick={() => fileInputRef.current?.click()}
++          className="flex cursor-pointer items-center text-black hover:opacity-60"
++        >
++          <Paperclip className="h-4 w-4" />
++        </button>
++
++        <input
++          type="text"
++          value={draft}
++          onChange={(e) => {
++            onDraftChange(e.target.value);
++            onTyping();
++          }}
++          onKeyDown={(e) => {
++            if (e.key === 'Enter') onSend();
++            else onTyping();
++          }}
++          onBlur={onStopTyping}
++          placeholder={
++            privateTarget
++              ? `Tulis pesan untuk ${privateTarget.name}...`
++              : mode === 'forum'
++                ? 'Tulis pesan forum (terlihat semua murid)...'
++                : 'Tulis pesan grup...'
++          }
++          className="flex-1 bg-transparent text-xs text-black outline-none placeholder:text-black/40"
++        />
++
++        <button
++          type="button"
++          onClick={onSend}
++          disabled={(!draft.trim() && !pendingAttachment) || !canSend}
++          className="flex items-center gap-1 rounded-md border-2 border-black bg-black px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-neutral-800 disabled:opacity-40"
++        >
++          <span>KIRIM</span>
++          <Send className="h-3 w-3" />
++        </button>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugasHeader.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugasHeader.tsx
+new file mode 100644
+index 0000000..45fe1a0
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugasHeader.tsx
+@@ -0,0 +1,77 @@
++/**
++ * Header workspace chat DiskusiTugas: judul percakapan aktif + toggle
++ * Forum/Grup (dengan badge belum dibaca). Dipecah dari DiskusiTugas.tsx.
++ */
++import { ArrowLeft, Globe, Users } from 'lucide-react';
++import type { ChatMode, PrivateTarget } from './DiskusiTugas.types';
++
++interface DiskusiTugasHeaderProps {
++  mode: ChatMode;
++  privateTarget: PrivateTarget | null;
++  activeTitle: string;
++  activeSubtitle: string;
++  forumUnread: number;
++  onSetMode: (mode: ChatMode) => void;
++  onBackFromPrivate: () => void;
++}
++
++export default function DiskusiTugasHeader({
++  mode,
++  privateTarget,
++  activeTitle,
++  activeSubtitle,
++  forumUnread,
++  onSetMode,
++  onBackFromPrivate,
++}: DiskusiTugasHeaderProps) {
++  return (
++    <div className="flex items-center justify-between border-b-2 border-black px-4 py-3">
++      <div className="flex min-w-0 items-center gap-2">
++        {privateTarget && (
++          <button
++            type="button"
++            onClick={onBackFromPrivate}
++            title="Kembali ke forum/grup"
++            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-2 py-1 text-[10px] font-bold transition-colors hover:bg-neutral-100"
++          >
++            <ArrowLeft className="h-3 w-3" /> Kembali
++          </button>
++        )}
++        <div className="min-w-0">
++          <h3 className="truncate text-xs font-bold tracking-wide text-black uppercase">
++            {activeTitle}
++          </h3>
++          <p className="truncate text-[10px] text-black/50">{activeSubtitle}</p>
++        </div>
++      </div>
++
++      {!privateTarget && (
++        <div className="flex shrink-0 items-center rounded-md border-2 border-black">
++          <button
++            type="button"
++            onClick={() => onSetMode('forum')}
++            className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors ${
++              mode === 'forum' ? 'bg-black text-white' : 'bg-white text-black hover:bg-neutral-100'
++            }`}
++          >
++            <Globe className="h-3.5 w-3.5" /> Forum
++            {forumUnread > 0 && (
++              <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
++                {forumUnread}
++              </span>
++            )}
++          </button>
++          <button
++            type="button"
++            onClick={() => onSetMode('group')}
++            className={`flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors ${
++              mode === 'group' ? 'bg-black text-white' : 'bg-white text-black hover:bg-neutral-100'
++            }`}
++          >
++            <Users className="h-3.5 w-3.5" /> Grup
++          </button>
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugasSidebar.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugasSidebar.tsx
+new file mode 100644
+index 0000000..af113e4
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugasSidebar.tsx
+@@ -0,0 +1,408 @@
++/**
++ * Panel kiri DiskusiTugas: pencarian + daftar peserta forum (dengan presence
++ * & chat privat) atau daftar grup + manajemen anggota. Dipecah dari DiskusiTugas.tsx.
++ */
++import type { ReactNode } from 'react';
++import { Search, Plus, Users, UserPlus, UserMinus, X } from 'lucide-react';
++import type { AuthUser, ChatGroup, Student } from '../../../types';
++import { isStudentOnline } from '../../../data/services';
++import { warnaNama } from '../../../codewarna/warnaNama';
++import { PresenceDot, type ChatMode, type PrivateTarget } from './DiskusiTugas.types';
++
++interface DiskusiTugasSidebarProps {
++  mode: ChatMode;
++  searchQuery: string;
++  onSearchQueryChange: (v: string) => void;
++  q: string;
++  user?: AuthUser | null;
++  isTeacher: boolean;
++
++  // Mode forum: daftar siswa + chat privat
++  filteredStudents: Student[];
++  /** Semua siswa kelas (tanpa filter) — dipakai untuk inisial avatar member grup. */
++  allStudents: Student[];
++  privateUnreadMap: Record<string, number>;
++  privateTarget: PrivateTarget | null;
++  onSelectPrivateTarget: (target: PrivateTarget) => void;
++
++  // Mode grup: daftar grup
++  filteredGroups: ChatGroup[];
++  selectedGroupId: string;
++  onSelectGroup: (id: string) => void;
++  groupUnreadMap: Record<string, number>;
++  onCreateGroup: () => void;
++  onDeleteGroup: (id: string) => void;
++  onJoinLeaveGroup: (groupId: string) => void;
++
++  // Manajemen anggota grup
++  selectedGroup: ChatGroup | null;
++  isMemberOfSelected: boolean;
++  addingMembers: boolean;
++  onToggleAddingMembers: () => void;
++  shownMembers: Student[];
++  shownCandidates: Student[];
++  onToggleMember: (studentId: string) => void;
++
++  leftFooter?: ReactNode;
++}
++
++export default function DiskusiTugasSidebar(props: DiskusiTugasSidebarProps) {
++  const {
++    mode,
++    searchQuery,
++    onSearchQueryChange,
++    q,
++    user,
++    isTeacher,
++    filteredStudents,
++    allStudents,
++    privateUnreadMap,
++    privateTarget,
++    onSelectPrivateTarget,
++    filteredGroups,
++    selectedGroupId,
++    onSelectGroup,
++    groupUnreadMap,
++    onCreateGroup,
++    onDeleteGroup,
++    onJoinLeaveGroup,
++    selectedGroup,
++    isMemberOfSelected,
++    addingMembers,
++    onToggleAddingMembers,
++    shownMembers,
++    shownCandidates,
++    onToggleMember,
++    leftFooter,
++  } = props;
++
++  return (
++    <aside className="flex w-72 flex-col border-r-2 border-black">
++      {/* Search Input */}
++      <div className="flex items-center gap-2 border-b-2 border-black px-3 py-2.5">
++        <Search className="h-4 w-4 shrink-0 text-black/50" />
++        <input
++          type="text"
++          placeholder="Cari percakapan..."
++          value={searchQuery}
++          onChange={(e) => onSearchQueryChange(e.target.value)}
++          className="w-full bg-transparent text-xs outline-none placeholder:text-black/40"
++        />
++      </div>
++
++      {mode === 'forum' ? (
++        /* ---------- MODE FORUM (terlihat semua murid) ---------- */
++        <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain">
++          <div className="border-b-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold tracking-wider text-black uppercase">
++            Peserta Forum (Semua)
++          </div>
++          {filteredStudents.length === 0 && (
++            <div className="px-3 py-6 text-center">
++              <Search className="mx-auto h-6 w-6 text-black/30" />
++              <p className="mt-2 text-[11px] text-black/50 italic">
++                {q
++                  ? 'Tidak ada siswa yang cocok dengan pencarian.'
++                  : 'Belum ada siswa di kelas ini.'}
++              </p>
++            </div>
++          )}
++          <div>
++            {filteredStudents.map((student) => {
++              const online = isStudentOnline(student.id);
++              const unread = privateUnreadMap[student.id] ?? 0;
++              const isTarget = privateTarget?.id === student.id;
++              return (
++                <div
++                  key={student.id}
++                  onClick={() => onSelectPrivateTarget({ id: student.id, name: student.name })}
++                  className={`flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2.5 last:border-0 ${
++                    isTarget
++                      ? 'bg-neutral-100 text-black shadow-[inset_3px_0_0_0_#2563eb]'
++                      : 'hover:bg-neutral-100'
++                  }`}
++                >
++                  <div className="flex min-w-0 items-center gap-2">
++                    <PresenceDot online={online} />
++                    <p className="truncate text-xs" style={{ color: warnaNama(student.name) }}>
++                      {student.name}
++                    </p>
++                    {unread > 0 && (
++                      <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
++                        {unread}
++                      </span>
++                    )}
++                  </div>
++                  <span
++                    className={`shrink-0 text-[10px] ${isTarget ? 'text-black/60' : 'text-black/40'}`}
++                  >
++                    {online ? 'Aktif' : 'Offline'}
++                  </span>
++                </div>
++              );
++            })}
++          </div>
++        </div>
++      ) : (
++        /* ---------- MODE GRUP (chat privat per grup) ---------- */
++        <div className="flex flex-1 flex-col overflow-hidden">
++          {/* Kotak GRUP (bingkai terpisah, scroll sendiri) */}
++          <div className="flex min-h-0 flex-1 flex-col border-b-2 border-black">
++            <div className="flex items-center justify-between border-b-2 border-black bg-white px-3 py-1.5">
++              <span className="text-[10px] font-bold tracking-wider text-black uppercase">
++                Grup
++              </span>
++              {isTeacher && (
++                <button
++                  type="button"
++                  onClick={onCreateGroup}
++                  title="Buat grup baru"
++                  className="inline-flex cursor-pointer items-center gap-0.5 text-[11px] font-bold text-black hover:text-black/60"
++                >
++                  <Plus className="h-3.5 w-3.5" /> Grup
++                </button>
++              )}
++            </div>
++            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
++              {filteredGroups.length === 0 && (
++                <div className="px-3 py-6 text-center">
++                  {q ? (
++                    <Search className="mx-auto h-6 w-6 text-black/30" />
++                  ) : (
++                    <Users className="mx-auto h-6 w-6 text-black/30" />
++                  )}
++                  <p className="mt-2 text-[11px] text-black/50 italic">
++                    {q
++                      ? 'Tidak ada grup yang cocok dengan pencarian.'
++                      : isTeacher
++                        ? 'Belum ada grup. Klik "+ Grup" untuk membuat.'
++                        : 'Belum ada grup di kelas ini. Gabung ke grup yang dibuat guru untuk mulai berdiskusi.'}
++                  </p>
++                </div>
++              )}{' '}
++              {filteredGroups.map((group) => {
++                const isSelected = group.id === selectedGroupId;
++                const isMember = user ? group.memberIds.includes(user.id) : false;
++                const unread = groupUnreadMap[group.id] ?? 0;
++                return (
++                  <div
++                    key={group.id}
++                    onClick={() => onSelectGroup(group.id)}
++                    className={`flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2.5 transition-colors last:border-0 ${
++                      isSelected
++                        ? 'bg-neutral-100 text-black shadow-[inset_3px_0_0_0_#2563eb]'
++                        : 'hover:bg-neutral-100'
++                    }`}
++                  >
++                    <div className="min-w-0 flex-1 pr-2">
++                      <p className="flex items-center gap-1.5 truncate text-xs font-bold">
++                        <span className="truncate" style={{ color: warnaNama(group.name) }}>
++                          {group.name}
++                        </span>
++                        {isMember && unread > 0 && (
++                          <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
++                            {unread}
++                          </span>
++                        )}
++                      </p>
++                      <div className="mt-1 flex items-center gap-1.5">
++                        {group.memberIds.length > 0 && (
++                          <span className="flex shrink-0 -space-x-1.5">
++                            {group.memberIds.slice(0, 4).map((mid) => {
++                              const member = allStudents.find((s) => s.id === mid);
++                              return (
++                                <span
++                                  key={mid}
++                                  className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-[8px] font-bold text-blue-800 ring-1 ring-white"
++                                >
++                                  {(member?.name?.trim().charAt(0) || '?').toUpperCase()}
++                                </span>
++                              );
++                            })}
++                          </span>
++                        )}
++                        <p className="truncate text-[10px] text-black/40">
++                          {group.memberIds.length} anggota
++                          {isMember ? ' · Anda anggota' : ' · Anda belum bergabung'}
++                        </p>
++                      </div>
++                    </div>
++                    {isTeacher ? (
++                      <button
++                        type="button"
++                        onClick={(e) => {
++                          e.stopPropagation();
++                          onDeleteGroup(group.id);
++                        }}
++                        title="Hapus grup"
++                        className="shrink-0 rounded p-0.5 hover:bg-white/20"
++                      >
++                        <X className="h-3.5 w-3.5" />
++                      </button>
++                    ) : (
++                      <button
++                        type="button"
++                        onClick={(e) => {
++                          e.stopPropagation();
++                          onJoinLeaveGroup(group.id);
++                        }}
++                        title={isMember ? 'Keluar dari grup' : 'Gabung ke grup'}
++                        className={`inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[10px] font-bold transition-colors ${
++                          isMember
++                            ? 'border-black/10 text-black/50 hover:bg-neutral-100'
++                            : 'border-black text-black hover:bg-black hover:text-white'
++                        }`}
++                      >
++                        {isMember ? (
++                          <UserMinus className="h-3 w-3" />
++                        ) : (
++                          <UserPlus className="h-3 w-3" />
++                        )}
++                        {isMember ? 'Keluar' : 'Gabung'}
++                      </button>
++                    )}
++                  </div>
++                );
++              })}
++            </div>
++          </div>
++
++          {/* Kotak ANGGOTA (hanya anggota grup; bingkai terpisah, scroll sendiri) */}
++          <div className="flex min-h-0 flex-1 flex-col">
++            <div className="flex items-center justify-between border-b-2 border-black bg-white px-3 py-1.5">
++              <span className="text-[10px] font-bold tracking-wider text-black uppercase">
++                Anggota {selectedGroup ? `(${selectedGroup.memberIds.length})` : ''}
++              </span>
++              {isTeacher && (
++                <button
++                  type="button"
++                  onClick={onToggleAddingMembers}
++                  disabled={!selectedGroup}
++                  title={addingMembers ? 'Tutup daftar calon anggota' : 'Tambah anggota ke grup'}
++                  className="inline-flex cursor-pointer items-center gap-0.5 text-[11px] font-bold text-black hover:text-black/60 disabled:cursor-not-allowed disabled:opacity-40"
++                >
++                  {addingMembers ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
++                  {addingMembers ? 'Selesai' : '+ Tambah'}
++                </button>
++              )}
++            </div>
++            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
++              {!selectedGroup && (
++                <div className="px-3 py-6 text-center">
++                  <Users className="mx-auto h-6 w-6 text-black/30" />
++                  <p className="mt-2 text-[11px] text-black/50 italic">
++                    Pilih grup dari daftar untuk melihat anggotanya.
++                  </p>
++                </div>
++              )}
++
++              {selectedGroup && !isTeacher && !isMemberOfSelected && (
++                <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
++                  <p className="text-[11px] text-black/50 italic">
++                    Anda belum menjadi anggota grup ini.
++                  </p>
++                  <button
++                    type="button"
++                    onClick={() => onJoinLeaveGroup(selectedGroup.id)}
++                    className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black px-2.5 py-1 text-[10px] font-bold transition-colors hover:bg-neutral-100"
++                  >
++                    <UserPlus className="h-3 w-3" /> Gabung Grup
++                  </button>
++                </div>
++              )}
++
++              {selectedGroup && isTeacher && !addingMembers && shownMembers.length === 0 && (
++                <div className="px-3 py-6 text-center">
++                  <Users className="mx-auto h-6 w-6 text-black/30" />
++                  <p className="mt-2 text-[11px] text-black/50 italic">
++                    {q
++                      ? 'Tidak ada siswa yang cocok dengan pencarian.'
++                      : 'Belum ada anggota di grup ini. Klik "+ Tambah" untuk menambah siswa.'}
++                  </p>
++                </div>
++              )}
++
++              {selectedGroup && addingMembers && shownCandidates.length === 0 && (
++                <div className="px-3 py-6 text-center">
++                  <UserPlus className="mx-auto h-6 w-6 text-black/30" />
++                  <p className="mt-2 text-[11px] text-black/50 italic">
++                    {q ? 'Tidak ada siswa yang cocok.' : 'Semua siswa sudah menjadi anggota.'}
++                  </p>
++                </div>
++              )}
++
++              {selectedGroup &&
++                !addingMembers &&
++                shownMembers.map((student) => {
++                  const online = isStudentOnline(student.id);
++                  const unread = privateUnreadMap[student.id] ?? 0;
++                  return (
++                    <div
++                      key={student.id}
++                      onClick={() => onSelectPrivateTarget({ id: student.id, name: student.name })}
++                      className="flex cursor-pointer items-center justify-between border-b border-black/10 px-3 py-2 last:border-0 hover:bg-neutral-100"
++                    >
++                      <div className="flex min-w-0 items-center gap-2">
++                        <PresenceDot online={online} />
++                        <p className="truncate text-xs" style={{ color: warnaNama(student.name) }}>
++                          {student.name}
++                        </p>
++                        {unread > 0 && (
++                          <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
++                            {unread}
++                          </span>
++                        )}
++                      </div>
++                      {isTeacher && (
++                        <button
++                          type="button"
++                          onClick={(e) => {
++                            e.stopPropagation();
++                            onToggleMember(student.id);
++                          }}
++                          title="Keluarkan dari grup"
++                          className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 text-[10px] font-bold transition-colors hover:bg-neutral-100"
++                        >
++                          <UserMinus className="h-3 w-3" /> Keluar
++                        </button>
++                      )}
++                    </div>
++                  );
++                })}
++
++              {selectedGroup &&
++                addingMembers &&
++                shownCandidates.map((student) => {
++                  const online = isStudentOnline(student.id);
++                  return (
++                    <div
++                      key={student.id}
++                      className="flex items-center justify-between border-b border-black/10 px-3 py-2 last:border-0"
++                    >
++                      <div className="flex min-w-0 items-center gap-2">
++                        <PresenceDot online={online} />
++                        <p className="truncate text-xs" style={{ color: warnaNama(student.name) }}>
++                          {student.name}
++                        </p>
++                      </div>
++                      {isTeacher && (
++                        <button
++                          type="button"
++                          onClick={() => onToggleMember(student.id)}
++                          title="Tambahkan ke grup"
++                          className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 text-[10px] font-bold transition-colors hover:bg-neutral-100"
++                        >
++                          <UserPlus className="h-3 w-3" /> + Grup
++                        </button>
++                      )}
++                    </div>
++                  );
++                })}
++            </div>
++          </div>
++        </div>
++      )}
++
++      {leftFooter && <div className="border-t-2 border-black p-3">{leftFooter}</div>}
++    </aside>
++  );
++}
+diff --git a/src/fitur/bersama/TugasKonten/DiskusiTugasStream.tsx b/src/fitur/bersama/TugasKonten/DiskusiTugasStream.tsx
+new file mode 100644
+index 0000000..c097b97
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/DiskusiTugasStream.tsx
+@@ -0,0 +1,228 @@
++/**
++ * Alur pesan DiskusiTugas: pemisah hari, bubble chat, lampiran, dan menu
++ * edit/hapus untuk pesan milik sendiri. Dipecah dari DiskusiTugas.tsx.
++ */
++import type { RefObject } from 'react';
++import { MessageSquare, Users, Globe, MoreVertical, Pencil, Trash2, FileText } from 'lucide-react';
++import type { AuthUser } from '../../../types';
++import { warnaNama } from '../../../codewarna/warnaNama';
++import { formatDateTime, formatFileSize, roleLabel } from './tugasKonten';
++import {
++  Avatar,
++  getDayKey,
++  getDayLabel,
++  isPrivateMessage,
++  type ChatMode,
++  type ChatStreamItem,
++  type PrivateTarget,
++} from './DiskusiTugas.types';
++
++interface DiskusiTugasStreamProps {
++  streamRef: RefObject<HTMLDivElement | null>;
++  messages: ChatStreamItem[];
++  q: string;
++  user?: AuthUser | null;
++  mode: ChatMode;
++  privateTarget: PrivateTarget | null;
++  editingId: string | null;
++  editingText: string;
++  menuOpenId: string | null;
++  onEditingTextChange: (v: string) => void;
++  onStartEdit: (id: string, message: string) => void;
++  onCancelEdit: () => void;
++  onSaveEdit: () => void;
++  onDeleteMessage: (id: string) => void;
++  onToggleMenu: (id: string) => void;
++}
++
++export default function DiskusiTugasStream(props: DiskusiTugasStreamProps) {
++  const {
++    streamRef,
++    messages,
++    q,
++    user,
++    mode,
++    privateTarget,
++    editingId,
++    editingText,
++    menuOpenId,
++    onEditingTextChange,
++    onStartEdit,
++    onCancelEdit,
++    onSaveEdit,
++    onDeleteMessage,
++    onToggleMenu,
++  } = props;
++
++  return (
++    <div ref={streamRef} className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
++      {messages.length === 0 && (
++        <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
++          {q ? (
++            <MessageSquare className="h-8 w-8 text-black/30" />
++          ) : privateTarget ? (
++            <Users className="h-8 w-8 text-black/30" />
++          ) : mode === 'forum' ? (
++            <Globe className="h-8 w-8 text-black/30" />
++          ) : (
++            <Users className="h-8 w-8 text-black/30" />
++          )}
++          <p className="text-xs font-semibold text-black/50">
++            {q
++              ? 'Tidak ada pesan yang cocok'
++              : privateTarget
++                ? 'Belum ada percakapan'
++                : mode === 'forum'
++                  ? 'Belum ada diskusi di forum'
++                  : 'Belum ada pesan di grup ini'}
++          </p>
++          <p className="text-[11px] text-black/40">
++            {q
++              ? 'Coba kata kunci lain.'
++              : privateTarget
++                ? 'Kirim sapaan pertama untuk memulai chat privat.'
++                : mode === 'forum'
++                  ? 'Jadilah yang pertama menulis pertanyaan atau tanggapan.'
++                  : 'Kirim pesan pertama untuk memulai diskusi grup.'}
++          </p>
++        </div>
++      )}
++
++      {messages.map((item, index) => {
++        const isMe = isPrivateMessage(item)
++          ? user?.id === item.senderId
++          : user?.id === item.authorId;
++        const prev = index > 0 ? messages[index - 1] : null;
++        const showDate = !prev || getDayKey(item.createdAt) !== getDayKey(prev.createdAt);
++        const isEditing = editingId === item.id;
++        return (
++          <div key={item.id}>
++            {showDate && (
++              <div className="my-3 flex items-center justify-center">
++                <span className="rounded-full border-2 border-black bg-white px-3 py-0.5 text-[10px] font-bold text-black">
++                  {getDayLabel(item.createdAt)}
++                </span>
++              </div>
++            )}
++
++            <div className={`flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
++              <Avatar name={item.authorName} />
++              <div
++                className={`flex max-w-[calc(100%-2rem)] flex-col ${isMe ? 'items-end' : 'items-start'}`}
++              >
++                <div className="mb-0.5 flex items-center gap-2 text-[10px]">
++                  <span className="font-bold" style={{ color: warnaNama(item.authorName) }}>
++                    {item.authorName}
++                  </span>
++                  <span className="text-black/50">[{roleLabel(item.role)}]</span>
++                  <span className="text-black/40">{formatDateTime(item.createdAt)}</span>
++                  {isMe && (
++                    <span className="relative">
++                      <button
++                        type="button"
++                        onClick={() => onToggleMenu(item.id)}
++                        title="Opsi pesan"
++                        className="flex cursor-pointer items-center rounded p-0.5 text-black/50 hover:bg-neutral-100 hover:text-black"
++                      >
++                        <MoreVertical className="h-3.5 w-3.5" />
++                      </button>
++                      {menuOpenId === item.id && (
++                        <span
++                          onClick={(e) => e.stopPropagation()}
++                          className="absolute top-full right-0 z-20 mt-1 flex flex-col border border-black bg-white py-1 text-[10px] font-bold text-black shadow-lg"
++                        >
++                          <button
++                            type="button"
++                            onClick={() => onStartEdit(item.id, item.message)}
++                            className="flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 text-left hover:bg-neutral-100"
++                          >
++                            <Pencil className="h-3 w-3" /> Edit
++                          </button>
++                          <button
++                            type="button"
++                            onClick={() => onDeleteMessage(item.id)}
++                            className="flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 text-left text-red-600 hover:bg-neutral-100"
++                          >
++                            <Trash2 className="h-3 w-3" /> Hapus
++                          </button>
++                        </span>
++                      )}
++                    </span>
++                  )}
++                </div>
++
++                <div
++                  className={`max-w-[80%] px-3 py-2 text-xs leading-relaxed ${
++                    isMe
++                      ? 'rounded-md rounded-br-sm border-2 border-black bg-white text-black'
++                      : 'rounded-md rounded-bl-sm border-2 border-black bg-white text-black'
++                  }`}
++                >
++                  {isEditing ? (
++                    <div className="flex w-64 flex-col gap-1.5">
++                      <input
++                        autoFocus
++                        value={editingText}
++                        onChange={(e) => onEditingTextChange(e.target.value)}
++                        onKeyDown={(e) => {
++                          if (e.key === 'Enter') onSaveEdit();
++                          if (e.key === 'Escape') onCancelEdit();
++                        }}
++                        className="bg-transparent text-xs text-black outline-none placeholder:text-black/40"
++                      />
++                      <div className="flex justify-end gap-1.5">
++                        <button
++                          type="button"
++                          onClick={onCancelEdit}
++                          className="rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold text-black hover:bg-neutral-100"
++                        >
++                          Batal
++                        </button>
++                        <button
++                          type="button"
++                          onClick={onSaveEdit}
++                          disabled={!editingText.trim()}
++                          className="rounded-md border-2 border-black bg-black px-2 py-0.5 text-[10px] font-bold text-white hover:bg-neutral-800 disabled:opacity-40"
++                        >
++                          Simpan
++                        </button>
++                      </div>
++                    </div>
++                  ) : (
++                    <>
++                      {item.message && <p className="whitespace-pre-line">{item.message}</p>}
++                      {item.attachment && (
++                        <a
++                          href={item.attachment.dataUrl}
++                          download={item.attachment.name}
++                          target="_blank"
++                          rel="noopener noreferrer"
++                          onClick={(e) => e.stopPropagation()}
++                          className={`mt-1.5 flex items-center gap-2 rounded-md border-2 p-2 text-[11px] font-semibold ${
++                            isMe
++                              ? 'border-blue-600 bg-white text-black hover:bg-neutral-100'
++                              : 'border-black bg-white text-black hover:bg-neutral-100'
++                          }`}
++                        >
++                          <FileText className="h-4 w-4 shrink-0" />
++                          <span className="min-w-0">
++                            <span className="block max-w-[180px] truncate">
++                              {item.attachment.name}
++                            </span>
++                            <span className="block text-[9px] opacity-60">
++                              {formatFileSize(item.attachment.size)} · buka
++                            </span>
++                          </span>
++                        </a>
++                      )}
++                    </>
++                  )}
++                </div>
++              </div>
++            </div>
++          </div>
++        );
++      })}
++    </div>
++  );
++}
+diff --git a/src/fitur/bersama/TugasKonten/useDiskusiTugas.ts b/src/fitur/bersama/TugasKonten/useDiskusiTugas.ts
+new file mode 100644
+index 0000000..f291448
+--- /dev/null
++++ b/src/fitur/bersama/TugasKonten/useDiskusiTugas.ts
+@@ -0,0 +1,594 @@
++/**
++ * Hook logika DiskusiTugas — semua state, memo, effect, dan handler chat
++ * (forum / grup / privat) dipisah dari JSX agar komponen murni presentasional.
++ * Dipecah dari DiskusiTugas.tsx.
++ */
++import { useEffect, useMemo, useRef, useState } from 'react';
++import { useStoreVersion } from '../../../hooks/useStoreVersion';
++import { useToast } from '../../../components/ui';
++import {
++  addAssignmentDiscussion,
++  getDiscussionsByAssignment,
++  editAssignmentDiscussion,
++  deleteAssignmentDiscussion,
++  addChatGroup,
++  deleteChatGroup,
++  getChatGroupsByClass,
++  addGroupMember,
++  removeGroupMember,
++  getGroupMessages,
++  addGroupMessage,
++  editGroupMessage,
++  deleteGroupMessage,
++  getPrivateMessages,
++  addPrivateMessage,
++  editPrivateMessage,
++  deletePrivateMessage,
++  getUnreadPrivateCount,
++  getStudentsByClass,
++  isStudentOnline,
++  markScopeRead,
++  getUnreadCountForScope,
++  setTyping,
++  clearTyping,
++  getTypingUsers,
++  touchPresence,
++  touchPresenceSilent,
++} from '../../../data/services';
++import type {
++  AuthUser,
++  OnlineAssignment,
++  AssignmentDiscussion,
++  ChatGroup,
++  PrivateMessage,
++} from '../../../types';
++import {
++  type ChatMode,
++  type ChatStreamItem,
++  type PendingAttachment,
++  type PrivateTarget,
++  type TypingUser,
++} from './DiskusiTugas.types';
++
++export interface UseDiskusiTugasResult {
++  // state mentah
++  draft: string;
++  setDraft: (v: string) => void;
++  mode: ChatMode;
++  setMode: (m: ChatMode) => void;
++  selectedGroupId: string;
++  setSelectedGroupId: (id: string) => void;
++  searchQuery: string;
++  setSearchQuery: (v: string) => void;
++  addingMembers: boolean;
++  setAddingMembers: (v: boolean) => void;
++  streamRef: React.RefObject<HTMLDivElement | null>;
++  privateTarget: PrivateTarget | null;
++  setPrivateTarget: (t: PrivateTarget | null) => void;
++  editingId: string | null;
++  setEditingId: (id: string | null) => void;
++  editingText: string;
++  setEditingText: (v: string) => void;
++  menuOpenId: string | null;
++  setMenuOpenId: (id: string | null) => void;
++  pendingAttachment: PendingAttachment | null;
++  setPendingAttachment: (a: PendingAttachment | null) => void;
++  fileInputRef: React.RefObject<HTMLInputElement | null>;
++  typingUsers: TypingUser[];
++
++  // data turunan
++  isTeacher: boolean;
++  discussions: AssignmentDiscussion[];
++  groups: ChatGroup[];
++  visibleGroups: ChatGroup[];
++  students: ReturnType<typeof getStudentsByClass>;
++  selectedGroup: ChatGroup | null;
++  isMemberOfSelected: boolean;
++  groupMessages: ReturnType<typeof getGroupMessages>;
++  privateMessages: PrivateMessage[];
++  privateUnreadMap: Record<string, number>;
++  stream: ChatStreamItem[];
++  q: string;
++  filteredStudents: ReturnType<typeof getStudentsByClass>;
++  groupMembers: ReturnType<typeof getStudentsByClass>;
++  groupCandidates: ReturnType<typeof getStudentsByClass>;
++  shownMembers: ReturnType<typeof getStudentsByClass>;
++  shownCandidates: ReturnType<typeof getStudentsByClass>;
++  filteredGroups: ChatGroup[];
++  filteredStream: ChatStreamItem[];
++  forumUnread: number;
++  groupUnreadMap: Record<string, number>;
++  activeScopeKey: string;
++
++  // handler
++  handleTyping: () => void;
++  handleStopTyping: () => void;
++  handleSend: () => void;
++  handleSendForum: () => void;
++  handlePickFile: (file: File | undefined | null) => void;
++  handleStartEdit: (id: string, message: string) => void;
++  handleSaveEdit: () => void;
++  handleDeleteMessage: (id: string) => void;
++  handleCreateGroup: () => void;
++  handleToggleMember: (studentId: string) => void;
++  handleJoinLeaveGroup: (groupId: string) => void;
++}
++
++/**
++ * Semua logika DiskusiTugas dalam satu hook. Komponen hanya membaca hasilnya.
++ */
++export function useDiskusiTugas(
++  assignment: OnlineAssignment,
++  user?: AuthUser | null,
++  onPosted?: () => void
++): UseDiskusiTugasResult {
++  const storeVersion = useStoreVersion();
++  const { showToast } = useToast();
++  const [draft, setDraft] = useState('');
++  const [mode, setMode] = useState<ChatMode>('forum');
++  const [selectedGroupId, setSelectedGroupId] = useState('');
++  const [searchQuery, setSearchQuery] = useState('');
++  const [addingMembers, setAddingMembers] = useState(false);
++  const streamRef = useRef<HTMLDivElement | null>(null);
++  const [presenceTick, setPresenceTick] = useState(0);
++
++  const [privateTarget, setPrivateTarget] = useState<PrivateTarget | null>(null);
++
++  const [editingId, setEditingId] = useState<string | null>(null);
++  const [editingText, setEditingText] = useState('');
++
++  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
++
++  const [pendingAttachment, setPendingAttachment] = useState<PendingAttachment | null>(null);
++  const fileInputRef = useRef<HTMLInputElement | null>(null);
++
++  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
++  const typingRef = useRef<string | null>(null);
++
++  const isTeacher = user?.role === 'teacher';
++
++  // Presensi: tick berkala (10 dtk) + online/offline event → badge Aktif selalu segar.
++  useEffect(() => {
++    const tick = () => setPresenceTick((v) => v + 1);
++    const id = window.setInterval(tick, 10000);
++    const online = () => {
++      tick();
++      if (user?.id) touchPresenceSilent(user.id);
++    };
++    const offline = () => tick();
++    window.addEventListener('online', online);
++    window.addEventListener('offline', offline);
++    if (user?.id) touchPresence(user.id);
++    return () => {
++      window.clearInterval(id);
++      window.removeEventListener('online', online);
++      window.removeEventListener('offline', offline);
++    };
++  }, [user?.id]);
++
++  const discussions = useMemo(
++    () => getDiscussionsByAssignment(assignment.id),
++    [assignment.id, storeVersion]
++  );
++  const groups = useMemo(
++    () => getChatGroupsByClass(assignment.classId),
++    [assignment.classId, storeVersion]
++  );
++  const visibleGroups = useMemo(() => groups, [groups]);
++  const students = useMemo(
++    () => getStudentsByClass(assignment.classId),
++    [assignment.classId, storeVersion]
++  );
++  const selectedGroup = useMemo(
++    () => groups.find((g) => g.id === selectedGroupId) ?? null,
++    [groups, selectedGroupId]
++  );
++  const isMemberOfSelected = useMemo(
++    () => !!user && !!selectedGroup && selectedGroup.memberIds.includes(user.id),
++    [user, selectedGroup]
++  );
++  const groupMessages = useMemo(
++    () => (selectedGroupId ? getGroupMessages(selectedGroupId) : []),
++    [selectedGroupId, storeVersion]
++  );
++  const privateMessages = useMemo(
++    () => (privateTarget && user ? getPrivateMessages(user.id, privateTarget.id) : []),
++    [privateTarget, user, storeVersion]
++  );
++  const privateUnreadMap = useMemo(() => {
++    if (!user) return {};
++    const map: Record<string, number> = {};
++    for (const student of students) {
++      map[student.id] = getUnreadPrivateCount(user.id, student.id);
++    }
++    return map;
++  }, [students, user, storeVersion]);
++
++  const streamLength =
++    mode === 'forum'
++      ? discussions.length
++      : privateTarget
++        ? privateMessages.length
++        : groupMessages.length;
++
++  // Auto-scroll pesan ke paling bawah saat buka chat / kirim pesan / ganti mode.
++  useEffect(() => {
++    const el = streamRef.current;
++    if (el) el.scrollTop = el.scrollHeight;
++  }, [streamLength, mode, selectedGroupId, privateTarget?.id]);
++
++  // Tandai forum sudah dibaca saat aktif melihatnya.
++  useEffect(() => {
++    if (mode === 'forum' && user?.id && discussions.length > 0) {
++      markScopeRead(`forum:${assignment.id}`, user.id);
++    }
++  }, [mode, assignment.id, user?.id, discussions.length]);
++
++  // Tandai grup sudah dibaca saat dipilih.
++  useEffect(() => {
++    if (mode === 'group' && user?.id && selectedGroupId && groupMessages.length > 0) {
++      markScopeRead(`group:${selectedGroupId}`, user.id);
++    }
++  }, [mode, selectedGroupId, user?.id, groupMessages.length]);
++
++  // C14: tandai chat privat sudah dibaca saat dibuka.
++  useEffect(() => {
++    if (privateTarget && user?.id && privateMessages.length > 0) {
++      markScopeRead(`private:${user.id}|${privateTarget.id}`, user.id);
++    }
++  }, [privateTarget, user?.id, privateMessages.length]);
++
++  // C13: tutup menu opsi pesan saat klik di luar.
++  useEffect(() => {
++    if (!menuOpenId) return;
++    const close = () => setMenuOpenId(null);
++    window.addEventListener('click', close);
++    return () => window.removeEventListener('click', close);
++  }, [menuOpenId]);
++
++  // C15: scope percakapan aktif (forum / grup / private).
++  const activeScopeKey = privateTarget
++    ? `private:${user?.id ?? ''}|${privateTarget.id}`
++    : mode === 'forum'
++      ? `forum:${assignment.id}`
++      : selectedGroupId
++        ? `group:${selectedGroupId}`
++        : '';
++
++  // C15: polling user yang sedang mengetik di percakapan aktif (cross-tab via store).
++  useEffect(() => {
++    if (!activeScopeKey) {
++      setTypingUsers([]);
++      return;
++    }
++    const refresh = () => setTypingUsers(getTypingUsers(activeScopeKey, user?.id ?? ''));
++    refresh();
++    const id = window.setInterval(refresh, 1500);
++    return () => window.clearInterval(id);
++  }, [activeScopeKey, user?.id]);
++
++  // C15: hentikan status ketikan saat meninggalkan percakapan.
++  useEffect(() => {
++    return () => {
++      if (typingRef.current) {
++        clearTyping(typingRef.current, user?.id ?? '');
++        typingRef.current = null;
++      }
++    };
++  }, [user?.id]);
++
++  // C15: tandai user sedang mengetik (throttle via timestamp di store) + beri jeda hidup.
++  const handleTyping = () => {
++    if (!activeScopeKey || !user) return;
++    typingRef.current = activeScopeKey;
++    setTyping(activeScopeKey, user.id, user.name || 'Pengguna', user.role || 'guest');
++  };
++
++  // C15: bersihkan status ketikan setelah kirim.
++  const handleStopTyping = () => {
++    if (typingRef.current && user) {
++      clearTyping(typingRef.current, user.id);
++      typingRef.current = null;
++    }
++    setTypingUsers([]);
++  };
++
++  // Auto-pilih grup pertama saat masuk mode grup.
++  useEffect(() => {
++    if (
++      mode === 'group' &&
++      visibleGroups.length > 0 &&
++      !visibleGroups.some((group) => group.id === selectedGroupId)
++    ) {
++      setSelectedGroupId(visibleGroups[0].id);
++    }
++  }, [mode, visibleGroups, selectedGroupId]);
++
++  const handleSendForum = () => {
++    if (!user) return;
++    const text = draft.trim();
++    const hasContent = text || pendingAttachment;
++    if (!hasContent) return;
++    addAssignmentDiscussion({
++      id: `disc_${Date.now()}`,
++      assignmentId: assignment.id,
++      authorId: user.id,
++      authorName: user.name || 'Pengguna',
++      role: user.role || 'guest',
++      message: text,
++      createdAt: Date.now(),
++      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
++    });
++    setDraft('');
++    setPendingAttachment(null);
++    handleStopTyping();
++    onPosted?.();
++  };
++
++  const handleSendGroup = () => {
++    if (!user || !selectedGroup) return;
++    const text = draft.trim();
++    const hasContent = text || pendingAttachment;
++    if (!hasContent) return;
++    const isMember = selectedGroup.memberIds.includes(user.id);
++    if (!isMember && !isTeacher) return;
++    addGroupMessage({
++      id: `gm_${Date.now()}`,
++      groupId: selectedGroup.id,
++      authorId: user.id,
++      authorName: user.name || 'Pengguna',
++      role: user.role || 'guest',
++      message: text,
++      createdAt: Date.now(),
++      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
++    });
++    setDraft('');
++    setPendingAttachment(null);
++    handleStopTyping();
++    onPosted?.();
++  };
++
++  const handleSendPrivate = () => {
++    if (!user || !privateTarget) return;
++    const text = draft.trim();
++    const hasContent = text || pendingAttachment;
++    if (!hasContent) return;
++    addPrivateMessage({
++      id: `pm_${Date.now()}`,
++      senderId: user.id,
++      receiverId: privateTarget.id,
++      authorName: user.name || 'Pengguna',
++      role: user.role || 'guest',
++      message: text,
++      createdAt: Date.now(),
++      ...(pendingAttachment ? { attachment: pendingAttachment } : {}),
++    });
++    setDraft('');
++    setPendingAttachment(null);
++    handleStopTyping();
++    onPosted?.();
++  };
++
++  const handleSend = () => {
++    if (privateTarget) return handleSendPrivate();
++    return mode === 'forum' ? handleSendForum() : handleSendGroup();
++  };
++
++  // C12: baca file yang dipilih → dataUrl (batasi ~1.5MB).
++  const handlePickFile = (file: File | undefined | null) => {
++    if (!file) return;
++    if (file.size > 1.5 * 1024 * 1024) {
++      showToast('error', 'Ukuran file maksimal 1.5MB.');
++      return;
++    }
++    const reader = new FileReader();
++    reader.onload = () => {
++      setPendingAttachment({
++        name: file.name,
++        type: file.type || 'application/octet-stream',
++        dataUrl: String(reader.result ?? ''),
++        size: file.size,
++      });
++    };
++    reader.readAsDataURL(file);
++  };
++
++  // C13: mulai edit pesan.
++  const handleStartEdit = (id: string, message: string) => {
++    setEditingId(id);
++    setEditingText(message);
++    setMenuOpenId(null);
++  };
++
++  const handleSaveEdit = () => {
++    if (!editingId) return;
++    const text = editingText.trim();
++    if (!text) return;
++    if (privateTarget) {
++      editPrivateMessage(editingId, text);
++    } else if (mode === 'forum') {
++      editAssignmentDiscussion(editingId, text);
++    } else {
++      editGroupMessage(editingId, text);
++    }
++    setEditingId(null);
++    setEditingText('');
++    onPosted?.();
++  };
++
++  // C13: hapus pesan (dengan konfirmasi).
++  const handleDeleteMessage = (id: string) => {
++    if (!window.confirm('Hapus pesan ini?')) return;
++    if (privateTarget) {
++      deletePrivateMessage(id);
++    } else if (mode === 'forum') {
++      deleteAssignmentDiscussion(id);
++    } else {
++      deleteGroupMessage(id);
++    }
++    setMenuOpenId(null);
++    onPosted?.();
++  };
++
++  const handleCreateGroup = () => {
++    if (!isTeacher || !user) return;
++    const name = window.prompt('Nama grup baru:');
++    if (name && name.trim()) {
++      addChatGroup({
++        id: `cg_${Date.now()}`,
++        classId: assignment.classId,
++        name: name.trim(),
++        memberIds: [],
++        createdBy: user.id,
++        createdAt: Date.now(),
++      });
++    }
++  };
++
++  const handleToggleMember = (studentId: string) => {
++    if (!isTeacher || !selectedGroup) return;
++    if (selectedGroup.memberIds.includes(studentId)) {
++      removeGroupMember(selectedGroup.id, studentId);
++    } else {
++      addGroupMember(selectedGroup.id, studentId);
++    }
++  };
++
++  // C11: murid join/keluar grup sendiri.
++  const handleJoinLeaveGroup = (groupId: string) => {
++    if (isTeacher || !user) return;
++    const group = groups.find((g) => g.id === groupId);
++    if (!group) return;
++    if (group.memberIds.includes(user.id)) {
++      removeGroupMember(groupId, user.id);
++      if (selectedGroupId === groupId) setSelectedGroupId('');
++    } else {
++      addGroupMember(groupId, user.id);
++      setSelectedGroupId(groupId);
++    }
++  };
++
++  const stream: ChatStreamItem[] = privateTarget
++    ? privateMessages
++    : mode === 'forum'
++      ? discussions
++      : groupMessages;
++
++  const q = searchQuery.trim().toLowerCase();
++
++  // A1: filter pencarian — daftar siswa, daftar grup, dan alur pesan.
++  const filteredStudents = useMemo(() => {
++    if (!q) return students;
++    return students.filter((s) => s.name.toLowerCase().includes(q));
++  }, [students, q]);
++
++  // Daftar anggota grup terpilih (hanya yang benar-benar anggota) vs kandidat.
++  const groupMembers = useMemo(
++    () => (selectedGroup ? students.filter((s) => selectedGroup.memberIds.includes(s.id)) : []),
++    [students, selectedGroup]
++  );
++  const groupCandidates = useMemo(
++    () => (selectedGroup ? students.filter((s) => !selectedGroup.memberIds.includes(s.id)) : []),
++    [students, selectedGroup]
++  );
++  const shownMembers = useMemo(() => {
++    if (!q) return groupMembers;
++    return groupMembers.filter((s) => s.name.toLowerCase().includes(q));
++  }, [groupMembers, q]);
++  const shownCandidates = useMemo(() => {
++    if (!q) return groupCandidates;
++    return groupCandidates.filter((s) => s.name.toLowerCase().includes(q));
++  }, [groupCandidates, q]);
++
++  const filteredGroups = useMemo(() => {
++    if (!q) return visibleGroups;
++    return visibleGroups.filter((g) => g.name.toLowerCase().includes(q));
++  }, [visibleGroups, q]);
++
++  const filteredStream = useMemo(() => {
++    if (!q) return stream;
++    return stream.filter(
++      (m) => m.message.toLowerCase().includes(q) || (m.authorName || '').toLowerCase().includes(q)
++    );
++  }, [stream, q]);
++
++  // B6: jumlah pesan belum dibaca per forum & per grup.
++  const forumScopeKey = `forum:${assignment.id}`;
++  const forumUnread = useMemo(
++    () => getUnreadCountForScope(forumScopeKey, user?.id ?? '', discussions),
++    [forumScopeKey, user?.id, discussions, storeVersion]
++  );
++  const groupUnreadMap = useMemo(() => {
++    const map: Record<string, number> = {};
++    for (const group of groups) {
++      map[group.id] = getUnreadCountForScope(
++        `group:${group.id}`,
++        user?.id ?? '',
++        getGroupMessages(group.id)
++      );
++    }
++    return map;
++  }, [groups, user?.id, storeVersion]);
++
++  return {
++    draft,
++    setDraft,
++    mode,
++    setMode,
++    selectedGroupId,
++    setSelectedGroupId,
++    searchQuery,
++    setSearchQuery,
++    addingMembers,
++    setAddingMembers,
++    streamRef,
++    privateTarget,
++    setPrivateTarget,
++    editingId,
++    setEditingId,
++    editingText,
++    setEditingText,
++    menuOpenId,
++    setMenuOpenId,
++    pendingAttachment,
++    setPendingAttachment,
++    fileInputRef,
++    typingUsers,
++    isTeacher,
++    discussions,
++    groups,
++    visibleGroups,
++    students,
++    selectedGroup,
++    isMemberOfSelected,
++    groupMessages,
++    privateMessages,
++    privateUnreadMap,
++    stream,
++    q,
++    filteredStudents,
++    groupMembers,
++    groupCandidates,
++    shownMembers,
++    shownCandidates,
++    filteredGroups,
++    filteredStream,
++    forumUnread,
++    groupUnreadMap,
++    activeScopeKey,
++    handleTyping,
++    handleStopTyping,
++    handleSend,
++    handleSendForum,
++    handlePickFile,
++    handleStartEdit,
++    handleSaveEdit,
++    handleDeleteMessage,
++    handleCreateGroup,
++    handleToggleMember,
++    handleJoinLeaveGroup,
++  };
++}
++
++// Re-export agar komponen pemakai tetap bisa memakai helper presence.
++export { isStudentOnline };
+-- 
+2.47.3
+

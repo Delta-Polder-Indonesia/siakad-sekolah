@@ -485,7 +485,7 @@ export default function StudentDashboard({ onNavigate }: PageProps) {
                     <td className="max-w-[160px] truncate px-3 py-2">{guru.name}</td>
                     <td className="px-3 py-2 font-mono">{guru.nip || '-'}</td>
                     <td className="px-3 py-2">
-                      <span className="rounded-md border-2 border-blue-600 bg-white px-2 py-0.5 text-[10px] font-bold text-black">
+                      <span className="rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black">
                         {guru.subject}
                       </span>
                     </td>

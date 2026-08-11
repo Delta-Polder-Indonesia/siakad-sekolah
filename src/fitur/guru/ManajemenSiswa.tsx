@@ -140,7 +140,7 @@ export default function StudentManagement() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Cari nama lengkap siswa atau nomor NIS..."
-            className="w-full rounded-md border-2 border-black bg-white py-2 pr-4 pl-10 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white py-2 pr-4 pl-10 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
           />
         </div>
         <div className="flex w-full shrink-0 items-center gap-2 md:w-auto">
@@ -150,7 +150,7 @@ export default function StudentManagement() {
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3 py-2 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600 md:w-48"
+            className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3 py-2 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50 md:w-48"
           >
             <option value="">Semua Kelas Binaan</option>
             {classes.map((c) => (
@@ -170,8 +170,8 @@ export default function StudentManagement() {
           </span>
           <span>Total Siswa</span>
         </div>
-        <div className="flex items-center gap-1.5 rounded-md border-2 border-blue-600 bg-white px-3.5 py-1.5 text-xs font-bold text-blue-700">
-          <span className="min-w-[20px] rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 text-center font-mono text-[10px] font-bold text-blue-700">
+        <div className="flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3.5 py-1.5 text-xs font-bold text-black">
+          <span className="min-w-[20px] rounded-md border-2 border-black bg-white px-1.5 py-0.5 text-center font-mono text-[10px] font-bold text-black">
             {filteredStudents.filter((s) => s.gender === 'L').length}
           </span>
           <span>Laki-laki</span>
@@ -227,7 +227,7 @@ export default function StudentManagement() {
                     {student.nis}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex rounded-md border-2 border-blue-600 bg-white px-2 py-0.5 text-[10px] font-bold tracking-wide text-blue-700 uppercase">
+                    <span className="inline-flex rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold tracking-wide text-black uppercase">
                       {getClassName(student.classId)}
                     </span>
                   </td>
@@ -246,7 +246,7 @@ export default function StudentManagement() {
                     <div className="flex items-center justify-center gap-1">
                       <button type="button"
                         onClick={() => openEditModal(student)}
-                        className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                        className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-black hover:bg-neutral-100 hover:text-black"
                         title="Ubah Data"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
@@ -307,7 +307,7 @@ export default function StudentManagement() {
             <div className="flex items-center justify-between border-b-2 border-black p-4">
               <h2 className="flex items-center gap-2 text-xs font-bold tracking-wider text-black uppercase">
                 {editingStudent ? (
-                  <div className="rounded-md border-2 border-blue-600 bg-white p-1.5 text-blue-600">
+                  <div className="rounded-md border-2 border-black bg-white p-1.5 text-black">
                     <Edit2 className="h-4 w-4" />
                   </div>
                 ) : (
@@ -319,7 +319,7 @@ export default function StudentManagement() {
               </h2>
               <button type="button"
                 onClick={() => setShowModal(false)}
-                className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-black hover:bg-neutral-100 hover:text-black"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -335,7 +335,7 @@ export default function StudentManagement() {
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                   placeholder="Masukkan nama lengkap siswa..."
                 />
               </div>
@@ -348,7 +348,7 @@ export default function StudentManagement() {
                   type="text"
                   value={formNis}
                   onChange={(e) => setFormNis(e.target.value)}
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                   placeholder="Contoh: 202601001"
                 />
               </div>
@@ -361,7 +361,7 @@ export default function StudentManagement() {
                   <select
                     value={formGender}
                     onChange={(e) => setFormGender(e.target.value as 'L' | 'P')}
-                    className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   >
                     <option value="L">Laki-laki</option>
                     <option value="P">Perempuan</option>
@@ -374,7 +374,7 @@ export default function StudentManagement() {
                   <select
                     value={formClass}
                     onChange={(e) => setFormClass(e.target.value)}
-                    className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   >
                     <option value="">Pilih Kelas</option>
                     {classes.map((c) => (
@@ -394,7 +394,7 @@ export default function StudentManagement() {
                   type="text"
                   value={formPassword}
                   onChange={(e) => setFormPassword(e.target.value)}
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                 />
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function StudentManagement() {
             <div className="flex justify-end gap-2.5 border-t-2 border-black bg-white p-4">
               <button type="button"
                 onClick={() => setShowModal(false)}
-                className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition hover:border-black hover:bg-neutral-100 hover:text-black"
               >
                 Batal
               </button>

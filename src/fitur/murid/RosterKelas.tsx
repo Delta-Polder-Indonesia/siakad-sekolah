@@ -67,7 +67,7 @@ export default function RosterPage() {
         </div>
         {classRoom && (
           <div className="self-start rounded-md border-2 border-black bg-white px-2 py-1 text-xs leading-none font-bold text-black sm:self-auto">
-            Kelas: <span className="text-blue-600">{classRoom.name}</span>
+            Kelas: <span className="text-black">{classRoom.name}</span>
           </div>
         )}
       </header>
@@ -83,7 +83,7 @@ export default function RosterPage() {
                 type="button"
                 onClick={() => setSelectedDay(day.value)}
                 className={`flex items-center justify-center rounded-md border-2 bg-white px-2 py-1.5 text-center text-xs font-bold text-black transition-colors select-none hover:bg-neutral-100 ${
-                  isActive ? 'border-blue-600' : 'border-black'
+                  isActive ? 'border-black bg-black text-white' : 'border-black'
                 }`}
               >
                 {day.label}

@@ -127,7 +127,7 @@ export default function PerpusDashboard() {
             className="flex overflow-hidden rounded-md border-2 border-black bg-white"
           >
             <div className="flex w-20 items-center justify-center border-r-2 border-black bg-white py-5">
-              <stat.icon className="h-8 w-8 text-blue-600" />
+              <stat.icon className="h-8 w-8 text-black" />
             </div>
             <div className="flex flex-1 flex-col justify-center p-3">
               <p className={`text-xl font-bold ${stat.textColor}`}>{stat.value}</p>
@@ -183,7 +183,7 @@ export default function PerpusDashboard() {
               {sortedActiveTx.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="px-3 py-8 text-center text-black">
-                    <BookOpen className="mx-auto mb-2 h-8 w-8 text-blue-600" />
+                    <BookOpen className="mx-auto mb-2 h-8 w-8 text-black" />
                     <p className="text-xs font-bold text-black">
                       Tidak ada peminjaman aktif saat ini
                     </p>
@@ -206,7 +206,7 @@ export default function PerpusDashboard() {
                   } else if (sisaHari <= 2) {
                     statusBadge = 'SEGERA';
                     statusClass = 'border-black bg-white text-black';
-                    sisaClass = 'text-blue-600 font-bold';
+                    sisaClass = 'text-black font-bold';
                   } else {
                     statusBadge = 'AKTIF';
                     statusClass = 'border-black bg-white text-black';
@@ -302,7 +302,7 @@ export default function PerpusDashboard() {
                 id="bulan-select"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="cursor-pointer appearance-none rounded-md border-2 border-black bg-white px-3 py-1 pr-8 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100"
+                className="cursor-pointer appearance-none rounded-md border-2 border-black bg-white px-3 py-1 pr-8 text-xs font-bold text-black transition-colors outline-none hover:border-black hover:bg-neutral-100"
               >
                 <option value="" className="bg-white font-bold text-black">
                   --Pilih--

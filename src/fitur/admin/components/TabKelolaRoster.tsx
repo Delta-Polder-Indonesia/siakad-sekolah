@@ -258,7 +258,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
           <button
             type="button"
             onClick={hitungWaktuOtomatis}
-            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
           >
             <RefreshCw className="h-3 w-3" /> Set Jam Otomatis
           </button>
@@ -278,7 +278,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setLocalNotice(null);
                 setShowConfirm(false);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {allClasses.map((cls) => (
                 <option key={cls.id} value={cls.id}>
@@ -298,7 +298,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setLocalNotice(null);
                 setShowConfirm(false);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {SCHOOL_DAY_OPTIONS.map((day) => (
                 <option key={day.value} value={day.value}>
@@ -321,7 +321,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setLocalNotice(null);
                 setShowConfirm(false);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="45">45 Menit (1 JP)</option>
               <option value="90">90 Menit (2 JP)</option>
@@ -339,7 +339,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
               type="time"
               value={startTime}
               onChange={(e) => handleStartTimeChange(e.target.value)}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -356,7 +356,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setLocalNotice(null);
                 setShowConfirm(false);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -374,7 +374,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setShowConfirm(false);
               }}
               placeholder="Matematika"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -392,7 +392,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setShowConfirm(false);
               }}
               placeholder="LAB-01"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -408,7 +408,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                 setLocalNotice(null);
                 setShowConfirm(false);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="">-- Pilih Guru --</option>
               {allTeachers.map((t) => (
@@ -460,14 +460,14 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                   <button
                     type="button"
                     onClick={() => setShowConfirm(false)}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     Batal
                   </button>
                   <button
                     type="button"
                     onClick={handleExecuteSimpan}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     Ya, Simpan
                   </button>
@@ -483,7 +483,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
               className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
                 showConfirm
                   ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                  : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                  : 'bg-white text-black hover:border-black hover:bg-neutral-100'
               }`}
             >
               <Plus className="h-3.5 w-3.5" />
@@ -509,7 +509,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
             onChange={(e) =>
               setSelectedDayFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))
             }
-            className="rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           >
             <option value="all">Semua Hari</option>
             {SCHOOL_DAY_OPTIONS.map((day) => (
@@ -586,14 +586,14 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                             <button
                               type="button"
                               onClick={() => setDeleteTargetId(null)}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Batal
                             </button>
                             <button
                               type="button"
                               onClick={handleConfirmDelete}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Ya, Hapus
                             </button>
@@ -604,7 +604,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
                       <button
                         type="button"
                         onClick={() => handleDeleteRoster(item.id)}
-                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Hapus Roster"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

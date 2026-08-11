@@ -184,7 +184,7 @@ export function FormPeminjaman({
               type="date"
               value={tglPinjam}
               onChange={(e) => setTglPinjam(e.target.value)}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
 
             <label className="pr-4 text-right text-xs font-bold text-black uppercase">
@@ -194,7 +194,7 @@ export function FormPeminjaman({
               type="date"
               value={tglKembali}
               onChange={(e) => setTglKembali(e.target.value)}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
 
             <MemberAutocomplete
@@ -211,7 +211,7 @@ export function FormPeminjaman({
             <textarea
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
-              className="h-20 resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="h-20 resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -236,7 +236,7 @@ export function FormPeminjaman({
           <div className="flex justify-end gap-2 border-t-2 border-black/10 pt-4">
             <button type="button"
               onClick={handleReset}
-              className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+              className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
             >
               <X className="h-3.5 w-3.5" /> Reset
             </button>
@@ -271,7 +271,7 @@ export function FormPeminjaman({
               onChange={(e) => setRejectNote(e.target.value)}
               placeholder="Contoh: stok sedang dipinjam siswa lain"
               rows={3}
-              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button type="button"

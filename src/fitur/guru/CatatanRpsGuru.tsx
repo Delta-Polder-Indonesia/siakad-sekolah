@@ -72,7 +72,7 @@ export default function CatatanRpsGuru({
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
-            className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           />
         </div>
         <div className="space-y-1">
@@ -83,7 +83,7 @@ export default function CatatanRpsGuru({
             value={materi}
             onChange={(event) => setMateri(event.target.value)}
             placeholder="Contoh: Persamaan Linear Dua Variabel"
-            className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
           />
         </div>
         <div className="space-y-1 md:col-span-2">
@@ -94,7 +94,7 @@ export default function CatatanRpsGuru({
             value={catatan}
             onChange={(event) => setCatatan(event.target.value)}
             placeholder="Ringkasan progres kelas, kendala, atau tindak lanjut"
-            className="h-16 w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-semibold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+            className="h-16 w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-semibold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
           />
         </div>
       </div>
@@ -114,7 +114,7 @@ export default function CatatanRpsGuru({
             value={prDetail}
             onChange={(event) => setPrDetail(event.target.value)}
             placeholder="Detail PR: halaman, soal, deadline"
-            className="mt-2 w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-semibold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+            className="mt-2 w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-semibold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
           />
         ) : null}
       </div>

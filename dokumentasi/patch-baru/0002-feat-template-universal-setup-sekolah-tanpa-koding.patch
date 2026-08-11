@@ -1,0 +1,1074 @@
+From 8e14303736886566729c4ac2953966a1c4e4582a Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 06:36:23 +0000
+Subject: [PATCH 2/7] feat: template universal - setup sekolah tanpa koding
+
+- config/school.ts: identitas sekolah sumber tunggal + override localStorage
+  (getSchoolIdentity/updateSchoolIdentity/resetSchoolIdentity) dengan
+  sanitasi & fallback aman; schoolConfig lama dipertahankan (compat)
+- hooks/useSchoolIdentity.ts: hook reaktif ikut store version
+- Branding reaktif: Sidebar (nama+logo), ProgramFooter (nama/kontak),
+  LoginPanel & LoginPage (logo), document.title dinamis di App
+- Hardcode 'SMA Negeri 1 Medan' dibersihkan dari SiakadSection,
+  BukuTamuForm, guestData, schoolData (tamu) -> interpolasi identitas
+- Panel Setup Sekolah (menu admin > Sistem): form nama/singkatan/jenjang/
+  tahun ajaran/NPSN/telepon/domain/alamat + unggah logo (maks 300KB)
+  + simpan/reset; berlaku langsung tanpa build ulang
+- +9 test: config/school (6) & TabSetupSekolah render (3)
+
+diff --git a/REVIEW_KODE.md b/REVIEW_KODE.md
+index 3934ef3..c449b72 100644
+--- a/REVIEW_KODE.md
++++ b/REVIEW_KODE.md
+@@ -399,4 +399,39 @@ pada heartbeat presence (10 dtk) dan penanda "sudah dibaca".
+ 
+ ---
+ 
++---
++
++## 11. Template Universal — Setup Sekolah Tanpa Koding ✅
++
++**Latar:** pengguna menjual SIAKAD sebagai template ke banyak sekolah (SD/SMP/SMA/SMK).
++Prioritas bergeser dari "sambungkan backend" → **"gampang di-branding & disetup ulang"**.
++
++### Yang dikerjakan
++1. **`src/config/school.ts` — sumber identitas tunggal + runtime override**
++   - `getSchoolIdentity()` = default + override localStorage (`siakad-school-identity`)
++   - `updateSchoolIdentity()` / `resetSchoolIdentity()` — langsung notify seluruh aplikasi
++   - `schoolConfig` lama dipertahankan (backward compat, dipakai FeedbackForm)
++2. **`src/hooks/useSchoolIdentity.ts`** — hook reaktif (ikut store version)
++3. **Branding reaktif**: Sidebar (nama+logo), ProgramFooter (nama/kontak), LoginPanel &
++   LoginPage (logo), judul browser dinamis di App (`document.title`)
++4. **Hardcode "SMA Negeri 1 Medan" dibersihkan** — SiakadSection, BukuTamuForm,
++   guestData, schoolData (tamu) kini interpolasi dari identitas
++5. **Panel Setup Sekolah** (menu admin → Sistem): form nama/singkatan/jenjang/tahun
++   ajaran/NPSN/telepon/domain email/alamat + **unggah logo** (max 300KB, preview) +
++   simpan/reset. Perubahan langsung berlaku, tanpa build ulang.
++
++### Test baru (+9)
++- `config/school.test.ts` (6): default, update parsial, reset, tolak field kosong,
++  aman dari data rusak, email dari domain
++- `TabSetupSekolah.test.tsx` (3 render): tampil form, simpan identitas, reset
++
++### Verifikasi
++- FE: 279 test (25 file) ✅ · lint 0 error ✅ · build ✅ · dev server semua modul 200 ✅
++
++### Catatan penting (dokumentasi untuk penjualan)
++- Setelan ini = identitas/branding. Isi konten (berita, sejarah, visi-misi, struktur)
++  tetap per-sekolah di file data masing-masing.
++- Perubahan jenjang penuh yang mengubah struktur konten (SD→SMK) tetap butuh build
++  ulang (ubah `jenjang` di `dataSekolah.ts`); setelan jenjang di panel untuk identitas.
++
+ *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
+diff --git a/src/App.tsx b/src/App.tsx
+index 63faa88..d57b717 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
+ import type { ComponentType } from 'react';
+ import { PageProps } from './types';
+ import { useAuth } from './context/AuthContext';
++import { useSchoolIdentity } from './hooks/useSchoolIdentity';
+ import { initializeData } from './data/services';
+ import LoginPage from './fitur/autentikasi/LoginPage';
+ import Sidebar from './layout/Sidebar';
+@@ -305,6 +306,12 @@ function AppContent() {
+ }
+ 
+ export default function App() {
++  const identity = useSchoolIdentity();
++
++  // Judul browser mengikuti identitas sekolah (dinamis, tanpa build ulang).
++  useEffect(() => {
++    document.title = `Portal SIAKAD │ ${identity.namaSekolah}`;
++  }, [identity.namaSekolah]);
+   useEffect(() => {
+     initializeData();
+   }, []);
+diff --git a/src/config/school.test.ts b/src/config/school.test.ts
+new file mode 100644
+index 0000000..70ab8e0
+--- /dev/null
++++ b/src/config/school.test.ts
+@@ -0,0 +1,58 @@
++/**
++ * Unit test identitas sekolah (config/school.ts) — fondasi template universal.
++ */
++import { describe, it, expect, beforeEach } from 'vitest';
++import {
++  getSchoolIdentity,
++  updateSchoolIdentity,
++  resetSchoolIdentity,
++  getSchoolEmail,
++  SCHOOL_IDENTITY_KEY,
++  DEFAULT_SCHOOL_IDENTITY,
++} from './school';
++
++describe('school identity (template universal)', () => {
++  beforeEach(() => {
++    localStorage.clear();
++  });
++
++  it('mengembalikan default saat belum ada override', () => {
++    const id = getSchoolIdentity();
++    expect(id.namaSekolah).toBe(DEFAULT_SCHOOL_IDENTITY.namaSekolah);
++    expect(id.jenjang).toBe('SMA');
++  });
++
++  it('updateSchoolIdentity menyimpan & menggabungkan sebagian field', () => {
++    const merged = updateSchoolIdentity({ namaSekolah: 'SMPN 5 Bandung', tahunAjaran: '2026/2027' });
++    expect(merged.namaSekolah).toBe('SMPN 5 Bandung');
++    expect(merged.tahunAjaran).toBe('2026/2027');
++    // field lain tetap default
++    expect(merged.telepon).toBe(DEFAULT_SCHOOL_IDENTITY.telepon);
++    // tersimpan di localStorage
++    expect(localStorage.getItem(SCHOOL_IDENTITY_KEY)).toContain('SMPN 5 Bandung');
++  });
++
++  it('resetSchoolIdentity menghapus override', () => {
++    updateSchoolIdentity({ namaSekolah: 'SDN 1 Medan' });
++    resetSchoolIdentity();
++    expect(getSchoolIdentity().namaSekolah).toBe(DEFAULT_SCHOOL_IDENTITY.namaSekolah);
++    expect(localStorage.getItem(SCHOOL_IDENTITY_KEY)).toBeNull();
++  });
++
++  it('abaikan field kosong saat update', () => {
++    const merged = updateSchoolIdentity({ namaSekolah: '   ', alamat: 'Jl. Baru No. 1' });
++    expect(merged.namaSekolah).toBe(DEFAULT_SCHOOL_IDENTITY.namaSekolah);
++    expect(merged.alamat).toBe('Jl. Baru No. 1');
++  });
++
++  it('aman dari data localStorage yang rusak', () => {
++    localStorage.setItem(SCHOOL_IDENTITY_KEY, '{not valid json');
++    const id = getSchoolIdentity();
++    expect(id.namaSekolah).toBe(DEFAULT_SCHOOL_IDENTITY.namaSekolah);
++  });
++
++  it('getSchoolEmail memakai domain dari identitas', () => {
++    updateSchoolIdentity({ emailDomain: 'smpn5bdg.sch.id' });
++    expect(getSchoolEmail(getSchoolIdentity())).toBe('info@smpn5bdg.sch.id');
++  });
++});
+diff --git a/src/config/school.ts b/src/config/school.ts
+index fbd3f78..341b1a4 100644
+--- a/src/config/school.ts
++++ b/src/config/school.ts
+@@ -1,3 +1,146 @@
++/**
++ * ============================================================================
++ * KONFIGURASI IDENTITAS SEKOLAH — SUMBER TUNGGAL (template universal)
++ * ============================================================================
++ *
++ * Tujuan: pemilik sekolah bisa mengganti identitas (nama, logo, kontak,
++ * jenjang, tahun ajaran) TANPA menyentuh kode — lewat Panel Setup Sekolah
++ * di menu admin. Perubahan tersimpan di localStorage dan langsung berlaku
++ * di seluruh aplikasi (Sidebar, Footer, Login, judul browser, dll).
++ *
++ * Alur:
++ *   DEFAULT_SCHOOL_IDENTITY  → nilai bawaan template (SMA Negeri 1 Medan)
++ *   getSchoolIdentity()      → gabungan default + override dari localStorage
++ *   updateSchoolIdentity()   → simpan override + beri tahu semua komponen
++ *   resetSchoolIdentity()    → kembalikan ke bawaan template
++ *
++ * Catatan penting untuk penjualan template:
++ *   - Setelan di sini hanya identitas/branding. Isi KONTEN (berita, sejarah,
++ *     visi-misi, struktur organisasi, dll) tetap diubah per-sekolah di file
++ *     data masing-masing (lihat README template).
++ *   - Perubahan JENJANG penuh (SD→SMP→SMA→SMK) yang mengubah struktur konten
++ *     membutuhkan build ulang (ubah `jenjang` di dataSekolah.ts). Setelan
++ *     jenjang di sini dipakai untuk identitas & label dinamis.
++ * ============================================================================
++ */
++import { notifyStoreUpdated } from '../data/store/core/db';
++
++export type JenjangSekolah = 'SD' | 'SMP' | 'SMA' | 'SMK';
++
++export interface SchoolIdentity {
++  /** Nama resmi sekolah, contoh: "SMA Negeri 1 Medan" */
++  namaSekolah: string;
++  /** Nama singkatan/umum, contoh: "SMAN 1 Medan" */
++  singkatan: string;
++  jenjang: JenjangSekolah;
++  /** Tahun ajaran berjalan, contoh: "2025/2026" */
++  tahunAjaran: string;
++  npsn: string;
++  alamat: string;
++  telepon: string;
++  /** Domain email sekolah, contoh: "sman1medan.sch.id" (email = info@domain) */
++  emailDomain: string;
++  /**
++   * Logo sekolah: path aset default (mis. "/images/logo/logo-sekolah.svg")
++   * atau dataURL hasil upload lewat Panel Setup Sekolah.
++   */
++  logo: string;
++}
++
++export const SCHOOL_IDENTITY_KEY = 'siakad-school-identity';
++
++/** Nilai bawaan template — ganti di sini untuk "default" versi Anda. */
++export const DEFAULT_SCHOOL_IDENTITY: SchoolIdentity = {
++  namaSekolah: 'SMA Negeri 1 Medan',
++  singkatan: 'SMAN 1 Medan',
++  jenjang: 'SMA',
++  tahunAjaran: '2025/2026',
++  npsn: '10210881',
++  alamat: 'Jl. Cik Ditiro No. 1, Madras Hulu, Kec. Medan Polonia, Kota Medan, Sumatera Utara 20152',
++  telepon: '(061) 4510803',
++  emailDomain: 'sman1medan.sch.id',
++  logo: `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`,
++};
++
++const LOGO_FALLBACK = `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`;
++
++function sanitize(override: Partial<SchoolIdentity>): Partial<SchoolIdentity> {
++  const out: Partial<SchoolIdentity> = {};
++  if (typeof override.namaSekolah === 'string' && override.namaSekolah.trim())
++    out.namaSekolah = override.namaSekolah.trim();
++  if (typeof override.singkatan === 'string' && override.singkatan.trim())
++    out.singkatan = override.singkatan.trim();
++  if (override.jenjang === 'SD' || override.jenjang === 'SMP' || override.jenjang === 'SMA' || override.jenjang === 'SMK')
++    out.jenjang = override.jenjang;
++  if (typeof override.tahunAjaran === 'string' && override.tahunAjaran.trim())
++    out.tahunAjaran = override.tahunAjaran.trim();
++  if (typeof override.npsn === 'string' && override.npsn.trim())
++    out.npsn = override.npsn.trim();
++  if (typeof override.alamat === 'string' && override.alamat.trim())
++    out.alamat = override.alamat.trim();
++  if (typeof override.telepon === 'string' && override.telepon.trim())
++    out.telepon = override.telepon.trim();
++  if (typeof override.emailDomain === 'string' && override.emailDomain.trim())
++    out.emailDomain = override.emailDomain.trim();
++  if (typeof override.logo === 'string' && override.logo.trim())
++    out.logo = override.logo.trim();
++  return out;
++}
++
++/** Baca identitas aktif = default + override localStorage (aman dari data rusak). */
++export function getSchoolIdentity(): SchoolIdentity {
++  const fallback = DEFAULT_SCHOOL_IDENTITY;
++  try {
++    const raw = localStorage.getItem(SCHOOL_IDENTITY_KEY);
++    if (!raw) return fallback;
++    const parsed = JSON.parse(raw) as Partial<SchoolIdentity>;
++    return { ...fallback, ...sanitize(parsed) };
++  } catch {
++    return fallback;
++  }
++}
++
++/** Simpan override identitas (sebagian atau seluruh field) + beri tahu komponen. */
++export function updateSchoolIdentity(patch: Partial<SchoolIdentity>): SchoolIdentity {
++  const current = getSchoolIdentity();
++  const merged = { ...current, ...sanitize(patch) };
++  try {
++    localStorage.setItem(SCHOOL_IDENTITY_KEY, JSON.stringify(merged));
++  } catch {
++    // Kuota penuh (mis. logo terlalu besar) — biarkan callback menangani error.
++    throw new Error('Gagal menyimpan: penyimpanan browser penuh. Coba logo yang lebih kecil.');
++  }
++  notifyStoreUpdated();
++  return merged;
++}
++
++/** Kembalikan identitas ke bawaan template. */
++export function resetSchoolIdentity(): SchoolIdentity {
++  try {
++    localStorage.removeItem(SCHOOL_IDENTITY_KEY);
++  } catch {
++    // abaikan
++  }
++  notifyStoreUpdated();
++  return DEFAULT_SCHOOL_IDENTITY;
++}
++
++/** Email instansi: info@{domain} — dipakai di kontak & footer. */
++export function getSchoolEmail(identity: SchoolIdentity): string {
++  return `info@${identity.emailDomain}`;
++}
++
++/** Nama sekolah huruf kapital — dipakai di judul/sidebar/footer. */
++export function getSchoolNameUppercase(identity: SchoolIdentity): string {
++  return identity.namaSekolah.toUpperCase();
++}
++
++/** ===== BACKWARD COMPAT: konfigurasi kontak lama =====
++ * Sebelumnya `src/config/school.ts` mengekspor `schoolConfig` statis.
++ * Dipertahankan agar pemakai lama (mis. FeedbackForm) tetap berfungsi.
++ * Untuk identitas DINAMIS (bisa diubah dari Panel Setup Sekolah), gunakan
++ * getSchoolIdentity() / useSchoolIdentity().
++ */
+ export const schoolConfig = {
+   name: 'Portal Sekolah',
+   contact: {
+@@ -16,4 +159,4 @@ export const schoolConfig = {
+   },
+ } as const;
+ 
+-export type SchoolConfig = typeof schoolConfig;
++export { LOGO_FALLBACK };
+diff --git a/src/fitur/admin/PanelAdminModal.tsx b/src/fitur/admin/PanelAdminModal.tsx
+index 72c0673..29fbc9e 100644
+--- a/src/fitur/admin/PanelAdminModal.tsx
++++ b/src/fitur/admin/PanelAdminModal.tsx
+@@ -24,6 +24,7 @@ import {
+   Printer,
+   Archive,
+   History,
++  Settings,
+ } from 'lucide-react';
+ import TabKelolaKelas from './components/TabKelolaKelas';
+ import TabTambahGuru from './components/TabTambahGuru';
+@@ -33,6 +34,7 @@ import TabTagihanSekolah from './components/TabTagihanSekolah';
+ import TabPengumumanAdmin from './components/TabPengumumanAdmin';
+ import TabAkunSiswa from './components/TabAkunSiswa';
+ import TabAkunOrangTua from './components/TabAkunOrangTua';
++import TabSetupSekolah from './components/TabSetupSekolah';
+ import TabKelolaRoster from './components/TabKelolaRoster';
+ import TabRiwayatLogin from './components/TabRiwayatLogin';
+ import TabMasterAkademik from './components/TabMasterAkademik';
+@@ -54,6 +56,7 @@ type TeacherAdminTab =
+   | 'pesan-masuk'
+   | 'akun-siswa'
+   | 'akun-orang-tua'
++  | 'setup-sekolah'
+   | 'kelola-roster'
+   | 'riwayat-login'
+   | 'ppdb-admin'
+@@ -88,6 +91,7 @@ const MENU_MASTER = [
+   { id: 'riwayat-login', label: 'Riwayat Login', icon: History },
+   { id: 'pesan-masuk', label: 'Pesan Masuk', icon: Mail },
+   { id: 'akun-orang-tua', label: 'Akun Orang Tua', icon: ShieldCheck },
++  { id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings },
+ ] as const;
+ 
+ const MENU_MASTER_GROUPS = [
+@@ -124,6 +128,10 @@ const MENU_MASTER_GROUPS = [
+       { id: 'akun-orang-tua', label: 'Akun Orang Tua', icon: ShieldCheck },
+     ],
+   },
++  {
++    title: 'Sistem',
++    items: [{ id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings }],
++  },
+ ] as const;
+ 
+ const MENU_PERPUS = [
+@@ -376,6 +384,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
+                 <AdminPanel onClose={() => setActiveTab('akun-siswa')} embedded />
+               )}
+               {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
++              {activeTab === 'setup-sekolah' && <TabSetupSekolah setNotice={handleNotice} />}
+ 
+               {/* Menu Perpustakaan */}
+               <Suspense
+diff --git a/src/fitur/admin/components/TabSetupSekolah.test.tsx b/src/fitur/admin/components/TabSetupSekolah.test.tsx
+new file mode 100644
+index 0000000..b1d2ffb
+--- /dev/null
++++ b/src/fitur/admin/components/TabSetupSekolah.test.tsx
+@@ -0,0 +1,44 @@
++import { describe, it, expect, beforeEach, vi } from 'vitest';
++import { render, screen, fireEvent } from '@testing-library/react';
++import TabSetupSekolah from './TabSetupSekolah';
++import { ToastProvider } from '../../../components/ui';
++import { getSchoolIdentity } from '../../../config/school';
++
++function renderTab() {
++  return render(
++    <ToastProvider>
++      <TabSetupSekolah />
++    </ToastProvider>
++  );
++}
++
++describe('TabSetupSekolah (template universal)', () => {
++  beforeEach(() => {
++    localStorage.clear();
++  });
++
++  it('menampilkan form identitas dengan nilai default', () => {
++    renderTab();
++    expect(screen.getByText('Nama Sekolah')).toBeTruthy();
++    expect(screen.getByText('Logo Sekolah')).toBeTruthy();
++    const nama = document.querySelector('input[placeholder="contoh: SMA Negeri 1 Medan"]') as HTMLInputElement;
++    expect(nama?.value).toBe('SMA Negeri 1 Medan');
++  });
++
++  it('menyimpan identitas baru ke localStorage', () => {
++    renderTab();
++    const nama = document.querySelector('input[placeholder="contoh: SMA Negeri 1 Medan"]') as HTMLInputElement;
++    fireEvent.change(nama, { target: { value: 'SMKN 2 Surabaya' } });
++    fireEvent.click(screen.getByText('Simpan Identitas Sekolah'));
++    expect(getSchoolIdentity().namaSekolah).toBe('SMKN 2 Surabaya');
++  });
++
++  it('reset mengembalikan ke bawaan', () => {
++    localStorage.setItem('siakad-school-identity', JSON.stringify({ namaSekolah: 'SMPN X' }));
++    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
++    renderTab();
++    fireEvent.click(screen.getByText('Reset ke Bawaan'));
++    expect(getSchoolIdentity().namaSekolah).toBe('SMA Negeri 1 Medan');
++    confirmSpy.mockRestore();
++  });
++});
+diff --git a/src/fitur/admin/components/TabSetupSekolah.tsx b/src/fitur/admin/components/TabSetupSekolah.tsx
+new file mode 100644
+index 0000000..abd4944
+--- /dev/null
++++ b/src/fitur/admin/components/TabSetupSekolah.tsx
+@@ -0,0 +1,286 @@
++/**
++ * TAB SETUP SEKOLAH — identitas sekolah tanpa menyentuh kode.
++ *
++ * Ini fitur kunci template universal: admin mengisi nama sekolah, logo,
++ * kontak, jenjang & tahun ajaran → tersimpan di localStorage → langsung
++ * berlaku di seluruh aplikasi (Sidebar, Footer, Login, judul browser,
++ * buku tamu, dll).
++ *
++ * Catatan:
++ *  - Perubahan di sini bersifat BRANDING/IDENTITAS. Isi konten (berita,
++ *    sejarah, visi-misi) tetap dikelola per-sekolah di file data.
++ *  - Perubahan jenjang penuh (SD→SMK) yang mengubah struktur konten
++ *    membutuhkan build ulang (ubah `jenjang` di dataSekolah.ts).
++ */
++import { useState } from 'react';
++import { Building2, ImagePlus, RotateCcw, Save, Info } from 'lucide-react';
++import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
++import { updateSchoolIdentity, resetSchoolIdentity, type JenjangSekolah } from '../../../config/school';
++import { useToast } from '../../../components/ui';
++
++const JENJANG_OPTIONS: Array<{ value: JenjangSekolah; label: string }> = [
++  { value: 'SD', label: 'SD — Sekolah Dasar' },
++  { value: 'SMP', label: 'SMP — Sekolah Menengah Pertama' },
++  { value: 'SMA', label: 'SMA — Sekolah Menengah Atas' },
++  { value: 'SMK', label: 'SMK — Sekolah Menengah Kejuruan' },
++];
++
++/** Maks ukuran logo yang diizinkan (300KB) — batas aman localStorage. */
++const MAX_LOGO_BYTES = 300 * 1024;
++
++interface TabSetupSekolahProps {
++  setNotice?: (message: string) => void;
++}
++
++export default function TabSetupSekolah({ setNotice }: TabSetupSekolahProps) {
++  const { showToast } = useToast();
++  const identity = useSchoolIdentity();
++
++  const [form, setForm] = useState({
++    namaSekolah: identity.namaSekolah,
++    singkatan: identity.singkatan,
++    jenjang: identity.jenjang,
++    tahunAjaran: identity.tahunAjaran,
++    npsn: identity.npsn,
++    alamat: identity.alamat,
++    telepon: identity.telepon,
++    emailDomain: identity.emailDomain,
++  });
++  const [logo, setLogo] = useState<string | null>(null); // dataURL baru (null = tidak diubah)
++  const [logoError, setLogoError] = useState('');
++
++  const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
++    setForm((f) => ({ ...f, [key]: value }));
++
++  const handleLogoFile = (file: File | undefined | null) => {
++    if (!file) return;
++    if (file.size > MAX_LOGO_BYTES) {
++      setLogoError('Logo terlalu besar. Maksimal 300KB (gunakan PNG/JPG kecil).');
++      return;
++    }
++    setLogoError('');
++    const reader = new FileReader();
++    reader.onload = () => setLogo(String(reader.result ?? ''));
++    reader.readAsDataURL(file);
++  };
++
++  const handleSave = () => {
++    try {
++      const merged = updateSchoolIdentity({
++        ...form,
++        ...(logo ? { logo } : {}),
++      });
++      setForm({
++        namaSekolah: merged.namaSekolah,
++        singkatan: merged.singkatan,
++        jenjang: merged.jenjang,
++        tahunAjaran: merged.tahunAjaran,
++        npsn: merged.npsn,
++        alamat: merged.alamat,
++        telepon: merged.telepon,
++        emailDomain: merged.emailDomain,
++      });
++      setLogo(null);
++      showToast('success', 'Identitas sekolah tersimpan & langsung berlaku.');
++      setNotice?.('Identitas sekolah berhasil diperbarui.');
++    } catch (err) {
++      showToast('error', err instanceof Error ? err.message : 'Gagal menyimpan identitas sekolah.');
++    }
++  };
++
++  const handleReset = () => {
++    if (!window.confirm('Kembalikan identitas ke bawaan template? Perubahan Anda akan hilang.')) return;
++    resetSchoolIdentity();
++    setForm({
++      namaSekolah: identity.namaSekolah,
++      singkatan: identity.singkatan,
++      jenjang: identity.jenjang,
++      tahunAjaran: identity.tahunAjaran,
++      npsn: identity.npsn,
++      alamat: identity.alamat,
++      telepon: identity.telepon,
++      emailDomain: identity.emailDomain,
++    });
++    setLogo(null);
++    showToast('success', 'Identitas dikembalikan ke bawaan template.');
++  };
++
++  const logoPreview = logo ?? identity.logo;
++
++  return (
++    <div className="mx-auto w-full max-w-2xl space-y-5 p-5">
++      {/* Info */}
++      <div className="flex items-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-[11px] leading-relaxed text-blue-900">
++        <Info className="mt-0.5 h-4 w-4 shrink-0" />
++        <p>
++          Ubah identitas sekolah di sini — <b>tanpa perlu menyentuh kode</b>. Perubahan langsung
++          berlaku di sidebar, halaman login, footer, judul browser, dan buku tamu. Simpan data
++          sekali, aplikasi siap dipakai sekolah lain.
++        </p>
++      </div>
++
++      {/* Logo */}
++      <div className="flex items-center gap-4 rounded-xl border-2 border-black bg-white p-4">
++        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-black bg-neutral-50 p-1">
++          {logoPreview.startsWith('data:') ? (
++            <img src={logoPreview} alt="Logo sekolah" className="h-full w-full object-contain" />
++          ) : (
++            <img
++              src={logoPreview}
++              alt="Logo sekolah"
++              className="h-full w-full object-contain"
++              loading="lazy"
++            />
++          )}
++        </div>
++        <div className="min-w-0 flex-1">
++          <p className="text-xs font-bold text-black uppercase">Logo Sekolah</p>
++          <p className="mt-0.5 text-[10px] text-neutral-500">
++            PNG/JPG maks. 300KB. Logo tersimpan di browser admin ini.
++          </p>
++          <label className="mt-2 inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black px-3 py-1.5 text-[11px] font-bold text-black transition-colors hover:bg-black hover:text-white">
++            <ImagePlus className="h-3.5 w-3.5" />
++            {logo ? 'Ganti Logo' : 'Unggah Logo'}
++            <input
++              type="file"
++              accept="image/png,image/jpeg,image/webp,image/svg+xml"
++              className="hidden"
++              onChange={(e) => {
++                handleLogoFile(e.target.files?.[0]);
++                e.target.value = '';
++              }}
++            />
++          </label>
++          {logoError && <p className="mt-1 text-[10px] font-bold text-red-600">{logoError}</p>}
++        </div>
++      </div>
++
++      {/* Form identitas */}
++      <div className="grid grid-cols-1 gap-4 rounded-xl border-2 border-black bg-white p-4 sm:grid-cols-2">
++        <Field label="Nama Sekolah" full>
++          <input
++            value={form.namaSekolah}
++            onChange={(e) => set('namaSekolah', e.target.value)}
++            placeholder="contoh: SMA Negeri 1 Medan"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="Singkatan / Nama Umum">
++          <input
++            value={form.singkatan}
++            onChange={(e) => set('singkatan', e.target.value)}
++            placeholder="contoh: SMAN 1 Medan"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="Jenjang">
++          <select
++            value={form.jenjang}
++            onChange={(e) => set('jenjang', e.target.value as JenjangSekolah)}
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          >
++            {JENJANG_OPTIONS.map((o) => (
++              <option key={o.value} value={o.value}>
++                {o.label}
++              </option>
++            ))}
++          </select>
++        </Field>
++
++        <Field label="Tahun Ajaran">
++          <input
++            value={form.tahunAjaran}
++            onChange={(e) => set('tahunAjaran', e.target.value)}
++            placeholder="contoh: 2026/2027"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="NPSN">
++          <input
++            value={form.npsn}
++            onChange={(e) => set('npsn', e.target.value)}
++            placeholder="8 digit NPSN"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="Telepon">
++          <input
++            value={form.telepon}
++            onChange={(e) => set('telepon', e.target.value)}
++            placeholder="contoh: (061) 4510803"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="Domain Email" full>
++          <input
++            value={form.emailDomain}
++            onChange={(e) => set('emailDomain', e.target.value)}
++            placeholder="contoh: sman1medan.sch.id (email: info@domain)"
++            className="w-full rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++
++        <Field label="Alamat" full>
++          <textarea
++            value={form.alamat}
++            onChange={(e) => set('alamat', e.target.value)}
++            rows={2}
++            placeholder="Alamat lengkap sekolah"
++            className="w-full resize-none rounded-md border border-black bg-white px-3 py-2 text-xs text-black outline-none"
++          />
++        </Field>
++      </div>
++
++      {/* Aksi */}
++      <div className="flex flex-wrap items-center justify-between gap-3">
++        <button
++          type="button"
++          onClick={handleReset}
++          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-[11px] font-bold text-black transition-colors hover:bg-neutral-100"
++        >
++          <RotateCcw className="h-3.5 w-3.5" /> Reset ke Bawaan
++        </button>
++        <button
++          type="button"
++          onClick={handleSave}
++          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-5 py-2 text-[11px] font-bold text-white transition-colors hover:bg-neutral-800"
++        >
++          <Save className="h-3.5 w-3.5" /> Simpan Identitas Sekolah
++        </button>
++      </div>
++
++      <div className="flex items-start gap-2 rounded-xl border-2 border-amber-200 bg-amber-50 p-3 text-[10px] leading-relaxed text-amber-900">
++        <Building2 className="mt-0.5 h-4 w-4 shrink-0" />
++        <p>
++          <b>Tips untuk penjualan template:</b> setelah menyimpan identitas sekolah pembeli,
++          lakukan <b>Reset Data Demo</b> (menu Data) agar data contoh guru/siswa tidak ikut
++          terbawa, lalu import data sekolah pembeli.
++        </p>
++      </div>
++    </div>
++  );
++}
++
++function Field({
++  label,
++  full = false,
++  children,
++}: {
++  label: string;
++  full?: boolean;
++  children: React.ReactNode;
++}) {
++  return (
++    <div className={full ? 'sm:col-span-2' : ''}>
++      <label className="mb-1 block text-[10px] font-bold tracking-wide text-neutral-600 uppercase">
++        {label}
++      </label>
++      {children}
++    </div>
++  );
++}
+diff --git a/src/fitur/autentikasi/DataLogingPage/LoginPanel.tsx b/src/fitur/autentikasi/DataLogingPage/LoginPanel.tsx
+index dfeabde..ef4f915 100644
+--- a/src/fitur/autentikasi/DataLogingPage/LoginPanel.tsx
++++ b/src/fitur/autentikasi/DataLogingPage/LoginPanel.tsx
+@@ -1,7 +1,8 @@
+ import React, { memo, useEffect, useRef } from 'react';
+ import { Eye, EyeOff, ChevronDown, X } from 'lucide-react';
+ import { LoginPanelProps } from './types';
+-import { LOGO_SMP, SCHOOL_CONFIG, Z_INDEX, VALID_ROLES, ROLE_CONFIG } from './constants';
++import { SCHOOL_CONFIG, Z_INDEX, VALID_ROLES, ROLE_CONFIG } from './constants';
++import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
+ import { isValidRole } from './utils';
+ import GoogleLoginButton from '../GoogleLoginButton';
+ 
+@@ -25,6 +26,7 @@ const LoginPanel = memo<LoginPanelProps>(
+     onGoogleLogin,
+     disabled = false,
+   }) => {
++    const identity = useSchoolIdentity();
+     const panelRef = useRef<HTMLDivElement>(null);
+     const config = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG] ?? ROLE_CONFIG.student;
+     const isBlocked = isLoading || disabled;
+@@ -86,7 +88,7 @@ const LoginPanel = memo<LoginPanelProps>(
+             {/* Header */}
+             <div className="flex flex-shrink-0 items-center justify-between px-8 pt-6">
+               <div className="flex items-center gap-4">
+-                <img src={LOGO_SMP} alt="Logo Sekolah" className="h-9 w-9 object-contain" />
++                <img src={identity.logo} alt="Logo Sekolah" className="h-9 w-9 object-contain" />
+                 <div>
+                   <p className="text-[9px] font-semibold tracking-[0.15em] text-slate-500 uppercase">
+                     {SCHOOL_CONFIG.systemTitle}
+diff --git a/src/fitur/autentikasi/LoginPage.tsx b/src/fitur/autentikasi/LoginPage.tsx
+index 218b8cb..6e03934 100644
+--- a/src/fitur/autentikasi/LoginPage.tsx
++++ b/src/fitur/autentikasi/LoginPage.tsx
+@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
+ import { UserRole } from '../../types';
+ import { logger } from '../../utils/logger';
+ import { ToastProvider } from '../../components/ui';
++import { useSchoolIdentity } from '../../hooks/useSchoolIdentity';
+ import { FeedbackButton } from '../halaman/feedback';
+ 
+ const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
+@@ -10,7 +11,6 @@ const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
+ import {
+   BACKGROUND_IMAGES,
+   MAIN_NAV,
+-  LOGO_SMP,
+   SCHOOL_CONFIG,
+   SLIDESHOW_INTERVAL_MS,
+   MAX_LOGIN_ATTEMPTS,
+@@ -30,6 +30,7 @@ const TutorialModal = lazy(() => import('./TutorialModal'));
+ const ExpectationModal = lazy(() => import('../halaman/ExpectationModal'));
+ 
+ export default function LoginPage() {
++  const identity = useSchoolIdentity();
+   const { login, loginGoogle } = useAuth();
+ 
+   const isMounted = useRef(true);
+@@ -265,7 +266,7 @@ export default function LoginPage() {
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                 <img
+-                  src={LOGO_SMP}
++                  src={identity.logo}
+                   alt="Logo Sekolah"
+                   className="h-11 w-11 object-contain drop-shadow-lg"
+                 />
+diff --git a/src/fitur/halaman/pages/DataBeranda/SiakadSection.tsx b/src/fitur/halaman/pages/DataBeranda/SiakadSection.tsx
+index 346c515..3e3fc9f 100644
+--- a/src/fitur/halaman/pages/DataBeranda/SiakadSection.tsx
++++ b/src/fitur/halaman/pages/DataBeranda/SiakadSection.tsx
+@@ -1,4 +1,5 @@
+ import React from 'react';
++import { useSchoolIdentity } from '../../../../hooks/useSchoolIdentity';
+ 
+ interface SiakadSectionProps {
+   imageSrc?: string;
+@@ -9,6 +10,7 @@ export default function SiakadSection({
+   imageSrc,
+   imageAlt = 'Ilustrasi SIAKAD',
+ }: SiakadSectionProps) {
++  const identity = useSchoolIdentity();
+   return (
+     /* 
+       1. '-mt-36' & 'z-20' menjaga agar background biru tetap naik ke atas menimpa section banner.
+@@ -41,7 +43,7 @@ export default function SiakadSection({
+               aplikasi berbasis web yang dirancang untuk melakukan proses pengelolaan data akademik
+               dan data terkait lainnya, sehingga seluruh kegiatan akademik dapat terkelola menjadi
+               informasi yang bermanfaat dalam pengelolaan manajemen sekolah, pengambilan keputusan,
+-              serta pelaporan di lingkungan SMA Negeri 1 Medan yang melibatkan siswa, guru, dan
++              serta pelaporan di lingkungan {identity.namaSekolah} yang melibatkan siswa, guru, dan
+               petugas administrasi akademik.
+             </p>
+             <p className="mb-4 text-justify">
+diff --git a/src/fitur/tamu/components/BukuTamuForm.tsx b/src/fitur/tamu/components/BukuTamuForm.tsx
+index 2f9464b..8e979a5 100644
+--- a/src/fitur/tamu/components/BukuTamuForm.tsx
++++ b/src/fitur/tamu/components/BukuTamuForm.tsx
+@@ -1,4 +1,5 @@
+ import { useState } from 'react';
++import { useSchoolIdentity } from '../../../hooks/useSchoolIdentity';
+ import {
+   User,
+   Building2,
+@@ -20,6 +21,7 @@ interface BukuTamuFormProps {
+ }
+ 
+ export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
++  const identity = useSchoolIdentity();
+   const [formData, setFormData] = useState({
+     nama: '',
+     instansi: '',
+@@ -101,7 +103,7 @@ export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
+         </div>
+         <h3 className="font-serif text-xl font-bold text-slate-950">Terima Kasih!</h3>
+         <p className="max-w-sm text-xs font-semibold text-slate-600">
+-          Pesan Anda telah berhasil tercatat dalam buku tamu SMA Negeri 1 Medan. Kami menghargai
++          Pesan Anda telah berhasil tercatat dalam buku tamu {identity.namaSekolah}. Kami menghargai
+           kunjungan dan masukan Anda.
+         </p>
+         <div className="flex gap-3 pt-2">
+@@ -253,7 +255,7 @@ export default function BukuTamuForm({ onSubmit, onClose }: BukuTamuFormProps) {
+         <textarea
+           value={formData.pesan}
+           onChange={(e) => handleChange('pesan', e.target.value)}
+-          placeholder="Tuliskan pesan, kesan, atau saran Anda untuk SMA Negeri 1 Medan..."
++          placeholder="Tuliskan pesan, kesan, atau saran Anda untuk {identity.namaSekolah}..."
+           rows={4}
+           className="w-full resize-none rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 shadow-2xs transition-colors outline-none hover:border-slate-950 focus:border-slate-950"
+         />
+diff --git a/src/fitur/tamu/data/guestData.ts b/src/fitur/tamu/data/guestData.ts
+index 63f9946..060f64d 100644
+--- a/src/fitur/tamu/data/guestData.ts
++++ b/src/fitur/tamu/data/guestData.ts
+@@ -1,3 +1,4 @@
++import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
+ import { GuestEntry } from '../types';
+ 
+ export const initialGuestEntries: GuestEntry[] = [
+@@ -9,7 +10,7 @@ export const initialGuestEntries: GuestEntry[] = [
+     noHp: '081234567890',
+     tujuan: 'Kunjungan Dinas',
+     pesan:
+-      'Senang sekali bisa mengunjungi SMAN 1 Medan. Fasilitas dan kualitas pendidikan sangat baik. Semoga terus menjadi sekolah unggulan di Sumatera Utara.',
++      `Senang sekali bisa mengunjungi ${namaSekolah}. Fasilitas dan kualitas pendidikan sangat baik. Semoga terus menjadi sekolah unggulan di Sumatera Utara.`,
+     tanggal: '2026-01-15',
+     waktu: '09:30',
+     rating: 5,
+@@ -35,7 +36,7 @@ export const initialGuestEntries: GuestEntry[] = [
+     noHp: '082345678901',
+     tujuan: 'Kerjasama Akademik',
+     pesan:
+-      'Kunjungan dalam rangka membahas program kerjasama akademik antara USU dan SMAN 1 Medan. Sangat antusias dengan potensi kolaborasi ke depan.',
++      `Kunjungan dalam rangka membahas program kerjasama akademik antara USU dan ${namaSekolah}. Sangat antusias dengan potensi kolaborasi ke depan.`,
+     tanggal: '2026-01-22',
+     waktu: '13:00',
+     rating: 5,
+@@ -61,7 +62,7 @@ export const initialGuestEntries: GuestEntry[] = [
+     noHp: '089876543210',
+     tujuan: 'Kunjungan Alumni',
+     pesan:
+-      'Nostalgia mengunjungi almamater tercinta. Banyak perubahan positif yang saya lihat. Bangga menjadi alumni SMAN 1 Medan!',
++      `Nostalgia mengunjungi almamater tercinta. Banyak perubahan positif yang saya lihat. Bangga menjadi alumni ${namaSekolah}!`,
+     tanggal: '2026-02-10',
+     waktu: '11:00',
+     rating: 5,
+diff --git a/src/fitur/tamu/data/schoolData.ts b/src/fitur/tamu/data/schoolData.ts
+index 1b2f4e4..acaf75c 100644
+--- a/src/fitur/tamu/data/schoolData.ts
++++ b/src/fitur/tamu/data/schoolData.ts
+@@ -1,3 +1,4 @@
++import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
+ // NOTE: Profil sekolah, identitas, dan statistik dikelola di satu pintu:
+ // `src/fitur/halaman/components/Profile/dataSekolah.ts`
+ // (dipakai oleh SekilasSekolah, GtkSiswaPage, dan halaman tamu TentangSekolah)
+@@ -126,7 +127,7 @@ export const prestasi = [
+   {
+     id: 2,
+     judul: 'Juara 2 Lomba Cerdas Cermat Tingkat Kabupaten',
+-    siswa: 'Tim LCC SMA Negeri 1 Medan',
++    siswa: `Tim LCC ${namaSekolah}`,
+     tahun: 2025,
+     tingkat: 'Kabupaten',
+     kategori: 'Akademik',
+@@ -166,7 +167,7 @@ export const prestasi = [
+   {
+     id: 7,
+     judul: 'Sekolah Adiwiyata Tingkat Nasional',
+-    siswa: 'SMA Negeri 1 Medan',
++    siswa: `${namaSekolah}`,
+     tahun: 2024,
+     tingkat: 'Nasional',
+     kategori: 'Lingkungan',
+@@ -227,7 +228,7 @@ export const ekstrakurikuler = [
+ export const beritaList = [
+   {
+     id: 1,
+-    judul: 'Siswa SMA Negeri 1 Medan Raih Juara 1 OSN Matematika',
++    judul: `Siswa ${namaSekolah} Raih Juara 1 OSN Matematika`,
+     tanggal: '2025-01-20',
+     kategori: 'Prestasi',
+     ringkasan:
+@@ -258,7 +259,7 @@ export const beritaList = [
+     tanggal: '2024-11-25',
+     kategori: 'Kegiatan',
+     ringkasan:
+-      'Seluruh civitas akademika SMA Negeri 1 Medan memperingati Hari Guru Nasional dengan berbagai kegiatan penuh makna.',
++      `Seluruh civitas akademika ${namaSekolah} memperingati Hari Guru Nasional dengan berbagai kegiatan penuh makna.`,
+     gambar: '/images/berita/hariguru.jpg',
+   },
+   {
+@@ -314,15 +315,15 @@ export const ppdbInfo = {
+ export const faqList = [
+   {
+     id: 1,
+-    pertanyaan: 'Bagaimana cara mendaftar di SMA Negeri 1 Medan?',
++    pertanyaan: `Bagaimana cara mendaftar di ${namaSekolah}?`,
+     jawaban:
+       'Pendaftaran dilakukan secara online melalui website resmi PPDB. Calon siswa perlu mengisi formulir pendaftaran dan mengunggah dokumen persyaratan yang diminta. Informasi lengkap dapat dilihat di menu Info PPDB.',
+   },
+   {
+     id: 2,
+-    pertanyaan: 'Berapa biaya pendidikan di SMA Negeri 1 Medan?',
++    pertanyaan: `Berapa biaya pendidikan di ${namaSekolah}?`,
+     jawaban:
+-      'Sebagai sekolah negeri, SMA Negeri 1 Medan tidak memungut biaya pendaftaran. SPP bulanan sebesar Rp 150.000. Untuk siswa dari keluarga kurang mampu, tersedia program beasiswa dan keringanan biaya.',
++      `Sebagai sekolah negeri, ${namaSekolah} tidak memungut biaya pendaftaran. SPP bulanan sebesar Rp 150.000. Untuk siswa dari keluarga kurang mampu, tersedia program beasiswa dan keringanan biaya.`,
+   },
+   {
+     id: 3,
+@@ -338,7 +339,7 @@ export const faqList = [
+   },
+   {
+     id: 5,
+-    pertanyaan: 'Bagaimana jam belajar di SMA Negeri 1 Medan?',
++    pertanyaan: `Bagaimana jam belajar di ${namaSekolah}?`,
+     jawaban:
+       'Kegiatan belajar mengajar berlangsung dari Senin-Jumat pukul 07:00-15:00 WIB. Hari Sabtu digunakan untuk kegiatan ekstrakurikuler dan pengembangan diri.',
+   },
+diff --git a/src/hooks/useSchoolIdentity.ts b/src/hooks/useSchoolIdentity.ts
+new file mode 100644
+index 0000000..f0ae76e
+--- /dev/null
++++ b/src/hooks/useSchoolIdentity.ts
+@@ -0,0 +1,13 @@
++/**
++ * Hook reaktif untuk identitas sekolah.
++ * Komponen yang memakai hook ini otomatis re-render saat identitas diubah
++ * lewat Panel Setup Sekolah (via store version).
++ */
++import { useSyncExternalStore } from 'react';
++import { store } from '../data/store/core/db';
++import { getSchoolIdentity, type SchoolIdentity } from '../config/school';
++
++export function useSchoolIdentity(): SchoolIdentity {
++  useSyncExternalStore(store.subscribe, store.getSnapshot);
++  return getSchoolIdentity();
++}
+diff --git a/src/layout/ProgramFooter.tsx b/src/layout/ProgramFooter.tsx
+index 7f67cdb..429c2d1 100644
+--- a/src/layout/ProgramFooter.tsx
++++ b/src/layout/ProgramFooter.tsx
+@@ -8,6 +8,8 @@ import {
+   namaJenjang,
+   jenjang,
+ } from '../fitur/halaman/components/Profile/dataSekolah';
++import { useSchoolIdentity } from '../hooks/useSchoolIdentity';
++import { getSchoolEmail } from '../config/school';
+ 
+ interface FooterProps {
+   onNavigate?: (page: NavItem) => void;
+@@ -44,6 +46,11 @@ const NEWS_TITLES: string[] = [
+ ];
+ 
+ export default function ProgramFooter({ onNavigate }: FooterProps) {
++  const identity = useSchoolIdentity();
++  const nameU = identity.namaSekolah.toUpperCase();
++  const identAlamat = identity.alamat;
++  const identTelp = identity.telepon;
++  const identEmail = getSchoolEmail(identity);
+   const bottomNavLinks: BottomNavLink[] = [
+     { label: 'Beranda', menu: 'Beranda' as NavItem },
+     { label: 'Program Keahlian', menu: 'Program Keahlian' as NavItem },
+@@ -99,7 +106,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
+             Social Media Kami
+           </h4>
+           <p className="mb-3 text-[11px] text-gray-300">
+-            Ayo follow dan ikuti informasi seputar kegiatan {namaSekolahUppercase} di media sosial
++            Ayo follow dan ikuti informasi seputar kegiatan {nameU} di media sosial
+             kami.
+           </p>
+           <ul className="space-y-2 text-[11px] text-amber-300">
+@@ -125,18 +132,18 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
+         {/* Tentang */}
+         <div>
+           <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold text-white uppercase">
+-            Tentang {namaSekolahUppercase}
++            Tentang {nameU}
+           </h4>
+           <p className="text-justify text-[11px] leading-relaxed text-gray-300">
+-            {namaSekolahUppercase} merupakan salah satu lembaga pendidikan{' '}
++            {nameU} merupakan salah satu lembaga pendidikan{' '}
+             {namaJenjang[jenjang].toLowerCase()} negeri yang berkomitmen menghasilkan lulusan
+             unggul, berintegritas, dan berdaya saing tinggi melalui penguatan karakter serta
+             implementasi teknologi digital.
+           </p>
+           <p className="mt-3 space-y-1 text-[11px] leading-relaxed text-gray-300">
+-            <span className="block">{alamatLengkap}</span>
+-            <span className="block">Telepon: {telepon}</span>
+-            <span className="block">Email: {email}</span>
++            <span className="block">{identAlamat}</span>
++            <span className="block">Telepon: {identTelp}</span>
++            <span className="block">Email: {identEmail}</span>
+           </p>
+         </div>
+ 
+@@ -193,7 +200,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
+             </span>
+           ))}
+         </div>
+-        <p>Copyright All Rights Reserved TIM ICT 2017 - 2026, {namaSekolahUppercase}</p>
++        <p>Copyright All Rights Reserved TIM ICT 2017 - 2026, {nameU}</p>
+         <p className="text-[10px] text-blue-200/60">Proudly powered by React & Tailwind CSS</p>
+       </div>
+     </footer>
+diff --git a/src/layout/Sidebar.tsx b/src/layout/Sidebar.tsx
+index 81e6392..6b3445f 100644
+--- a/src/layout/Sidebar.tsx
++++ b/src/layout/Sidebar.tsx
+@@ -1,6 +1,6 @@
+ import { useAuth } from '../context/AuthContext';
+ import { useNotifications } from '../fitur/bersama/NotificationProvider';
+-import { namaSekolahUppercase } from '../fitur/halaman/components/Profile/dataSekolah';
++import { useSchoolIdentity } from '../hooks/useSchoolIdentity';
+ import NotificationBadge from '../fitur/bersama/NotificationBadge';
+ import NotificationDropdown from '../fitur/bersama/NotificationDropdown';
+ import {
+@@ -127,6 +127,7 @@ const Sidebar = memo(function Sidebar({
+   onToggleCollapse: setSidebarCollapsed,
+ }: SidebarProps) {
+   const { user, logout } = useAuth();
++  const identity = useSchoolIdentity();
+   const { counts, markRead } = useNotifications();
+   const [mobileOpen, setMobileOpen] = useState(false);
+   const [notificationOpen, setNotificationOpen] = useState(false);
+@@ -431,8 +432,8 @@ const Sidebar = memo(function Sidebar({
+               <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-600 bg-slate-800 p-1">
+                 <img
+                   loading="lazy"
+-                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
+-                  alt={`Logo ${namaSekolahUppercase}`}
++                  src={identity.logo}
++                  alt={`Logo ${identity.namaSekolah}`}
+                   className="h-full w-full object-contain"
+                 />
+               </div>
+@@ -441,7 +442,7 @@ const Sidebar = memo(function Sidebar({
+                   PORTAL SISWA
+                 </h1>
+                 <p className="m-0 p-0 text-[10px] leading-tight text-slate-400">
+-                  {namaSekolahUppercase}
++                  {identity.namaSekolah.toUpperCase()}
+                 </p>
+               </div>
+             </div>
+-- 
+2.47.3
+

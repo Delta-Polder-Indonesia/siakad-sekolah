@@ -30,7 +30,7 @@ export default function Berita() {
       case 'Prestasi':
         return 'bg-amber-100 text-amber-700';
       case 'Kegiatan':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-blue-100 text-black';
       case 'Akademik':
         return 'bg-emerald-100 text-emerald-700';
       case 'PPDB':

@@ -163,7 +163,7 @@ export default function RapotSiswa() {
             <select
               value={tahunAjaran}
               onChange={(e) => setTahunAjaran(e.target.value)}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors outline-none hover:bg-neutral-100 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors outline-none hover:bg-neutral-100 focus:border-black"
             >
               {tahunAjaranList.map((ta) => (
                 <option key={ta} value={ta}>
@@ -180,7 +180,7 @@ export default function RapotSiswa() {
             <select
               value={semester}
               onChange={(e) => setSemester(e.target.value as 'ganjil' | 'genap')}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors outline-none hover:bg-neutral-100 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors outline-none hover:bg-neutral-100 focus:border-black"
             >
               <option value="ganjil">Ganjil</option>
               <option value="genap">Genap</option>
@@ -196,7 +196,7 @@ export default function RapotSiswa() {
               onClick={() =>
                 exportRapotPdf(nilaiRapot, student?.name || '', className, tahunAjaran, semester)
               }
-              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               <Download className="h-3.5 w-3.5" />
               <span>Export PDF</span>
@@ -211,7 +211,7 @@ export default function RapotSiswa() {
                   `Rapot_${(student?.name || 'siswa').replace(/\s+/g, '_')}_${tahunAjaran}_${semester}.csv`
                 )
               }
-              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               <Download className="h-3.5 w-3.5" />
               <span>CSV</span>
@@ -221,7 +221,7 @@ export default function RapotSiswa() {
             <button
               type="button"
               onClick={handleCetakRapot}
-              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               <Download className="h-3.5 w-3.5" />
               <span>Cetak KHS</span>
@@ -241,7 +241,7 @@ export default function RapotSiswa() {
       ) : (
         <div className="overflow-hidden rounded-md border-2 border-black bg-white">
           {/* Header Biru Khas Portal */}
-          <div className="flex flex-col gap-2 border-b-2 border-black bg-blue-600 p-3 text-white md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 border-b-2 border-black bg-black p-3 text-white md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xs font-bold tracking-wide text-white uppercase">
                 PORTAL MAHASISWA UNPAB
@@ -251,7 +251,7 @@ export default function RapotSiswa() {
               </p>
             </div>
 
-            <div className="flex max-w-full items-center gap-2 rounded-md border-2 border-white bg-blue-600 px-2.5 py-1 text-xs">
+            <div className="flex max-w-full items-center gap-2 rounded-md border-2 border-white bg-black px-2.5 py-1 text-xs">
               {student?.avatar ? (
                 <img
                   src={student.avatar}
@@ -352,7 +352,7 @@ export default function RapotSiswa() {
                       <td className="border-r-2 border-black px-1.5 py-1.5 text-center text-xs font-bold text-black">
                         KKNI
                       </td>
-                      <td className="border-r-2 border-black px-1.5 py-1.5 text-center font-bold text-blue-600">
+                      <td className="border-r-2 border-black px-1.5 py-1.5 text-center font-bold text-black">
                         {item.predikat}
                       </td>
                       <td className="border-r-2 border-black px-1.5 py-1.5 text-center font-mono font-bold text-black">
@@ -389,7 +389,7 @@ export default function RapotSiswa() {
             <span>|</span>
             <span>
               IP Semester :{' '}
-              <span className="font-mono font-extrabold text-blue-600">{stats.ipSemester}</span>
+              <span className="font-mono font-extrabold text-black">{stats.ipSemester}</span>
             </span>
             <span>|</span>
             <span>

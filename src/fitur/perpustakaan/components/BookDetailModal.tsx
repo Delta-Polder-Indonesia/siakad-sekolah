@@ -190,7 +190,7 @@ export default function BookDetailModal({
                 <span className="rounded-lg bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700">
                   {book.category}
                 </span>
-                <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-black">
                   Rak {book.rack}
                 </span>
                 <span

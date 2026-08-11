@@ -70,7 +70,7 @@ export function BookAutocomplete({
           onChange={(e) => handleSearchChange(e.target.value)}
           onFocus={() => setShowDropdown(true)}
           placeholder={placeholder}
-          className={`w-full rounded-md border-2 bg-white py-2 pr-8 pl-9 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600 ${
+          className={`w-full rounded-md border-2 bg-white py-2 pr-8 pl-9 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50 ${
             selectedId ? 'border-emerald-600' : 'border-black'
           }`}
         />

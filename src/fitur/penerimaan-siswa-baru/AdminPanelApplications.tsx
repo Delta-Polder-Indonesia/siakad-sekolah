@@ -74,8 +74,8 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
               className={cn(
                 'text-[11px] font-bold transition-colors',
                 !currentFolder
-                  ? 'border-b border-black text-black hover:border-blue-600 hover:text-blue-600'
-                  : 'text-neutral-400 hover:text-blue-600'
+                  ? 'border-b border-black text-black hover:border-black hover:bg-neutral-100'
+                  : 'text-neutral-400 hover:text-black'
               )}
             >
               My Files
@@ -98,7 +98,7 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
                 type="button"
                 key={jenjang}
                 onClick={() => onOpenFolder(jenjang)}
-                className="group inline-flex items-center gap-1.5 rounded-md border border-black bg-neutral-50 px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600"
+                className="group inline-flex items-center gap-1.5 rounded-md border border-black bg-neutral-50 px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black"
               >
                 <Folder className="h-3 w-3 text-neutral-400" fill="currentColor" />
                 <span>{jenjang}</span>
@@ -111,13 +111,13 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
         )}
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex rounded-md border border-black p-0.5 transition-colors hover:border-blue-600">
+          <div className="flex rounded-md border border-black p-0.5 transition-colors hover:border-black">
             <button
               type="button"
               onClick={() => onViewModeChange('list')}
               className={cn(
                 'rounded p-1 transition-colors',
-                viewMode === 'list' ? 'bg-black text-white' : 'text-black hover:text-blue-600'
+                viewMode === 'list' ? 'bg-black text-white' : 'text-black hover:text-black'
               )}
             >
               <List className="h-3.5 w-3.5" />
@@ -127,7 +127,7 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
               onClick={() => onViewModeChange('grid')}
               className={cn(
                 'rounded p-1 transition-colors',
-                viewMode === 'grid' ? 'bg-black text-white' : 'text-black hover:text-blue-600'
+                viewMode === 'grid' ? 'bg-black text-white' : 'text-black hover:text-black'
               )}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
@@ -136,7 +136,7 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
           <button
             type="button"
             onClick={onDownloadAll}
-            className="inline-flex items-center gap-1.5 rounded-md border border-black bg-white px-3 py-1.5 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+            className="inline-flex items-center gap-1.5 rounded-md border border-black bg-white px-3 py-1.5 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
           >
             <DownloadIcon className="h-3.5 w-3.5" />
             Download Semua
@@ -187,7 +187,7 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
                             : item.status === 'REJECTED'
                               ? 'border-red-600 bg-red-50 text-red-600'
                               : item.status === 'VERIFIED'
-                                ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                ? 'border-black bg-neutral-100 text-black'
                                 : 'border-amber-600 bg-amber-50 text-amber-600'
                         )}
                       >
@@ -267,7 +267,7 @@ export default function AdminPanelApplications(props: AdminPanelApplicationsProp
                         : item.status === 'REJECTED'
                           ? 'bg-red-100 text-red-700'
                           : item.status === 'VERIFIED'
-                            ? 'bg-blue-100 text-blue-700'
+                            ? 'bg-blue-100 text-black'
                             : 'bg-amber-100 text-amber-700'
                     )}
                   >

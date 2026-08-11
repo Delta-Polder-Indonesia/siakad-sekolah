@@ -1,0 +1,34 @@
+From 33c675cb15b3acb1166d63c7e9a78e8a3aafe503 Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 06:47:07 +0000
+Subject: [PATCH 5/7] docs: perbarui laporan review (section 13 - dokumentasi
+ penjualan)
+
+
+diff --git a/REVIEW_KODE.md b/REVIEW_KODE.md
+index 0a4fb95..d148520 100644
+--- a/REVIEW_KODE.md
++++ b/REVIEW_KODE.md
+@@ -467,4 +467,19 @@ impor data lama, tanpa input manual.
+ ### Verifikasi
+ - FE: 288 test (27 file) ✅ · lint 0 error ✅ · build ✅
+ 
++---
++
++## 13. Dokumentasi Penjualan (README + 2 Panduan) ✅
++
++Lengkap untuk menawarkan produk ke sekolah:
++
++- `dokumentasi/PANDUAN_SETUP_SEKOLAH.md` — untuk admin sekolah (pembeli):
++  setup identitas, kelola data, akun & login, cek cepat. Tanpa koding.
++- `dokumentasi/PANDUAN_PENYESUAIAN_KONTEN.md` — untuk tim teknis: peta file
++  konten per halaman publik, jenjang, tema, deploy (GH Pages/Netlify/Vercel),
++  mode Standar vs Cloud, checklist serah terima.
++- `README.md` — judul jadi "Template Portal Sekolah (SD/SMP/SMA/SMK)" +
++  tabel dokumentasi & fitur template universal.
++- (Sebelumnya) `PANDUAN_PERSIAPAN_SEKOLAH.md` — formulir data calon pembeli.
++
+ *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
+-- 
+2.47.3
+

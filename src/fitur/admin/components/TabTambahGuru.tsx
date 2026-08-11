@@ -122,7 +122,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
                   setShowConfirm(false);
                 }}
                 placeholder="Contoh: Budi Santoso"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -139,7 +139,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
                   setShowConfirm(false);
                 }}
                 placeholder="Masukkan NIP"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -157,7 +157,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
                   setShowConfirm(false);
                 }}
                 placeholder="guru@sekolah.sch.id"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -175,7 +175,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
                   setShowConfirm(false);
                 }}
                 placeholder="Minimal 8 karakter"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -192,7 +192,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
                   setShowConfirm(false);
                 }}
                 placeholder="Contoh: Bahasa Indonesia"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
           </div>
@@ -283,13 +283,13 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
               <div className="flex justify-end gap-1.5 text-[10px]">
                 <button type="button"
                   onClick={() => setShowConfirm(false)}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   Batal
                 </button>
                 <button type="button"
                   onClick={handleExecuteSimpan}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   Ya, Tambahkan
                 </button>
@@ -303,7 +303,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
               showConfirm
                 ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                : 'bg-white text-black hover:border-black hover:bg-neutral-100'
             }`}
             disabled={showConfirm}
           >

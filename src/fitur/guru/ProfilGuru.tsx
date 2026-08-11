@@ -193,7 +193,7 @@ export default function TeacherProfilePage() {
             className={`inline-flex cursor-pointer items-center justify-center gap-2 self-start rounded-md border-2 px-4 py-2 text-xs font-bold transition-colors ${
               isUploadingAvatar
                 ? 'cursor-not-allowed border-black bg-neutral-100 text-black/50'
-                : 'border-black bg-white text-black hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600'
+                : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100 hover:text-black'
             } sm:self-end`}
           >
             {isUploadingAvatar ? (
@@ -305,7 +305,7 @@ export default function TeacherProfilePage() {
                   setFormData((prev) => ({ ...prev, name: e.target.value }));
                   setIsDirty(true);
                 }}
-                className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 placeholder="Masukkan nama lengkap"
               />
             </div>
@@ -323,7 +323,7 @@ export default function TeacherProfilePage() {
                     setIsDirty(true);
                   }}
                   placeholder="nama@domain.com"
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
               <div>
@@ -338,7 +338,7 @@ export default function TeacherProfilePage() {
                     setIsDirty(true);
                   }}
                   placeholder="08xxxxxxxxxx"
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function TeacherProfilePage() {
                     setIsDirty(true);
                   }}
                   placeholder="08xxxxxxxxxx"
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
               <div>
@@ -371,7 +371,7 @@ export default function TeacherProfilePage() {
                     setIsDirty(true);
                   }}
                   placeholder="Matematika, Bahasa Indonesia, dll"
-                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
             </div>
@@ -388,7 +388,7 @@ export default function TeacherProfilePage() {
                   setIsDirty(true);
                 }}
                 placeholder="Tuliskan alamat domisili..."
-                className="w-full resize-none rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full resize-none rounded-md border-2 border-black bg-white px-3.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function TeacherProfilePage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
               >
                 Batalkan
               </button>

@@ -83,7 +83,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
               setLocalNotice(null);
               setShowConfirm(false);
             }}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           />
         </div>
 
@@ -102,7 +102,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
               setLocalNotice(null);
               setShowConfirm(false);
             }}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           />
         </div>
 
@@ -121,7 +121,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
               setLocalNotice(null);
               setShowConfirm(false);
             }}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           />
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
               showConfirm
                 ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                : 'bg-white text-black hover:border-black hover:bg-neutral-100'
             }`}
             disabled={showConfirm}
           >

@@ -73,7 +73,7 @@ export default function AturPengumumanGuru() {
               id="target-kelas-select"
               value={selectedClassId}
               onChange={(e) => setSelectedClassId(e.target.value)}
-              className="mt-0.5 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="mt-0.5 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {teacherClasses.map((cls) => (
                 <option key={cls.id} value={cls.id} className="font-bold text-black">
@@ -112,7 +112,7 @@ export default function AturPengumumanGuru() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ketik topik maklumat utama..."
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -128,7 +128,7 @@ export default function AturPengumumanGuru() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Tulis deskripsi atau instruksi formal kelas di sini..."
-              className="field-sizing-content h-auto min-h-[120px] w-full resize-y overflow-hidden rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs leading-4 font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="field-sizing-content h-auto min-h-[120px] w-full resize-y overflow-hidden rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs leading-4 font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 

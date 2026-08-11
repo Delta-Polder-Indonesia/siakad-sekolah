@@ -219,7 +219,7 @@ export default function ManajemenEkskul({ onNavigate }: { onNavigate?: (page: st
   };
 
   const inputCls =
-    'w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-blue-600';
+    'w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-black';
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4 bg-white p-3 text-black antialiased selection:bg-neutral-200">
@@ -386,7 +386,7 @@ export default function ManajemenEkskul({ onNavigate }: { onNavigate?: (page: st
 
           {feedback && (
             <p
-              className={`font-mono text-xs font-bold ${feedback.startsWith('Berhasil') ? 'text-blue-600' : 'text-black'}`}
+              className={`font-mono text-xs font-bold ${feedback.startsWith('Berhasil') ? 'text-black' : 'text-black'}`}
             >
               {feedback}
             </p>
@@ -548,7 +548,7 @@ export default function ManajemenEkskul({ onNavigate }: { onNavigate?: (page: st
 
           {feedbackAnggota && (
             <p
-              className={`font-mono text-xs font-bold ${feedbackAnggota.startsWith('Berhasil') ? 'text-blue-600' : 'text-black'}`}
+              className={`font-mono text-xs font-bold ${feedbackAnggota.startsWith('Berhasil') ? 'text-black' : 'text-black'}`}
             >
               {feedbackAnggota}
             </p>
@@ -631,7 +631,7 @@ export default function ManajemenEkskul({ onNavigate }: { onNavigate?: (page: st
 
           {feedbackAbsen && (
             <p
-              className={`font-mono text-xs font-bold ${feedbackAbsen.startsWith('Berhasil') ? 'text-blue-600' : 'text-black'}`}
+              className={`font-mono text-xs font-bold ${feedbackAbsen.startsWith('Berhasil') ? 'text-black' : 'text-black'}`}
             >
               {feedbackAbsen}
             </p>

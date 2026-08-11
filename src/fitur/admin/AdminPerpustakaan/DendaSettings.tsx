@@ -73,7 +73,7 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
         ref={buttonRef}
         type="button"
         onClick={() => setShowPanel(!showPanel)}
-        className="flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+        className="flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
       >
         <Settings className="h-3.5 w-3.5 text-black" />
         Pengaturan Denda
@@ -98,7 +98,7 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
               <button
                 type="button"
                 onClick={() => setShowPanel(false)}
-                className="text-black transition-colors hover:text-blue-600"
+                className="text-black transition-colors hover:text-black"
               >
                 <X className="h-4 w-4 text-black" />
               </button>
@@ -114,7 +114,7 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
                     type="number"
                     value={dendaPerHari}
                     onChange={(e) => onDendaChange(Math.max(0, parseInt(e.target.value) || 0))}
-                    className="w-full min-w-0 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full min-w-0 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     min="0"
                     step="500"
                   />

@@ -328,7 +328,7 @@ export default function DasborGuru({ onNavigate }: PageProps) {
                       <p className="text-xs font-bold tracking-tight text-black">
                         {item.mataPelajaran}
                       </p>
-                      <span className="inline-block rounded-md border-2 border-blue-600 bg-white px-2 py-0.5 text-[10px] font-bold text-black">
+                      <span className="inline-block rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black">
                         Kelas : {item.className}
                       </span>
                     </td>
@@ -346,7 +346,7 @@ export default function DasborGuru({ onNavigate }: PageProps) {
                       <button
                         type="button"
                         onClick={() => setSelectedSchedule(item)}
-                        className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold tracking-wider text-black uppercase transition-colors hover:border-blue-600 hover:text-blue-600"
+                        className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold tracking-wider text-black uppercase transition-colors hover:border-black hover:bg-neutral-100"
                       >
                         <BookOpen className="h-3 w-3" />
                         <span>RPS</span>

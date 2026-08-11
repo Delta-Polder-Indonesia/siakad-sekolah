@@ -72,7 +72,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
         <p className="text-xs font-bold text-black">Buku tidak ditemukan</p>
         <button type="button"
           onClick={onBack}
-          className="mt-4 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+          className="mt-4 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
         >
           Kembali ke daftar
         </button>
@@ -134,7 +134,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
             <p className="mb-1 text-xs font-bold text-black">Download e-book di sini</p>
             <a
               href="#"
-              className="inline-flex items-center gap-2 rounded-md border-2 border-blue-600 bg-white px-3 py-1.5 text-xs font-bold text-blue-600 transition-colors hover:bg-neutral-100"
+              className="inline-flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
             >
               <Download className="h-4 w-4" />
               {book.ebook}

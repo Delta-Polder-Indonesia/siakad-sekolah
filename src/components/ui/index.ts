@@ -12,3 +12,5 @@ export { default as BarChart, HorizontalBarChart } from './BarChart';
 export { default as QuickActions } from './QuickActions';
 export { lazyPage, PageSkeleton } from './LazyLoad';
 export { default as StatCard } from './StatCard';
+export { default as PageHeader } from './PageHeader';
+export { default as SectionTitle } from './SectionTitle';

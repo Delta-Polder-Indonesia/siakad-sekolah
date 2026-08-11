@@ -144,7 +144,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   setShowForm(false);
                   setCoverPreview(null);
                 }}
-                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -158,7 +158,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                 <input
                   value={formData.id || ''}
                   onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   required
                   readOnly={!!editingBook}
                 />
@@ -173,7 +173,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   <input
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     required
                   />
                 </div>
@@ -185,7 +185,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   <input
                     value={formData.author || ''}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     required
                   />
                 </div>
@@ -198,7 +198,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                     value={formData.isbn || ''}
                     onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
                     placeholder="978-602-xxx-xx-x"
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   />
                 </div>
                 {/* Kategori */}
@@ -209,7 +209,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   <select
                     value={formData.category || 'Fiksi'}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   >
                     <option value="Fiksi">Fiksi</option>
                     <option value="Non-Fiksi">Non-Fiksi</option>
@@ -229,7 +229,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   <input
                     value={formData.publisher || ''}
                     onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   />
                 </div>
                 {/* Stok */}
@@ -253,7 +253,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                         available: editingBook ? Math.max(0, stock - borrowed) : stock,
                       });
                     }}
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     required
                   />
                 </div>
@@ -266,7 +266,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                     value={formData.rack || ''}
                     onChange={(e) => setFormData({ ...formData, rack: e.target.value })}
                     placeholder="Contoh: A1, B2, C3"
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     required
                   />
                 </div>
@@ -288,7 +288,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                       <button
                         type="button"
                         onClick={handleRemoveCover}
-                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-md border border-black bg-white text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-md border border-black bg-white text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -301,7 +301,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   )}
                   {/* Upload Button */}
                   <div className="flex-1">
-                    <label className="flex w-fit cursor-pointer items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+                    <label className="flex w-fit cursor-pointer items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100">
                       <Upload className="h-4 w-4 text-black" />
                       <span>{coverPreview ? 'Ganti Gambar' : 'Upload Cover'}</span>
                       <input
@@ -329,7 +329,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Tulis deskripsi singkat tentang isi buku ini..."
                   rows={4}
-                  className="w-full resize-none rounded border border-black bg-white px-3 py-2 text-sm font-bold text-black outline-none focus:border-blue-600"
+                  className="w-full resize-none rounded border border-black bg-white px-3 py-2 text-sm font-bold text-black outline-none focus:border-black"
                 />
               </div>
             </div>
@@ -340,13 +340,13 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   setShowForm(false);
                   setCoverPreview(null);
                 }}
-                className="rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-black hover:bg-neutral-100"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 rounded-md border border-black bg-white px-6 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="flex items-center gap-2 rounded-md border border-black bg-white px-6 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-black hover:bg-neutral-100"
               >
                 <Save className="h-3.5 w-3.5" /> Simpan Data
               </button>
@@ -365,12 +365,12 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
         <div className="flex flex-wrap items-center gap-3 p-4">
           <button type="button"
             onClick={handleOpenAdd}
-            className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+            className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
           >
             <Plus className="h-3.5 w-3.5" />
             Entry Buku Baru
           </button>
-          <button className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+          <button className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100">
             <Printer className="h-3.5 w-3.5" />
             Cetak Katalog
           </button>
@@ -382,7 +382,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-36 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                className="w-36 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
               />
             </div>
           </div>
@@ -430,7 +430,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                     {book.id}
                   </td>
                   <td
-                    className="max-w-[180px] cursor-pointer truncate border-r border-black px-3 py-2.5 font-bold text-black hover:text-blue-600 hover:underline"
+                    className="max-w-[180px] cursor-pointer truncate border-r border-black px-3 py-2.5 font-bold text-black hover:text-black hover:underline"
                     onClick={() => onViewDetail(book.id)}
                     title={book.title}
                   >
@@ -456,14 +456,14 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                     <div className="flex gap-1">
                       <button type="button"
                         onClick={() => handleEdit(book)}
-                        className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Edit"
                       >
                         <Edit className="h-3 w-3" />
                       </button>
                       <button type="button"
                         onClick={() => handleDelete(book.id)}
-                        className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Hapus"
                       >
                         <Trash2 className="h-3 w-3" />

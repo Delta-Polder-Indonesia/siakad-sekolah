@@ -200,7 +200,7 @@ export default function DiskusiTugasStream(props: DiskusiTugasStreamProps) {
                           onClick={(e) => e.stopPropagation()}
                           className={`mt-1.5 flex items-center gap-2 rounded-md border-2 p-2 text-[11px] font-semibold ${
                             isMe
-                              ? 'border-blue-600 bg-white text-black hover:bg-neutral-100'
+                              ? 'border-black bg-black text-white hover:bg-neutral-100'
                               : 'border-black bg-white text-black hover:bg-neutral-100'
                           }`}
                         >

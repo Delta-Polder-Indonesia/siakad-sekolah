@@ -1,0 +1,73 @@
+From eaf195232982ecd999d44037c62a32f9f7d3212b Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 06:01:11 +0000
+Subject: [PATCH 15/19] fix(test): mock jspdf agar test tidak menulis file PDF
+ ke disk
+
+- ppdbExport.test.ts memanggil doc.save() dari jsPDF -> di environment
+  Node/Windows artefak detail-REG-001.pdf tertulis di folder repo
+- Mock modul jspdf di test (file-scoped, produksi tidak berubah)
+- .gitignore: tambah /*.pdf sebagai pengaman
+
+diff --git a/.gitignore b/.gitignore
+index 190b86b..05bac6a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -31,6 +31,9 @@ Thumbs.db
+ test-results/
+ playwright-report/
+ 
++# Artefak test di folder root (mis. PDF hasil jsPDF saat vitest jalan)
++/*.pdf
++
+ # md lokal yang sengaja tidak di-commit (berisi info internal/rahasia)
+ # CATATAN: jangan ignore seluruh folder (mis. "dokumentasi/") —
+ # gunakan daftar nama file eksplisit di atas agar file lain tetap ter-track.
+diff --git a/src/fitur/penerimaan-siswa-baru/ppdbExport.test.ts b/src/fitur/penerimaan-siswa-baru/ppdbExport.test.ts
+index 89bdd56..6298566 100644
+--- a/src/fitur/penerimaan-siswa-baru/ppdbExport.test.ts
++++ b/src/fitur/penerimaan-siswa-baru/ppdbExport.test.ts
+@@ -4,6 +4,40 @@ import { exportPpdbCsv, downloadJsonFile, printDetailPdf, printRecap } from './p
+ import { statusText, formatDate } from './AdminPanel.types';
+ import type { AdminPanelStats } from './AdminPanel.types';
+ 
++// Mock jspdf agar test tidak menulis file PDF nyata ke disk (sebelumnya
++// muncul artefak `detail-REG-001.pdf` di folder repo setelah `npm test`).
++vi.mock('jspdf', () => {
++  class MockJsPDF {
++    internal = { pageSize: { getWidth: () => 210, getHeight: () => 297 } };
++    constructor(_opts?: unknown) {}
++    setFont(_font?: unknown, _style?: unknown) {
++      return this;
++    }
++    setFontSize(_size?: unknown) {
++      return this;
++    }
++    setTextColor(_r?: unknown, _g?: unknown, _b?: unknown) {
++      return this;
++    }
++    setDrawColor(_c?: unknown) {
++      return this;
++    }
++    setLineWidth(_w?: unknown) {
++      return this;
++    }
++    line() {
++      return this;
++    }
++    text() {
++      return this;
++    }
++    save(_filename?: unknown) {
++      return this;
++    }
++  }
++  return { jsPDF: MockJsPDF };
++});
++
+ const DUMMY_APP: PPDBApplication = {
+   id: 'a1',
+   registrationNo: 'REG-001',
+-- 
+2.47.3
+

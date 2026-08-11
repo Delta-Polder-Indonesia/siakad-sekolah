@@ -151,7 +151,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                 setShowConfirm(false);
               }}
               placeholder="Judul pengumuman"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -169,7 +169,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
               }}
               placeholder="Isi pengumuman"
               rows={4}
-              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -187,7 +187,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                 setShowConfirm(false);
                 if (nextValue === 'all') setTargetKelasPengumumanAdmin([]);
               }}
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="all">Semua Kelas (Global)</option>
               <option value="classes">Kelas Tertentu</option>
@@ -204,7 +204,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                 {classes.map((item) => (
                   <label
                     key={item.id}
-                    className="flex cursor-pointer items-center gap-2 text-xs font-bold text-black select-none hover:text-blue-600"
+                    className="flex cursor-pointer items-center gap-2 text-xs font-bold text-black select-none hover:text-black"
                   >
                     <input
                       type="checkbox"
@@ -234,7 +234,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
               type="file"
               accept="image/*"
               onChange={handlePilihFotoPengumuman}
-              className="block w-full text-[10px] font-bold text-black file:mr-2 file:cursor-pointer file:rounded-md file:border-2 file:border-black file:bg-white file:px-3 file:py-1 file:text-[10px] file:font-bold file:text-black file:transition-colors file:hover:border-blue-600 file:hover:text-blue-600"
+              className="block w-full text-[10px] font-bold text-black file:mr-2 file:cursor-pointer file:rounded-md file:border-2 file:border-black file:bg-white file:px-3 file:py-1 file:text-[10px] file:font-bold file:text-black file:transition-colors file:hover:border-black file:hover:text-black"
             />
             <p className="text-[10px] font-semibold text-neutral-900">
               Foto akan tampil di dasbor kelas tujuan pengumuman.
@@ -260,7 +260,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                     setLocalNotice(null);
                     setShowConfirm(false);
                   }}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   Hapus Foto
                 </button>
@@ -302,13 +302,13 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                   <div className="flex justify-end gap-1.5 text-[10px]">
                     <button type="button"
                       onClick={() => setShowConfirm(false)}
-                      className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                      className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                     >
                       Batal
                     </button>
                     <button type="button"
                       onClick={handleExecuteSimpan}
-                      className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                      className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                     >
                       Ya, Publikasikan
                     </button>
@@ -322,7 +322,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                 className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-5 py-2 text-xs font-bold text-black transition-colors sm:w-auto ${
                   showConfirm
                     ? 'cursor-not-allowed bg-neutral-100 opacity-60'
-                    : 'hover:border-blue-600 hover:text-blue-600'
+                    : 'hover:border-black hover:bg-neutral-100'
                 }`}
                 disabled={showConfirm}
               >
@@ -366,7 +366,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                         });
                       }
                     }}
-                    className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                     title="Hapus pengumuman"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

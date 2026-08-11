@@ -202,7 +202,7 @@ export default function TaskPouchPage() {
 
             <div className="rounded-md border-2 border-black bg-white p-3.5">
               <h3 className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wider text-black uppercase">
-                <Info className="h-3.5 w-3.5 text-blue-600" /> Petunjuk Pengumpulan Tugas
+                <Info className="h-3.5 w-3.5 text-black" /> Petunjuk Pengumpulan Tugas
               </h3>
               <ul className="list-inside list-disc space-y-1 text-xs font-medium text-black">
                 <li>Format file berupa PDF, DOC, ZIP, atau Gambar dengan ukuran maksimal 5MB.</li>
@@ -221,7 +221,7 @@ export default function TaskPouchPage() {
                   onChange={(e) => setAnswerText(e.target.value)}
                   rows={3}
                   placeholder="Tuliskan lembar jawaban atau penjelasan tugas Anda di sini..."
-                  className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-medium text-black transition-colors outline-none placeholder:text-black/40 focus:border-blue-600 focus:ring-2 focus:ring-blue-600"
+                  className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-medium text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:ring-2 focus:ring-black"
                 />
               </div>
 
@@ -252,7 +252,7 @@ export default function TaskPouchPage() {
                   type="button"
                   onClick={handleSubmitAnswer}
                   disabled={isSaving || !answerText.trim()}
-                  className="inline-flex items-center gap-2 rounded-md border-2 border-blue-600 bg-white px-6 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-neutral-300 disabled:bg-neutral-100 disabled:text-black"
+                  className="inline-flex items-center gap-2 rounded-md border-2 border-black bg-white px-6 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-neutral-300 disabled:bg-neutral-100 disabled:text-black"
                 >
                   {isSaving ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -264,7 +264,7 @@ export default function TaskPouchPage() {
               </div>
 
               {saveMessage && (
-                <p className="text-right text-xs font-semibold text-blue-600">{saveMessage}</p>
+                <p className="text-right text-xs font-semibold text-black">{saveMessage}</p>
               )}
             </div>
           </div>
@@ -299,7 +299,7 @@ export default function TaskPouchPage() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center justify-center gap-2 rounded-md border-2 bg-white px-3 py-2 text-xs font-bold text-black transition-all ${
-                isActive ? 'border-blue-600' : 'border-black hover:bg-neutral-100'
+                isActive ? 'border-black bg-black text-white' : 'border-black bg-white hover:bg-neutral-100'
               }`}
             >
               <Icon className="h-4 w-4 shrink-0 text-black" />

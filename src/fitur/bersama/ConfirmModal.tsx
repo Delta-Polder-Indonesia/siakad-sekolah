@@ -60,7 +60,7 @@ export default function ConfirmModal({
             className={`flex h-10 w-10 items-center justify-center rounded-md border-2 ${
               variant === 'danger'
                 ? 'border-rose-600 bg-white text-rose-600'
-                : 'border-blue-600 bg-white text-blue-600'
+                : 'border-black bg-black text-white'
             }`}
           >
             <AlertTriangle className="h-5 w-5" />

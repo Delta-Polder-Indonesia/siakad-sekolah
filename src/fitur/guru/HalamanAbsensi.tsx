@@ -145,7 +145,7 @@ export default function AttendancePage() {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="space-y-1">
@@ -155,7 +155,7 @@ export default function AttendancePage() {
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="min-w-[160px] cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="min-w-[160px] cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="" className="font-bold text-black">
                 SELECT_CLASS...
@@ -174,7 +174,7 @@ export default function AttendancePage() {
             <button
               type="button"
               onClick={() => setAllStatus('hadir')}
-              className="cursor-pointer rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="cursor-pointer rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               SET_ALL_HADIR
             </button>
@@ -185,7 +185,7 @@ export default function AttendancePage() {
                 setNoteMap({});
                 setSaved(false);
               }}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>RESET_MAP</span>
@@ -285,8 +285,8 @@ export default function AttendancePage() {
                               onClick={() => setStatus(student.id, status)}
                               className={`inline-flex cursor-pointer items-center gap-1 rounded-md border-2 px-2 py-1 text-xs font-bold transition-colors ${
                                 isSelected
-                                  ? 'border-blue-600 bg-white text-blue-600'
-                                  : 'border-black bg-white text-black hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600'
+                                  ? 'border-black bg-black text-white'
+                                  : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100 hover:text-black'
                               }`}
                             >
                               {cfg.icon}
@@ -305,7 +305,7 @@ export default function AttendancePage() {
                           setSaved(false);
                         }}
                         placeholder="ENTRY_NOTE..."
-                        className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                        className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                       />
                     </td>
                   </tr>

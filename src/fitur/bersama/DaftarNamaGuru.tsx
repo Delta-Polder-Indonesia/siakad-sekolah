@@ -53,7 +53,7 @@ export default function DaftarNamaGuru() {
             placeholder="Cari nama guru / mata pelajaran..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-md border border-black bg-white py-2 pr-3 pl-9 text-xs font-bold text-black placeholder:font-normal placeholder:text-gray-500 focus:border-blue-600 focus:outline-none"
+            className="w-full rounded-md border border-black bg-white py-2 pr-3 pl-9 text-xs font-bold text-black placeholder:font-normal placeholder:text-gray-500 focus:border-black focus:outline-none"
           />
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function DaftarNamaGuru() {
                       href={`https://wa.me/${guru.whatsapp.replace(/[^\d]/g, '')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-block rounded-md border border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                      className="inline-block rounded-md border border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                     >
                       {guru.whatsapp}
                     </a>

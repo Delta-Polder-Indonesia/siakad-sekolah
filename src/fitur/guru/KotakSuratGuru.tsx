@@ -144,7 +144,7 @@ export default function KotakSuratGuru() {
       case 'disetujui':
         return 'border-emerald-600 bg-white text-emerald-700';
       case 'menunggu':
-        return 'border-blue-600 bg-white text-blue-700';
+        return 'border-black bg-black text-white';
       case 'ditolak':
         return 'border-rose-600 bg-white text-rose-700 line-through';
       default:
@@ -174,7 +174,7 @@ export default function KotakSuratGuru() {
             </span>
             <button type="button"
               onClick={() => setShowCalendar((prev) => !prev)}
-              className="mt-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="mt-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               <Calendar className="h-3.5 w-3.5" />
               {selectedDate ? selectedDate : monthLabel.toUpperCase()}
@@ -192,7 +192,7 @@ export default function KotakSuratGuru() {
                 <div className="flex items-center gap-1">
                   <button type="button"
                     onClick={() => navigateMonth(-1)}
-                    className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                   </button>
@@ -201,7 +201,7 @@ export default function KotakSuratGuru() {
                   </span>
                   <button type="button"
                     onClick={() => navigateMonth(1)}
-                    className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
@@ -237,7 +237,7 @@ export default function KotakSuratGuru() {
                           day.day === 0
                             ? 'border-transparent bg-transparent'
                             : selectedDate === day.date
-                              ? 'border-blue-600 bg-blue-600 text-white'
+                              ? 'border-black bg-black text-white'
                               : day.count > 0
                                 ? 'border-black bg-white text-black hover:bg-neutral-100'
                                 : 'border-transparent text-black/50 hover:border-black'
@@ -268,7 +268,7 @@ export default function KotakSuratGuru() {
                     setSelectedLetterId('');
                     setShowCalendar(false);
                   }}
-                  className="mt-1.5 w-full cursor-pointer rounded-md border-2 border-black bg-white py-1 text-[10px] font-bold text-black uppercase transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                  className="mt-1.5 w-full cursor-pointer rounded-md border-2 border-black bg-white py-1 text-[10px] font-bold text-black uppercase transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
                 >
                   Hapus Filter Tanggal
                 </button>
@@ -493,7 +493,7 @@ export default function KotakSuratGuru() {
                     href={selectedLetter.attachmentDataUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex shrink-0 items-center justify-center rounded-md border-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold text-black uppercase transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                    className="inline-flex shrink-0 items-center justify-center rounded-md border-2 border-black bg-white px-3 py-1.5 text-[10px] font-bold text-black uppercase transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
                   >
                     Buka Lampiran
                   </a>
@@ -516,7 +516,7 @@ export default function KotakSuratGuru() {
                         className={`cursor-pointer rounded-md border-2 px-3 py-1.5 text-[10px] font-bold uppercase transition-colors ${
                           isActive
                             ? 'border-black bg-black text-white'
-                            : 'border-black bg-white text-black hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600'
+                            : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100 hover:text-black'
                         }`}
                       >
                         {status === 'menunggu'

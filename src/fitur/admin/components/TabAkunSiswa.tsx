@@ -41,7 +41,7 @@ const STATUS_LABEL: Record<StudentStatus, string> = {
 const STATUS_COLOR: Record<StudentStatus, string> = {
   aktif: 'border-emerald-600 bg-white text-emerald-600',
   keluar: 'border-rose-600 bg-white text-rose-600',
-  lulus: 'border-blue-600 bg-white text-blue-600',
+  lulus: 'border-black bg-black text-white',
   pindah: 'border-amber-600 bg-white text-amber-600',
 };
 
@@ -57,7 +57,7 @@ type StudentEditMap = Record<
 >;
 
 const inputClass =
-  'w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none transition-colors placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600';
+  'w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none transition-colors placeholder:text-black/40 focus:border-black focus:bg-neutral-50';
 
 export default function TabAkunSiswa() {
   const storeVersion = useStoreVersion();
@@ -425,7 +425,7 @@ export default function TabAkunSiswa() {
             onChange={(event) =>
               setNewStudent((prev) => ({ ...prev, classId: event.target.value }))
             }
-            className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           >
             {classes.map((item) => (
               <option key={item.id} value={item.id}>
@@ -441,7 +441,7 @@ export default function TabAkunSiswa() {
                 gender: event.target.value === 'P' ? 'P' : 'L',
               }))
             }
-            className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           >
             <option value="L">Laki-laki</option>
             <option value="P">Perempuan</option>
@@ -525,7 +525,7 @@ export default function TabAkunSiswa() {
                             },
                           }))
                         }
-                        className="w-14 cursor-pointer rounded-md border-2 border-black bg-white px-1 py-1 text-center text-xs font-bold text-black transition-colors outline-none hover:border-blue-600"
+                        className="w-14 cursor-pointer rounded-md border-2 border-black bg-white px-1 py-1 text-center text-xs font-bold text-black transition-colors outline-none hover:border-black"
                       >
                         <option value="L">L</option>
                         <option value="P">P</option>
@@ -543,7 +543,7 @@ export default function TabAkunSiswa() {
                             },
                           }))
                         }
-                        className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600"
+                        className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-black"
                       >
                         {classes.map((item) => (
                           <option key={item.id} value={item.id}>
@@ -610,14 +610,14 @@ export default function TabAkunSiswa() {
                         <button type="button"
                           onClick={() => openStatusModal(student)}
                           title="Ubah status mutasi siswa"
-                          className="inline-flex items-center gap-1 rounded-md border-2 border-blue-600 bg-white px-2.5 py-1 text-[10px] font-bold text-blue-600 transition-colors hover:bg-neutral-100"
+                          className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:bg-neutral-100"
                         >
                           <UserCog className="h-3 w-3" />
                           Mutasi
                         </button>
                         <button type="button"
                           onClick={() => setHistoryStudentId(student.id)}
-                          className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                          className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                         >
                           <History className="h-3 w-3" />
                           Log
@@ -663,13 +663,13 @@ export default function TabAkunSiswa() {
                 <>
                   <button type="button"
                     onClick={handleExportMutationsCsv}
-                    className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     <Download className="h-3.5 w-3.5" /> CSV
                   </button>
                   <button type="button"
                     onClick={handleExportMutationsPdf}
-                    className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     <FileText className="h-3.5 w-3.5" /> PDF
                   </button>
@@ -688,7 +688,7 @@ export default function TabAkunSiswa() {
               <button
                 type="button"
                 onClick={() => setHistoryStudentId('')}
-                className="rounded-md border-2 border-black bg-white px-3 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                className="rounded-md border-2 border-black bg-white px-3 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
               >
                 Tutup Log
               </button>
@@ -808,7 +808,7 @@ export default function TabAkunSiswa() {
                 <select
                   value={statusTarget}
                   onChange={(e) => setStatusTarget(e.target.value as StudentStatus)}
-                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                 >
                   <option value="aktif">Aktif</option>
                   <option value="lulus">Lulus</option>

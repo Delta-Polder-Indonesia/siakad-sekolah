@@ -3,7 +3,7 @@ import { getLoginHistory, getLoginStats } from '../../../data/services';
 import { Users, LogIn, Search, History } from 'lucide-react';
 
 const roleBadgeClass: Record<string, string> = {
-  teacher: 'border-blue-600 bg-white text-blue-600',
+  teacher: 'border-black bg-black text-white',
   student: 'border-emerald-600 bg-white text-emerald-600',
   parent: 'border-amber-600 bg-white text-amber-600',
   guest: 'border-black bg-white text-black',
@@ -66,7 +66,7 @@ export default function TabRiwayatLogin() {
               <p
                 className={`mt-1 text-xl leading-tight font-bold tabular-nums ${
                   idx === 1
-                    ? 'text-blue-600'
+                    ? 'text-black'
                     : idx === 2
                       ? 'text-amber-600'
                       : idx === 3
@@ -144,13 +144,13 @@ export default function TabRiwayatLogin() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari nama atau email..."
-                className="w-48 rounded-md border-2 border-black bg-white py-1.5 pr-2 pl-8 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-48 rounded-md border-2 border-black bg-white py-1.5 pr-2 pl-8 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="all">Semua Role</option>
               <option value="teacher">Guru</option>

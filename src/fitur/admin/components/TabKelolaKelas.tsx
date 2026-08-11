@@ -310,7 +310,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                 if (showAddConfirm) setShowAddConfirm(false);
               }}
               placeholder="Contoh: X-IPA-1"
-              className="w-52 rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-52 rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -327,7 +327,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                 if (showAddConfirm) setShowAddConfirm(false);
               }}
               placeholder="Contoh: X, XI, XII"
-              className="w-36 rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-36 rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -335,10 +335,10 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
             {showAddConfirm && (
               <div className="absolute bottom-full left-0 z-20 mb-2 w-64 space-y-2 rounded-md border-2 border-black bg-white p-2.5">
                 <div className="flex items-start gap-1.5">
-                  <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                  <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-black" />
                   <p className="text-[10px] leading-tight font-bold text-black">
                     Yakin ingin menambahkan kelas{' '}
-                    <span className="font-mono text-blue-600">"{newClassName.trim()}"</span>?
+                    <span className="font-mono text-black">"{newClassName.trim()}"</span>?
                   </p>
                 </div>
                 <div className="flex justify-end gap-1.5 text-[10px]">
@@ -346,7 +346,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                   <button
                     type="button"
                     onClick={() => setShowAddConfirm(false)}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     Batal
                   </button>
@@ -354,7 +354,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                   <button
                     type="button"
                     onClick={handleExecuteAdd}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                   >
                     Ya, Tambahkan
                   </button>
@@ -370,7 +370,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
               className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
                 showAddConfirm
                   ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                  : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                  : 'bg-white text-black hover:border-black hover:bg-neutral-100'
               }`}
             >
               <UserPlus className="h-3.5 w-3.5 text-black" />
@@ -402,7 +402,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
 
               return (
                 <tr key={classItem.id} className="transition-colors hover:bg-neutral-100">
-                  <td className="px-3 py-2.5 font-mono text-xs font-bold text-blue-600">
+                  <td className="px-3 py-2.5 font-mono text-xs font-bold text-black">
                     {classItem.id}
                   </td>
                   <td className="px-3 py-2 pr-4">
@@ -410,7 +410,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                       type="text"
                       value={edit?.name ?? classItem.name}
                       onChange={(e) => setClassField(classItem.id, 'name', e.target.value)}
-                      className="w-full max-w-[180px] rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                      className="w-full max-w-[180px] rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     />
                   </td>
                   <td className="px-3 py-2 pr-4">
@@ -418,14 +418,14 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                       type="text"
                       value={edit?.grade ?? classItem.grade}
                       onChange={(e) => setClassField(classItem.id, 'grade', e.target.value)}
-                      className="w-20 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                      className="w-20 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     />
                   </td>
                   <td className="px-3 py-2.5 text-xs font-bold text-black">{teacherName}</td>
                   <td className="px-3 py-2.5">
                     <span
                       className={`font-mono text-xs font-bold tabular-nums ${
-                        studentCount > 0 ? 'text-blue-600' : 'text-black'
+                        studentCount > 0 ? 'text-black' : 'text-black'
                       }`}
                     >
                       {studentCount}
@@ -437,10 +437,10 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                         {deleteTargetId === classItem.id && (
                           <div className="absolute right-0 bottom-full z-20 mb-2 w-60 space-y-2 rounded-md border-2 border-black bg-white p-2.5">
                             <div className="flex items-start gap-1.5">
-                              <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                              <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-black" />
                               <p className="text-[10px] leading-tight font-bold text-black">
                                 Hapus kelas{' '}
-                                <span className="font-mono text-blue-600">"{classItem.name}"</span>?
+                                <span className="font-mono text-black">"{classItem.name}"</span>?
                                 Roster, pengumuman, tugas, dan absensi juga terhapus.
                               </p>
                             </div>
@@ -449,7 +449,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                               <button
                                 type="button"
                                 onClick={() => setDeleteTargetId(null)}
-                                className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                                className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                               >
                                 Batal
                               </button>
@@ -457,7 +457,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                               <button
                                 type="button"
                                 onClick={handleExecuteDelete}
-                                className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                                className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                               >
                                 Ya, Hapus
                               </button>
@@ -469,7 +469,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                           type="button"
                           onClick={() => preCheckDelete(classItem.id)}
                           title="Hapus kelas"
-                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                         >
                           <Trash2 className="h-3 w-3 text-black" />
                           Hapus Kelas
@@ -491,7 +491,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                               if (localNotice) setLocalNotice(null);
                               if (moveConfirmId) setMoveConfirmId(null);
                             }}
-                            className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                            className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                           >
                             <option value="" className="font-bold text-black">
                               Pilih kelas tujuan
@@ -512,12 +512,12 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                           {moveConfirmId === classItem.id && (
                             <div className="absolute bottom-full left-0 z-20 mb-2 w-64 space-y-2 rounded-md border-2 border-black bg-white p-2.5">
                               <div className="flex items-start gap-1.5">
-                                <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                                <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-black" />
                                 <p className="text-[10px] leading-tight font-bold text-black">
                                   Pindahkan{' '}
-                                  <span className="font-mono text-blue-600">{studentCount}</span>{' '}
+                                  <span className="font-mono text-black">{studentCount}</span>{' '}
                                   siswa dari{' '}
-                                  <span className="font-mono text-blue-600">
+                                  <span className="font-mono text-black">
                                     "{classItem.name}"
                                   </span>{' '}
                                   ke kelas tujuan?
@@ -528,7 +528,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                                 <button
                                   type="button"
                                   onClick={() => setMoveConfirmId(null)}
-                                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                                 >
                                   Batal
                                 </button>
@@ -536,7 +536,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                                 <button
                                   type="button"
                                   onClick={handleExecuteMove}
-                                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                                 >
                                   Ya, Pindahkan
                                 </button>
@@ -552,7 +552,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                             className={`rounded-md border-2 border-black px-2 py-1 text-xs font-bold transition-colors ${
                               classes.length <= 1 || moveConfirmId === classItem.id
                                 ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                                : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                                : 'bg-white text-black hover:border-black hover:bg-neutral-100'
                             }`}
                           >
                             Pindahkan
@@ -584,13 +584,13 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
           {localNotice && (
             <div
               className={`flex items-center gap-1.5 text-[11px] font-bold tracking-tight ${
-                localNotice.type === 'error' ? 'text-black' : 'text-blue-600'
+                localNotice.type === 'error' ? 'text-black' : 'text-black'
               }`}
             >
               {localNotice.type === 'error' ? (
                 <AlertCircle className="h-3.5 w-3.5 shrink-0 text-black" />
               ) : (
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-black" />
               )}
               <span>{localNotice.message}</span>
             </div>
@@ -601,7 +601,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
           {showSaveConfirm && (
             <div className="absolute right-0 bottom-full z-20 mb-2 w-64 space-y-2 rounded-md border-2 border-black bg-white p-2.5 text-right">
               <div className="flex items-start gap-1.5 text-left">
-                <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-black" />
                 <p className="text-[10px] leading-tight font-bold text-black">
                   Yakin ingin menyimpan semua perubahan nama dan tingkat kelas?
                 </p>
@@ -611,7 +611,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                 <button
                   type="button"
                   onClick={() => setShowSaveConfirm(false)}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   Batal
                 </button>
@@ -619,7 +619,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                 <button
                   type="button"
                   onClick={handleExecuteSave}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   Ya, Simpan
                 </button>
@@ -635,7 +635,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
               showSaveConfirm
                 ? 'cursor-not-allowed bg-neutral-100 text-black opacity-60'
-                : 'bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                : 'bg-white text-black hover:border-black hover:bg-neutral-100'
             }`}
           >
             <Save className="h-3.5 w-3.5 text-black" />

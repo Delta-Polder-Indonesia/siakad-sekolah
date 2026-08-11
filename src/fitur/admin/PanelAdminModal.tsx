@@ -172,12 +172,12 @@ function MenuRenderer({
             key={menu.id}
             onClick={() => onSelect(menu.id)}
             className={`flex w-full items-center gap-2.5 px-2 py-1.5 text-left transition-colors select-none ${
-              isActive ? 'font-bold text-blue-600' : 'font-bold text-black hover:text-blue-600'
+              isActive ? 'font-bold text-black' : 'font-bold text-black hover:text-black'
             }`}
           >
             <menu.icon
               className={`h-4 w-4 shrink-0 transition-colors ${
-                isActive ? 'text-blue-600' : 'text-black'
+                isActive ? 'text-black' : 'text-black'
               }`}
             />
             <span className="flex-1 truncate text-xs tracking-wide">{menu.label}</span>
@@ -262,7 +262,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
         <div className="space-y-5">
           <div className="flex flex-col gap-0.5 border-b-2 border-black pb-3">
             <h2 className="text-sm font-bold tracking-tight text-black uppercase">Tata Usaha</h2>
-            <p className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">
+            <p className="text-[10px] font-bold tracking-widest text-black uppercase">
               Portal Kendali Pusat
             </p>
           </div>
@@ -326,7 +326,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
                 ].map((kpi) => (
                   <div key={kpi.label} className="flex items-center justify-between py-0.5">
                     <span className="text-[10px] font-bold text-black">{kpi.label}</span>
-                    <span className="text-[10px] font-bold text-blue-600 tabular-nums">
+                    <span className="text-[10px] font-bold text-black tabular-nums">
                       {kpi.value}
                     </span>
                   </div>
@@ -344,7 +344,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-bold text-black uppercase">Panel Admin</span>
             <ChevronRight className="h-3.5 w-3.5 text-black" />
-            <span className="text-xs font-bold tracking-wider text-blue-600 uppercase">
+            <span className="text-xs font-bold tracking-wider text-black uppercase">
               {isPerpusTab ? 'Perpustakaan' : activeMenu?.label || '—'}
             </span>
           </div>
@@ -353,7 +353,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+              className="rounded-md border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
             >
               Tutup
             </button>

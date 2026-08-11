@@ -248,7 +248,7 @@ const LoginPanel = memo<LoginPanelProps>(
                       className={`w-full rounded-lg border py-3.5 text-sm font-semibold transition-all ${
                         disabled
                           ? 'cursor-not-allowed border-red-200 bg-red-50 text-red-600'
-                          : 'border-black hover:border-blue-600 hover:text-blue-600'
+                          : 'border-black hover:border-black hover:bg-neutral-100'
                       }`}
                     >
                       {isLoading ? 'Memproses...' : disabled ? 'Akun Terkunci' : 'Masuk ke Akun'}

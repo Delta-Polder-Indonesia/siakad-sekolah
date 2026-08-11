@@ -39,7 +39,7 @@ export default function TabVideo({ assignment }: { assignment: OnlineAssignment 
                   href={video.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex h-full w-full items-center justify-center bg-white text-center text-xs font-bold text-blue-600"
+                  className="flex h-full w-full items-center justify-center bg-white text-center text-xs font-bold text-black"
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <ExternalLink className="h-4 w-4" /> Buka Video di Tab Baru

@@ -162,7 +162,7 @@ export default function HalamanRpsGuru({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
           >
             <ArrowLeft className="h-4 w-4" /> Kembali
           </button>
@@ -179,7 +179,7 @@ export default function HalamanRpsGuru({
           <button
             type="button"
             onClick={handleAddRow}
-            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+            className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
           >
             <Plus className="h-3.5 w-3.5" /> Baris
           </button>
@@ -227,7 +227,7 @@ export default function HalamanRpsGuru({
               value={tingkatPendidikan}
               onChange={(e) => setTingkatPendidikan(e.target.value)}
               placeholder="SD / SMP / SMA / SMK"
-              className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -238,7 +238,7 @@ export default function HalamanRpsGuru({
               value={kurikulum}
               onChange={(e) => setKurikulum(e.target.value)}
               placeholder="Kurikulum Merdeka / K13"
-              className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export default function HalamanRpsGuru({
                 value={tahunAjaran}
                 onChange={(e) => setTahunAjaran(e.target.value)}
                 placeholder="2025/2026"
-                className="w-24 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-24 rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
               <input
                 value={className}
@@ -305,7 +305,7 @@ export default function HalamanRpsGuru({
                     type="date"
                     value={row.tanggal || ''}
                     onChange={(e) => updateCell(index, 'tanggal', e.target.value)}
-                    className="w-full rounded-md border-2 border-black bg-white px-1 py-0.5 text-center font-mono text-[10px] transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="w-full rounded-md border-2 border-black bg-white px-1 py-0.5 text-center font-mono text-[10px] transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5 break-words whitespace-normal">
@@ -313,7 +313,7 @@ export default function HalamanRpsGuru({
                     value={row.kemampuanAkhir}
                     onChange={(e) => updateCell(index, 'kemampuanAkhir', e.target.value)}
                     rows={2}
-                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5 break-words whitespace-normal">
@@ -321,7 +321,7 @@ export default function HalamanRpsGuru({
                     value={row.materiPembelajaran}
                     onChange={(e) => updateCell(index, 'materiPembelajaran', e.target.value)}
                     rows={2}
-                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5 break-words whitespace-normal">
@@ -329,7 +329,7 @@ export default function HalamanRpsGuru({
                     value={row.indikator}
                     onChange={(e) => updateCell(index, 'indikator', e.target.value)}
                     rows={2}
-                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="h-auto min-h-[44px] w-full resize-y rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5">
@@ -337,7 +337,7 @@ export default function HalamanRpsGuru({
                     value={row.outputPembelajaran}
                     onChange={(e) => updateCell(index, 'outputPembelajaran', e.target.value)}
                     rows={2}
-                    className="h-auto min-h-[44px] w-full resize rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="h-auto min-h-[44px] w-full resize rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5">
@@ -345,28 +345,28 @@ export default function HalamanRpsGuru({
                     value={row.strategiPembelajaran}
                     onChange={(e) => updateCell(index, 'strategiPembelajaran', e.target.value)}
                     rows={2}
-                    className="h-auto min-h-[44px] w-full resize rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="h-auto min-h-[44px] w-full resize rounded-md border-2 border-black bg-white p-1.5 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5">
                   <input
                     value={row.bentukPembelajaran}
                     onChange={(e) => updateCell(index, 'bentukPembelajaran', e.target.value)}
-                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="border-r-2 border-black/10 p-1.5">
                   <input
                     value={row.estimasiWaktu}
                     onChange={(e) => updateCell(index, 'estimasiWaktu', e.target.value)}
-                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
                 <td className="p-1.5">
                   <input
                     value={row.bobotPenilaian}
                     onChange={(e) => updateCell(index, 'bobotPenilaian', e.target.value)}
-                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors hover:border-blue-600 focus:border-blue-600 focus:outline-none"
+                    className="w-full rounded-md border-2 border-black bg-white px-1.5 py-1 text-xs transition-colors focus:border-black focus:bg-neutral-50 focus:outline-none"
                   />
                 </td>
               </tr>

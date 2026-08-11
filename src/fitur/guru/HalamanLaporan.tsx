@@ -129,7 +129,7 @@ export default function ReportPage() {
   const statusClassName = (status: string) => {
     switch (status) {
       case 'hadir':
-        return 'border-2 border-black bg-blue-600 text-white font-bold';
+        return 'border-2 border-black bg-black text-white font-bold';
       case 'izin':
         return 'border-2 border-black bg-white text-black font-bold';
       case 'sakit':
@@ -270,7 +270,7 @@ export default function ReportPage() {
                   type="button"
                   onClick={() => setReportMode('range')}
                   className={`rounded-md border-2 bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors hover:bg-neutral-100 ${
-                    reportMode === 'range' ? 'border-blue-600' : 'border-black'
+                    reportMode === 'range' ? 'border-black bg-black text-white' : 'border-black'
                   }`}
                 >
                   Rentang Tanggal
@@ -279,7 +279,7 @@ export default function ReportPage() {
                   type="button"
                   onClick={() => setReportMode('monthly')}
                   className={`rounded-md border-2 bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors hover:bg-neutral-100 ${
-                    reportMode === 'monthly' ? 'border-blue-600' : 'border-black'
+                    reportMode === 'monthly' ? 'border-black bg-black text-white' : 'border-black'
                   }`}
                 >
                   Per Bulan
@@ -293,7 +293,7 @@ export default function ReportPage() {
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="min-w-[160px] cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                className="min-w-[160px] cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
               >
                 <option value="">SELECT_CLASS...</option>
                 {classes.map((c) => (
@@ -313,7 +313,7 @@ export default function ReportPage() {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   />
                 </div>
                 <div className="space-y-1">
@@ -324,7 +324,7 @@ export default function ReportPage() {
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   />
                 </div>
               </>
@@ -337,7 +337,7 @@ export default function ReportPage() {
                   type="month"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                 />
               </div>
             )}
@@ -347,7 +347,7 @@ export default function ReportPage() {
               {reportMode === 'monthly' && kelasRekap.length > 0 && (
                 <button type="button"
                   onClick={handleExportKelasCSV}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-black transition-colors hover:border-black hover:bg-neutral-100"
                 >
                   <Download className="h-3.5 w-3.5" /> CSV KELAS
                 </button>
@@ -371,7 +371,7 @@ export default function ReportPage() {
                         overallStats
                       );
                     }}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-blue-600 bg-blue-600 px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-white transition-colors hover:bg-blue-700"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-white transition-colors hover:bg-blue-700"
                   >
                     <FileText className="h-3.5 w-3.5" /> PDF
                   </button>

@@ -100,11 +100,11 @@ export default function HistoryPage() {
 
   const statusClasses = (status?: string, isSelected?: boolean) => {
     if (isSelected) {
-      return 'border-2 border-blue-600 bg-white text-blue-600 z-10';
+      return 'border-2 border-black bg-black text-white z-10';
     }
     switch (status) {
       case 'hadir':
-        return 'bg-blue-600 text-white border-2 border-black hover:bg-blue-700';
+        return 'bg-black text-white border-2 border-black hover:bg-neutral-800';
       case 'izin':
       case 'sakit':
       case 'alpha':
@@ -152,7 +152,7 @@ export default function HistoryPage() {
               <button
                 type="button"
                 onClick={() => navigateMonth(-1)}
-                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold transition-colors hover:border-black hover:bg-neutral-100"
               >
                 <ChevronLeft className="h-3 w-3 text-current" />
               </button>
@@ -162,7 +162,7 @@ export default function HistoryPage() {
               <button
                 type="button"
                 onClick={() => navigateMonth(1)}
-                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold transition-colors hover:border-black hover:bg-neutral-100"
               >
                 <ChevronRight className="h-3 w-3 text-current" />
               </button>
@@ -228,7 +228,7 @@ export default function HistoryPage() {
                     exportToCsv(rows, headers, `Absensi_${selectedMonth}.csv`);
                     showToast('success', '✅ Data absensi berhasil diexport ke CSV');
                   }}
-                  className="inline-flex items-center gap-1 rounded-md border-2 border-blue-600 bg-blue-600 px-2 py-0.5 text-[10px] font-bold text-white transition-colors hover:border-blue-700 hover:bg-blue-700"
+                  className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-black px-2 py-0.5 text-[10px] font-bold text-white transition-colors hover:border-black hover:bg-neutral-800"
                 >
                   <Download className="h-2.5 w-2.5" />
                   Export CSV

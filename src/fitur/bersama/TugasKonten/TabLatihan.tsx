@@ -84,13 +84,13 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
   return (
     <div className="space-y-3">
       {quizResult && !quizDirty && (
-        <div className="rounded-md border-2 border-blue-600 bg-white p-3.5">
+        <div className="rounded-md border-2 border-black bg-white p-3.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] font-bold tracking-wider text-blue-600 uppercase">
+              <p className="text-[10px] font-bold tracking-wider text-black uppercase">
                 Skor Terakhir
               </p>
-              <p className="mt-0.5 text-xl font-extrabold text-blue-600">
+              <p className="mt-0.5 text-xl font-extrabold text-black">
                 {quizResult.score} / {quizResult.total}
               </p>
               <p className="mt-1 text-[10px] font-medium text-black">
@@ -133,7 +133,7 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
                       ? 'border-emerald-500 bg-emerald-50 font-semibold text-emerald-900'
                       : isWrongPick
                         ? 'border-rose-500 bg-rose-50 text-rose-900'
-                        : 'border-black bg-white text-black hover:border-blue-600'
+                        : 'border-black bg-white text-black hover:border-black'
                   }`}
                 >
                   <input
@@ -161,7 +161,7 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
           type="button"
           onClick={handleCheckQuiz}
           disabled={!allAnswered || !user || isSaving}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-blue-600 bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-neutral-300 disabled:bg-neutral-100 disabled:text-black"
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-neutral-300 disabled:bg-neutral-100 disabled:text-black"
         >
           {isSaving ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -175,7 +175,7 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
             Jawab semua soal untuk memeriksa hasil.
           </p>
         )}
-        {saveMessage && <p className="text-xs font-semibold text-blue-600">{saveMessage}</p>}
+        {saveMessage && <p className="text-xs font-semibold text-black">{saveMessage}</p>}
       </div>
     </div>
   );

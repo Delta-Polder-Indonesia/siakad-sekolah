@@ -151,7 +151,7 @@ export default function RiwayatAbsensiAnak({
           <select
             value={monthFilter}
             onChange={(e) => setMonthFilter(e.target.value)}
-            className="rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+            className="rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black"
           >
             <option value="">Semua Bulan</option>
             {monthOptions.map((m) => (

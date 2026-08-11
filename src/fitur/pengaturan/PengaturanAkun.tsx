@@ -248,7 +248,7 @@ export default function PengaturanAkun() {
           <input
             value={identifier}
             onChange={(event) => setIdentifier(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black"
           />
         </div>
 
@@ -263,7 +263,7 @@ export default function PengaturanAkun() {
                 setMessage('');
                 setError('');
               }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black"
               placeholder="Diperlukan untuk verifikasi di server"
               autoComplete="current-password"
             />
@@ -285,7 +285,7 @@ export default function PengaturanAkun() {
                   setMessage('');
                   setError('');
                 }}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-black"
                 placeholder="Biarkan kosong jika tidak ingin mengganti"
               />
               <button
@@ -342,7 +342,7 @@ export default function PengaturanAkun() {
             <button
               type="button"
               onClick={handleGeneratePassword}
-              className="text-xs text-blue-600 underline hover:text-blue-700"
+              className="text-xs text-black underline hover:text-black"
             >
               Generate Password Kuat
             </button>
@@ -366,7 +366,7 @@ export default function PengaturanAkun() {
                 setMessage('');
                 setError('');
               }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-11 text-sm outline-none focus:ring-2 focus:ring-black"
               placeholder="Ulangi kata sandi baru"
             />
             <button

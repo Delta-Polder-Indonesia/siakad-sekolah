@@ -69,7 +69,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
               value={newStudentName}
               onChange={(e) => setNewStudentName(e.target.value)}
               placeholder="Contoh: Andi Pratama"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -81,7 +81,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
               value={newStudentNis}
               onChange={(e) => setNewStudentNis(e.target.value)}
               placeholder="Contoh: 2024001"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -92,7 +92,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
             <select
               value={newStudentGender}
               onChange={(e) => setNewStudentGender(e.target.value as 'L' | 'P')}
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="L">Laki-Laki (L)</option>
               <option value="P">Perempuan (P)</option>
@@ -107,7 +107,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
               value={newStudentPassword}
               onChange={(e) => setNewStudentPassword(e.target.value)}
               placeholder="Minimal 6 karakter"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -118,7 +118,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
             <select
               value={newStudentClassId}
               onChange={(e) => setNewStudentClassId(e.target.value)}
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="">-- Pilih Kelas --</option>
               {classes.map((c) => (

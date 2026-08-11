@@ -1,0 +1,1352 @@
+diff --git a/REVIEW_KODE.md b/REVIEW_KODE.md
+index d148520..de2af92 100644
+--- a/REVIEW_KODE.md
++++ b/REVIEW_KODE.md
+@@ -482,4 +482,78 @@ Lengkap untuk menawarkan produk ke sekolah:
+   tabel dokumentasi & fitur template universal.
+ - (Sebelumnya) `PANDUAN_PERSIAPAN_SEKOLAH.md` — formulir data calon pembeli.
+ 
++---
++
++## 14. Review Folder `fitur/halaman` (168 file) — Sistem vs Konten ✅
++
++> Konten halaman yang sengaja kosong (stub template: SdgsDetail, SilaAsa/Asa,
++> ResearchDetail, dll.) TIDAK dinilai — sesuai permintaan. Yang direview:
++> sistem/fungsionalitas.
++
++### ✅ Sistem yang SUDAH BAGUS (pertahankan)
++1. **Navigasi** — `NavigationContext` rapi (goBack/navigateTo + hook
++   `useBackNavigation`/`useSectionNavigate`); `navItems` adaptif jenjang
++   (`isSmk`); switch-case lengkap di ExpectationModal; sistem `detailNav`
++   (resolveRiset/Sdgs/Sila/Asa/Ebook/Reg/Berita) **dengan test**.
++2. **Kalender Akademik** — `dateUtils.ts` satu pintu (parse tanggal Indonesia,
++   rentang, regex lookbehind) + test; data agenda 4 tahun (2023–2027); libur
++   nasional 2025–2027; DasborKalender sudah terstruktur (TypeTable,
++   SemesterSection, AgendaDetailView).
++3. **Carousel manual** — auto-play + pause + swipe touch + kontrol; lengkap
++   tanpa dependency eksternal.
++4. **Kebersihan kode** — 0 `any`, 0 `console.log`, 0 TODO di seluruh folder.
++5. **Integrasi identitas** — `useSchoolIdentity` dipakai di GtkSiswaPage,
++   FeedbackForm, SiakadSection.
++
++### 🔧 DIPERBAIKI (commit #22)
++1. **FloatingNav hardcode URL API** — sebelumnya
++   `import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api'` ditulis
++   manual (duplikasi config) dan tetap fetch walau mode lokal → kini pakai
++   `API_BASE` & `hasApi` dari `services/apiConfig` (konsisten dengan sistem
++   lain; mode lokal tidak fetch sia-sia).
++2. **embla-carousel-react & embla-carousel-auto-scroll DIHAPUS** — keduanya
++   ada di dependencies tapi **0 pemakaian** di seluruh repo (carousel buatan
++   sendiri). Menghemat install & ukuran bundle.
++
++### 📝 Rekomendasi (belum dikerjakan — butuh waktu)
++1. **God component**: `ExpectationModal` (824), `AgendaPage` (889),
++   `DasborKalenderAkademik` (921) — sudah terstruktur, tapi bisa dipecah lagi
++   dengan pola hook (seperti AdminPanel/DiskusiTugas).
++2. **Duplikasi carousel**: `TestimoniCarousel` & `LayananCarousel` ~90% identik
++   → ekstrak satu hook `useCarousel`.
++3. **Stub konten** (Sdgs/SilaAsa/Research): pastikan terhubung via detailNav —
++   sudah ada resolver + test ✅; isi konten menyusul per sekolah.
++4. **Libur nasional 2027** baru 6 entri — lengkapi mendekati tahun berjalan.
++
++---
++
++## 15. Perbaikan Markup Menu Utama (nilai 54 → target 65+) ✅
++
++Audit markup 10 folder role (~110 file) menghasilkan skor 54/100. Perbaikan
++yang dikerjakan (tanpa emoji / efek mengambang — hanya icon):
++
++### ✅ Dikerjakan
++1. **`type="button"` pada 108 tombol** (40 file) — tombol ber-`onClick` kini
++   eksplisit `type="button"`, menghilangkan risiko submit tak sengaja saat
++   berada di dalam `<form>` (sebelumnya default `type="submit"`). Tombol
++   submit (tanpa onClick, di form) sengaja dibiarkan.
++2. **Audit `alt` gambar** — hasil pengecekan tag penuh (multi-line): SEMUA
++   70 `<img>` sudah punya `alt` (hitungan 62 sebelumnya false positive grep
++   per-baris). Tidak ada yang perlu diperbaiki.
++3. **Komponen `StatCard`** (baru, `components/ui`) — gaya hitam-putih
++   konsisten, props `label/value/icon/alert/loading`, TANPA animasi/emoji.
++   Dipakai di **DasborGuru** menggantikan 2 blok markup duplikat (loading &
++   data, 6 kartu) — visual identik, kode jauh lebih pendek. +4 unit test.
++   Ini contoh awal "design system mulai dipakai" — komponen UI lama
++   (Button/Card/Input) bergaya slate/blue TIDAK dipakai karena tidak cocok
++   dengan design system hitam-putih aplikasi (rekomendasi: samakan gayanya
++   dulu, lalu pakai bertahap).
++
++### 📋 Rekomendasi lanjutan (urutan dampak)
++1. Samakan gaya komponen `Button/Input/Card` ke hitam-putih → pakai di
++   form guru/murid (menghapus markup duplikat terbesar).
++2. Ekstrak `SectionHeader` (pola border-b + uppercase) — muncul 40×.
++3. Terapkan `StatCard` ke dasbor lain setelah polanya disamakan.
++4. Hapus 350 tombol tanpa onClick yang dibiarkan? (itu submit button — aman).
++
+ *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
+diff --git a/src/components/ui/StatCard.test.tsx b/src/components/ui/StatCard.test.tsx
+new file mode 100644
+index 0000000..7ea33ec
+--- /dev/null
++++ b/src/components/ui/StatCard.test.tsx
+@@ -0,0 +1,32 @@
++/**
++ * Unit test StatCard — komponen kartu statistik dashboard.
++ */
++import { describe, it, expect } from 'vitest';
++import { render, screen } from '@testing-library/react';
++import { Users } from 'lucide-react';
++import StatCard from './StatCard';
++
++describe('StatCard', () => {
++  it('menampilkan label dan value', () => {
++    render(<StatCard label="Total Siswa" value={120} />);
++    expect(screen.getByText('Total Siswa')).toBeTruthy();
++    expect(screen.getByText('120')).toBeTruthy();
++  });
++
++  it('mode loading menampilkan skeleton, bukan value', () => {
++    const { container } = render(<StatCard label="Hadir" value={5} loading />);
++    expect(screen.queryByText('5')).toBeNull();
++    expect(container.querySelectorAll('.animate-pulse, .bg-neutral-200, [class*=skeleton], .animate-pulse')).toBeTruthy();
++  });
++
++  it('mode alert memakai warna merah untuk value', () => {
++    const { container } = render(<StatCard label="Alpa" value={3} alert />);
++    const valueEl = [...container.querySelectorAll('p')].find((p) => p.textContent === '3');
++    expect(valueEl?.className).toContain('text-rose-700');
++  });
++
++  it('menerima ikon dan merendernya', () => {
++    const { container } = render(<StatCard label="Siswa" value={1} icon={Users} />);
++    expect(container.querySelector('svg')).toBeTruthy();
++  });
++});
+diff --git a/src/components/ui/StatCard.tsx b/src/components/ui/StatCard.tsx
+new file mode 100644
+index 0000000..82562a9
+--- /dev/null
++++ b/src/components/ui/StatCard.tsx
+@@ -0,0 +1,51 @@
++/**
++ * StatCard — kartu statistik dashboard (gaya hitam-putih konsisten).
++ *
++ * Dipakai di dasbor guru/murid/orang-tua untuk menampilkan satu angka
++ * ringkasan dengan label + ikon opsional. Memiliki state loading
++ * (skeleton) dan state alert (angka menonjol warna merah).
++ */
++import type { LucideIcon } from 'lucide-react';
++import Skeleton from './Skeleton';
++
++interface StatCardProps {
++  label: string;
++  value?: number | string;
++  icon?: LucideIcon;
++  alert?: boolean;
++  loading?: boolean;
++}
++
++export default function StatCard({
++  label,
++  value,
++  icon: Icon,
++  alert = false,
++  loading = false,
++}: StatCardProps) {
++  return (
++    <div className="flex min-h-[74px] flex-col justify-between rounded-md border-2 border-black bg-white p-2.5">
++      <div className="flex items-center justify-between border-b-2 border-black/10 pb-1">
++        {loading ? (
++          <Skeleton className="h-3 w-24" />
++        ) : (
++          <span className="text-[10px] font-bold tracking-wider text-black uppercase">{label}</span>
++        )}
++        {loading ? (
++          <Skeleton className="h-3.5 w-3.5 rounded" />
++        ) : Icon ? (
++          <Icon className={`h-3.5 w-3.5 ${alert ? 'text-rose-600' : 'text-black'}`} />
++        ) : null}
++      </div>
++      <div className="mt-1 text-center">
++        {loading ? (
++          <Skeleton className="h-6 w-12" />
++        ) : (
++          <p className={`text-xl leading-tight font-bold ${alert ? 'text-rose-700' : 'text-black'}`}>
++            {value}
++          </p>
++        )}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/ui/index.ts b/src/components/ui/index.ts
+index 7b01a77..a5fb7bc 100644
+--- a/src/components/ui/index.ts
++++ b/src/components/ui/index.ts
+@@ -11,3 +11,4 @@ export { default as DonutChart, MiniDonut } from './DonutChart';
+ export { default as BarChart, HorizontalBarChart } from './BarChart';
+ export { default as QuickActions } from './QuickActions';
+ export { lazyPage, PageSkeleton } from './LazyLoad';
++export { default as StatCard } from './StatCard';
+diff --git a/src/fitur/admin/AdminPerpustakaan/BookAutocomplete.tsx b/src/fitur/admin/AdminPerpustakaan/BookAutocomplete.tsx
+index 5f77711..a04c5ea 100644
+--- a/src/fitur/admin/AdminPerpustakaan/BookAutocomplete.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/BookAutocomplete.tsx
+@@ -169,7 +169,7 @@ export function BookAutocomplete({
+           </div>
+         )}
+       </div>
+-      <button
++      <button type="button"
+         onClick={onAdd}
+         disabled={!selectedId}
+         className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/40"
+diff --git a/src/fitur/admin/AdminPerpustakaan/FormPeminjaman.tsx b/src/fitur/admin/AdminPerpustakaan/FormPeminjaman.tsx
+index 3d70402..f1b33ea 100644
+--- a/src/fitur/admin/AdminPerpustakaan/FormPeminjaman.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/FormPeminjaman.tsx
+@@ -234,13 +234,13 @@ export function FormPeminjaman({
+           </div>
+ 
+           <div className="flex justify-end gap-2 border-t-2 border-black/10 pt-4">
+-            <button
++            <button type="button"
+               onClick={handleReset}
+               className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+             >
+               <X className="h-3.5 w-3.5" /> Reset
+             </button>
+-            <button
++            <button type="button"
+               onClick={handleProcess}
+               className="flex items-center gap-2 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
+             >
+@@ -274,13 +274,13 @@ export function FormPeminjaman({
+               className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+             />
+             <div className="mt-4 flex justify-end gap-2">
+-              <button
++              <button type="button"
+                 onClick={() => setRejectTargetId(null)}
+                 className="rounded-md border-2 border-black bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
+               >
+                 Batal
+               </button>
+-              <button
++              <button type="button"
+                 onClick={handleConfirmReject}
+                 className="rounded-md border-2 border-rose-600 bg-rose-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-700"
+               >
+diff --git a/src/fitur/admin/AdminPerpustakaan/PendingLoansTable.tsx b/src/fitur/admin/AdminPerpustakaan/PendingLoansTable.tsx
+index c1b781a..bfea0a0 100644
+--- a/src/fitur/admin/AdminPerpustakaan/PendingLoansTable.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/PendingLoansTable.tsx
+@@ -55,13 +55,13 @@ export function PendingLoansTable({ loans, books, onApprove, onReject }: Pending
+                 <td className="px-3 py-2.5 font-mono text-[10px] text-black/70">{tx.borrowDate}</td>
+                 <td className="px-3 py-2.5 text-right">
+                   <div className="flex justify-end gap-2">
+-                    <button
++                    <button type="button"
+                       onClick={() => onApprove(tx.id)}
+                       className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
+                     >
+                       <Check className="h-3.5 w-3.5" /> SETUJUI
+                     </button>
+-                    <button
++                    <button type="button"
+                       onClick={() => onReject(tx.id)}
+                       className="flex items-center gap-1.5 rounded-md border-2 border-rose-600 bg-white px-3 py-1 text-[10px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
+                     >
+diff --git a/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx b/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
+index 8ef9229..d2d2e55 100644
+--- a/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
+@@ -70,7 +70,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
+     return (
+       <div className="rounded-md border-2 border-dashed border-black bg-white p-8 text-center">
+         <p className="text-xs font-bold text-black">Buku tidak ditemukan</p>
+-        <button
++        <button type="button"
+           onClick={onBack}
+           className="mt-4 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+         >
+@@ -142,7 +142,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
+           </div>
+ 
+           {/* Back Button */}
+-          <button
++          <button type="button"
+             onClick={onBack}
+             className="mt-5 flex items-center gap-2 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
+           >
+diff --git a/src/fitur/admin/AdminPerpustakaan/PerpusInventori.tsx b/src/fitur/admin/AdminPerpustakaan/PerpusInventori.tsx
+index 4609c45..15f53a2 100644
+--- a/src/fitur/admin/AdminPerpustakaan/PerpusInventori.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/PerpusInventori.tsx
+@@ -363,7 +363,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps)
+         </div>
+ 
+         <div className="flex flex-wrap items-center gap-3 p-4">
+-          <button
++          <button type="button"
+             onClick={handleOpenAdd}
+             className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+           >
+@@ -454,14 +454,14 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps)
+                   </td>
+                   <td className="px-3 py-2.5">
+                     <div className="flex gap-1">
+-                      <button
++                      <button type="button"
+                         onClick={() => handleEdit(book)}
+                         className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                         title="Edit"
+                       >
+                         <Edit className="h-3 w-3" />
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() => handleDelete(book.id)}
+                         className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                         title="Hapus"
+diff --git a/src/fitur/admin/AdminPerpustakaan/ReturnReceipt.tsx b/src/fitur/admin/AdminPerpustakaan/ReturnReceipt.tsx
+index 8f443fa..0ccbda3 100644
+--- a/src/fitur/admin/AdminPerpustakaan/ReturnReceipt.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/ReturnReceipt.tsx
+@@ -31,7 +31,7 @@ export function ReturnReceipt({ struk }: ReturnReceiptProps) {
+   };
+ 
+   return (
+-    <button
++    <button type="button"
+       onClick={handlePrint}
+       className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
+     >
+diff --git a/src/fitur/admin/AdminPerpustakaan/SelectedBooksTable.tsx b/src/fitur/admin/AdminPerpustakaan/SelectedBooksTable.tsx
+index 80b95e1..b9f587e 100644
+--- a/src/fitur/admin/AdminPerpustakaan/SelectedBooksTable.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/SelectedBooksTable.tsx
+@@ -44,7 +44,7 @@ export function SelectedBooksTable({ books, onRemove }: SelectedBooksTableProps)
+                 {book.qty}
+               </td>
+               <td className="px-3 py-2 text-center">
+-                <button
++                <button type="button"
+                   onClick={() => onRemove(book.id)}
+                   className="rounded-md border-2 border-rose-600 bg-white p-1 text-rose-600 transition-colors hover:bg-rose-50"
+                   title="Hapus buku"
+diff --git a/src/fitur/admin/AdminPerpustakaan/master/MasterAnggota.tsx b/src/fitur/admin/AdminPerpustakaan/master/MasterAnggota.tsx
+index 0990f0b..8afafd9 100644
+--- a/src/fitur/admin/AdminPerpustakaan/master/MasterAnggota.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/master/MasterAnggota.tsx
+@@ -46,7 +46,7 @@ export default function MasterAnggota() {
+       </div>
+ 
+       <div className="p-4">
+-        <button
++        <button type="button"
+           onClick={() => {
+             setShowForm(true);
+             setEditingId(null);
+@@ -114,7 +114,7 @@ export default function MasterAnggota() {
+                   </td>
+                   <td className="px-3 py-2.5">
+                     <div className="flex gap-1">
+-                      <button
++                      <button type="button"
+                         onClick={() => {
+                           setShowForm(true);
+                           setEditingId(item.id);
+@@ -123,7 +123,7 @@ export default function MasterAnggota() {
+                       >
+                         <Pencil className="h-3 w-3" /> Edit
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() => handleDelete(item.id)}
+                         className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                       >
+diff --git a/src/fitur/admin/AdminPerpustakaan/master/MasterBuku.tsx b/src/fitur/admin/AdminPerpustakaan/master/MasterBuku.tsx
+index 4f894b5..19a878a 100644
+--- a/src/fitur/admin/AdminPerpustakaan/master/MasterBuku.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/master/MasterBuku.tsx
+@@ -107,7 +107,7 @@ export default function MasterBuku() {
+                       <button className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+                         <Pencil className="h-3 w-3" /> Edit
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() => handleDelete(item.id)}
+                         className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                       >
+diff --git a/src/fitur/admin/AdminPerpustakaan/master/MasterKategori.tsx b/src/fitur/admin/AdminPerpustakaan/master/MasterKategori.tsx
+index cce121a..0df4684 100644
+--- a/src/fitur/admin/AdminPerpustakaan/master/MasterKategori.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/master/MasterKategori.tsx
+@@ -70,7 +70,7 @@ export default function MasterKategori() {
+                       <button className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+                         <Pencil className="h-3 w-3" /> Edit
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() => handleDelete(item.id)}
+                         className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                       >
+diff --git a/src/fitur/admin/AdminPerpustakaan/master/MasterPenerbit.tsx b/src/fitur/admin/AdminPerpustakaan/master/MasterPenerbit.tsx
+index 35a1c9a..44dcd10 100644
+--- a/src/fitur/admin/AdminPerpustakaan/master/MasterPenerbit.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/master/MasterPenerbit.tsx
+@@ -77,7 +77,7 @@ export default function MasterPenerbit() {
+                       <button className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+                         <Pencil className="h-3 w-3" /> Edit
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() => handleDelete(item.id)}
+                         className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                       >
+diff --git a/src/fitur/admin/AdminPerpustakaan/master/MasterRak.tsx b/src/fitur/admin/AdminPerpustakaan/master/MasterRak.tsx
+index 3bc249b..d0eb46d 100644
+--- a/src/fitur/admin/AdminPerpustakaan/master/MasterRak.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/master/MasterRak.tsx
+@@ -88,7 +88,7 @@ export default function MasterRak() {
+                         <button className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
+                           <Pencil className="h-3 w-3" /> Edit
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => handleDelete(item.kode)}
+                           className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                         >
+diff --git a/src/fitur/admin/components/TabAkunGuru.tsx b/src/fitur/admin/components/TabAkunGuru.tsx
+index c31126a..eb0bbdb 100644
+--- a/src/fitur/admin/components/TabAkunGuru.tsx
++++ b/src/fitur/admin/components/TabAkunGuru.tsx
+@@ -424,13 +424,13 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
+                         </p>
+                       </div>
+                       <div className="flex justify-end gap-1.5">
+-                        <button
++                        <button type="button"
+                           onClick={() => setShowConfirm(false)}
+                           className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:bg-neutral-100"
+                         >
+                           Batal
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => handleExecuteSave(selectedTeacher.id)}
+                           className="rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
+                         >
+@@ -440,7 +440,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
+                     </div>
+                   )}
+ 
+-                  <button
++                  <button type="button"
+                     onClick={() => preCheckValidation(selectedTeacher.id)}
+                     disabled={showConfirm}
+                     className={`inline-flex items-center gap-1.5 rounded-md border-2 px-4 py-2 text-xs font-bold transition-colors ${
+diff --git a/src/fitur/admin/components/TabAkunOrangTua.tsx b/src/fitur/admin/components/TabAkunOrangTua.tsx
+index 0823610..0815f7c 100644
+--- a/src/fitur/admin/components/TabAkunOrangTua.tsx
++++ b/src/fitur/admin/components/TabAkunOrangTua.tsx
+@@ -85,7 +85,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+           </div>
+           <div className="sm:mt-0">
+             {!isEditingGuest ? (
+-              <button
++              <button type="button"
+                 onClick={() => setIsEditingGuest(true)}
+                 className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+               >
+@@ -93,13 +93,13 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+               </button>
+             ) : (
+               <div className="flex gap-2">
+-                <button
++                <button type="button"
+                   onClick={handleSaveGuest}
+                   className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                 >
+                   <Save className="h-3 w-3" /> Simpan
+                 </button>
+-                <button
++                <button type="button"
+                   onClick={() => setIsEditingGuest(false)}
+                   className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                 >
+@@ -137,7 +137,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+               </p>
+             </div>
+ 
+-            <button
++            <button type="button"
+               disabled={!isEditingGuest}
+               onClick={() =>
+                 setGuestConfig({ ...guestConfig, allowEmailLogin: !guestConfig.allowEmailLogin })
+@@ -193,7 +193,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+                 <th className="w-1/4 border-r border-black px-4 py-2.5">
+                   <div className="flex items-center gap-1.5">
+                     <span>Kata Sandi</span>
+-                    <button
++                    <button type="button"
+                       onClick={() => setShowPasswords(!showPasswords)}
+                       className="rounded-md border-2 border-black bg-white p-1 font-bold text-black transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                       title={showPasswords ? 'Sembunyikan' : 'Tampilkan'}
+@@ -259,14 +259,14 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+                   <td className="px-4 py-3 text-right">
+                     {editingId === s.id ? (
+                       <div className="flex justify-end gap-1">
+-                        <button
++                        <button type="button"
+                           onClick={() => handleSave(s.id)}
+                           className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                           title="Simpan"
+                         >
+                           <Save className="h-3 w-3" />
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => setEditingId(null)}
+                           className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                           title="Batal"
+@@ -275,7 +275,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
+                         </button>
+                       </div>
+                     ) : (
+-                      <button
++                      <button type="button"
+                         onClick={() => handleEdit(s)}
+                         className="ml-auto inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
+                       >
+diff --git a/src/fitur/admin/components/TabAkunSiswa.tsx b/src/fitur/admin/components/TabAkunSiswa.tsx
+index 98b9887..0001590 100644
+--- a/src/fitur/admin/components/TabAkunSiswa.tsx
++++ b/src/fitur/admin/components/TabAkunSiswa.tsx
+@@ -601,13 +601,13 @@ export default function TabAkunSiswa() {
+                     </td>
+                     <td className="p-2.5 text-center">
+                       <div className="flex items-center justify-center gap-1.5">
+-                        <button
++                        <button type="button"
+                           onClick={() => handleSaveStudent(student.id)}
+                           className="rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
+                         >
+                           Simpan
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => openStatusModal(student)}
+                           title="Ubah status mutasi siswa"
+                           className="inline-flex items-center gap-1 rounded-md border-2 border-blue-600 bg-white px-2.5 py-1 text-[10px] font-bold text-blue-600 transition-colors hover:bg-neutral-100"
+@@ -615,14 +615,14 @@ export default function TabAkunSiswa() {
+                           <UserCog className="h-3 w-3" />
+                           Mutasi
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => setHistoryStudentId(student.id)}
+                           className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                         >
+                           <History className="h-3 w-3" />
+                           Log
+                         </button>
+-                        <button
++                        <button type="button"
+                           onClick={() => handleDeleteStudent(student.id)}
+                           className="inline-flex items-center gap-1 rounded-md border-2 border-rose-600 bg-white px-2.5 py-1 text-[10px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
+                         >
+@@ -661,13 +661,13 @@ export default function TabAkunSiswa() {
+             <div className="flex flex-wrap items-center gap-1.5">
+               {mutationRows.length > 0 ? (
+                 <>
+-                  <button
++                  <button type="button"
+                     onClick={handleExportMutationsCsv}
+                     className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                   >
+                     <Download className="h-3.5 w-3.5" /> CSV
+                   </button>
+-                  <button
++                  <button type="button"
+                     onClick={handleExportMutationsPdf}
+                     className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                   >
+@@ -677,7 +677,7 @@ export default function TabAkunSiswa() {
+               ) : null}
+               {selectedHistoryStudent.status === 'pindah' ||
+               selectedHistoryStudent.status === 'keluar' ? (
+-                <button
++                <button type="button"
+                   onClick={handleExportSuratMutasi}
+                   className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-600 bg-white px-2.5 py-1 text-[10px] font-bold text-emerald-600 transition-colors hover:bg-neutral-100"
+                 >
+@@ -829,13 +829,13 @@ export default function TabAkunSiswa() {
+               </label>
+             </div>
+             <div className="flex justify-end gap-2 border-t-2 border-black/10 bg-neutral-50 p-3">
+-              <button
++              <button type="button"
+                 onClick={() => setStatusModal(null)}
+                 className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
+               >
+                 Batal
+               </button>
+-              <button
++              <button type="button"
+                 onClick={handleSetStatus}
+                 className="rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
+               >
+diff --git a/src/fitur/admin/components/TabPengumumanAdmin.tsx b/src/fitur/admin/components/TabPengumumanAdmin.tsx
+index 19ff164..32c5a82 100644
+--- a/src/fitur/admin/components/TabPengumumanAdmin.tsx
++++ b/src/fitur/admin/components/TabPengumumanAdmin.tsx
+@@ -300,13 +300,13 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
+                     </p>
+                   </div>
+                   <div className="flex justify-end gap-1.5 text-[10px]">
+-                    <button
++                    <button type="button"
+                       onClick={() => setShowConfirm(false)}
+                       className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                     >
+                       Batal
+                     </button>
+-                    <button
++                    <button type="button"
+                       onClick={handleExecuteSimpan}
+                       className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                     >
+@@ -317,7 +317,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
+               )}
+ 
+               {/* TOMBOL UTAMA */}
+-              <button
++              <button type="button"
+                 onClick={preCheckValidation}
+                 className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-5 py-2 text-xs font-bold text-black transition-colors sm:w-auto ${
+                   showConfirm
+@@ -356,7 +356,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
+                       {new Date(item.createdAt).toLocaleString('id-ID')}
+                     </p>
+                   </div>
+-                  <button
++                  <button type="button"
+                     onClick={() => {
+                       if (window.confirm('Hapus pengumuman ini?')) {
+                         deletePengumumanAdmin(item.id);
+diff --git a/src/fitur/admin/components/TabTagihanSekolah.tsx b/src/fitur/admin/components/TabTagihanSekolah.tsx
+index 81dea1d..2f640af 100644
+--- a/src/fitur/admin/components/TabTagihanSekolah.tsx
++++ b/src/fitur/admin/components/TabTagihanSekolah.tsx
+@@ -172,13 +172,13 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
+                 </p>
+               </div>
+               <div className="flex justify-end gap-1.5 text-[10px]">
+-                <button
++                <button type="button"
+                   onClick={() => setShowConfirm(false)}
+                   className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:bg-neutral-100"
+                 >
+                   Batal
+                 </button>
+-                <button
++                <button type="button"
+                   onClick={handleExecuteTerapkan}
+                   className="rounded-md border-2 border-black bg-black px-2.5 py-1 font-bold text-white transition-colors hover:bg-neutral-900"
+                 >
+@@ -189,7 +189,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
+           )}
+ 
+           {/* TOMBOL UTAMA */}
+-          <button
++          <button type="button"
+             onClick={preCheckValidation}
+             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
+               showConfirm
+diff --git a/src/fitur/admin/components/TabTambahGuru.tsx b/src/fitur/admin/components/TabTambahGuru.tsx
+index bff0553..2f4ffbe 100644
+--- a/src/fitur/admin/components/TabTambahGuru.tsx
++++ b/src/fitur/admin/components/TabTambahGuru.tsx
+@@ -281,13 +281,13 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string)
+                 </p>
+               </div>
+               <div className="flex justify-end gap-1.5 text-[10px]">
+-                <button
++                <button type="button"
+                   onClick={() => setShowConfirm(false)}
+                   className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                 >
+                   Batal
+                 </button>
+-                <button
++                <button type="button"
+                   onClick={handleExecuteSimpan}
+                   className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                 >
+@@ -298,7 +298,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string)
+           )}
+ 
+           {/* TOMBOL UTAMA */}
+-          <button
++          <button type="button"
+             onClick={preCheckValidation}
+             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
+               showConfirm
+diff --git a/src/fitur/admin/components/TabTambahSiswa.tsx b/src/fitur/admin/components/TabTambahSiswa.tsx
+index 613e2dc..43424a1 100644
+--- a/src/fitur/admin/components/TabTambahSiswa.tsx
++++ b/src/fitur/admin/components/TabTambahSiswa.tsx
+@@ -131,7 +131,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
+         </div>
+ 
+         <div className="flex w-full justify-end border-t-2 border-black/10 pt-3">
+-          <button
++          <button type="button"
+             onClick={handleAddStudent}
+             className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
+           >
+diff --git a/src/fitur/autentikasi/TutorialModal.tsx b/src/fitur/autentikasi/TutorialModal.tsx
+index 455cf58..bb43e37 100644
+--- a/src/fitur/autentikasi/TutorialModal.tsx
++++ b/src/fitur/autentikasi/TutorialModal.tsx
+@@ -18,7 +18,7 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
+           {/* Banner / Judul Utama */}
+           <div className="relative mb-6 border-b-4 border-double border-gray-900 pt-14 pb-5 text-center md:pt-10">
+             <div className="absolute top-14 right-0 z-10 md:top-10">
+-              <button
++              <button type="button"
+                 onClick={onClose}
+                 className="mr-0 cursor-pointer text-sm font-medium text-slate-700 transition hover:text-slate-900"
+               >
+diff --git a/src/fitur/bersama/ConfirmModal.tsx b/src/fitur/bersama/ConfirmModal.tsx
+index 5b62967..0d9f106 100644
+--- a/src/fitur/bersama/ConfirmModal.tsx
++++ b/src/fitur/bersama/ConfirmModal.tsx
+@@ -47,7 +47,7 @@ export default function ConfirmModal({
+         aria-labelledby="confirm-modal-title"
+         className="relative z-10 mx-4 w-full max-w-sm rounded-md border-2 border-black bg-white p-5"
+       >
+-        <button
++        <button type="button"
+           onClick={onCancel}
+           className="absolute top-3 right-3 rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:bg-neutral-100"
+           aria-label="Tutup"
+@@ -76,13 +76,13 @@ export default function ConfirmModal({
+         <p className="mb-5 text-xs leading-relaxed font-bold text-black">{message}</p>
+ 
+         <div className="flex justify-end gap-2">
+-          <button
++          <button type="button"
+             onClick={onCancel}
+             className="rounded-md border-2 border-black bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
+           >
+             {cancelLabel}
+           </button>
+-          <button
++          <button type="button"
+             onClick={onConfirm}
+             className={`rounded-md border-2 px-4 py-1.5 text-xs font-bold transition-colors ${
+               variant === 'danger'
+diff --git a/src/fitur/bersama/NotificationDropdown.tsx b/src/fitur/bersama/NotificationDropdown.tsx
+index 421d34a..e9d8e6e 100644
+--- a/src/fitur/bersama/NotificationDropdown.tsx
++++ b/src/fitur/bersama/NotificationDropdown.tsx
+@@ -71,7 +71,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
+     >
+       <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
+         <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase">Notifikasi</h3>
+-        <button
++        <button type="button"
+           onClick={handleMarkAllRead}
+           className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800"
+         >
+@@ -89,7 +89,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
+             const Icon = TYPE_ICONS[item.type];
+             const isNew = newKeys.includes(item.itemKey);
+             return (
+-              <button
++              <button type="button"
+                 key={item.id}
+                 onClick={() => handleClickItem(item)}
+                 className={`flex w-full items-start gap-3 border-b border-slate-100 px-4 py-2.5 text-left transition-colors hover:bg-slate-50 ${
+@@ -112,7 +112,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
+       </div>
+ 
+       <div className="border-t border-slate-200 px-4 py-2 text-center">
+-        <button
++        <button type="button"
+           onClick={() => {
+             onNavigate('school-announcements');
+             onClose();
+diff --git a/src/fitur/bersama/PesanMasuk.tsx b/src/fitur/bersama/PesanMasuk.tsx
+index 16af243..bdc3f30 100644
+--- a/src/fitur/bersama/PesanMasuk.tsx
++++ b/src/fitur/bersama/PesanMasuk.tsx
+@@ -187,7 +187,7 @@ export default function PesanMasuk() {
+             </div>
+           ) : (
+             filteredUsers.map((u) => (
+-              <button
++              <button type="button"
+                 key={u.id}
+                 onClick={() => {
+                   setActiveChatId(u.id);
+diff --git a/src/fitur/guru/DasborGuru.tsx b/src/fitur/guru/DasborGuru.tsx
+index 1cfceaf..707b492 100644
+--- a/src/fitur/guru/DasborGuru.tsx
++++ b/src/fitur/guru/DasborGuru.tsx
+@@ -26,7 +26,7 @@ import {
+ import { useStoreVersion } from '../../hooks/useStoreVersion';
+ import HalamanRpsGuru from './HalamanRpsGuru';
+ import { PageProps } from '../../types';
+-import { Skeleton, TableSkeleton, DonutChart, BarChart, QuickActions } from '../../components/ui';
++import { Skeleton, TableSkeleton, DonutChart, BarChart, QuickActions, StatCard } from '../../components/ui';
+ 
+ type JadwalHariIni = {
+   no: number;
+@@ -167,18 +167,7 @@ export default function DasborGuru({ onNavigate }: PageProps) {
+               'Alpa',
+               'Belum Presensi',
+             ].map((label) => (
+-              <div
+-                key={label}
+-                className="flex min-h-[74px] flex-col justify-between rounded-md border-2 border-black bg-white p-2.5"
+-              >
+-                <div className="flex items-center justify-between border-b-2 border-black/10 pb-1">
+-                  <Skeleton className="h-3 w-24" />
+-                  <Skeleton className="h-3.5 w-3.5 rounded" />
+-                </div>
+-                <div className="mt-1 flex justify-center">
+-                  <Skeleton className="h-6 w-12" />
+-                </div>
+-              </div>
++              <StatCard key={label} label={label} loading />
+             ))}
+           </>
+         ) : (
+@@ -201,28 +190,13 @@ export default function DasborGuru({ onNavigate }: PageProps) {
+                 alert: stats.todayBelum > 0,
+               },
+             ].map((card) => (
+-              <div
++              <StatCard
+                 key={card.label}
+-                className="flex min-h-[74px] flex-col justify-between rounded-md border-2 border-black bg-white p-2.5"
+-              >
+-                <div className="flex items-center justify-between border-b-2 border-black/10 pb-1">
+-                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+-                    {card.label}
+-                  </span>
+-                  <card.icon
+-                    className={`h-3.5 w-3.5 ${card.alert ? 'text-rose-600' : 'text-black'}`}
+-                  />
+-                </div>
+-                <div className="mt-1 text-center">
+-                  <p
+-                    className={`text-xl leading-tight font-bold text-black ${
+-                      card.alert ? 'text-rose-700' : ''
+-                    }`}
+-                  >
+-                    {card.value}
+-                  </p>
+-                </div>
+-              </div>
++                label={card.label}
++                value={card.value}
++                icon={card.icon}
++                alert={card.alert}
++              />
+             ))}{' '}
+           </>
+         )}
+diff --git a/src/fitur/guru/HalamanLaporan.tsx b/src/fitur/guru/HalamanLaporan.tsx
+index b408234..fa5eb9e 100644
+--- a/src/fitur/guru/HalamanLaporan.tsx
++++ b/src/fitur/guru/HalamanLaporan.tsx
+@@ -345,7 +345,7 @@ export default function ReportPage() {
+           {(reportData.length > 0 || (reportMode === 'monthly' && kelasRekap.length > 0)) && (
+             <div className="flex items-center gap-2">
+               {reportMode === 'monthly' && kelasRekap.length > 0 && (
+-                <button
++                <button type="button"
+                   onClick={handleExportKelasCSV}
+                   className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                 >
+@@ -354,13 +354,13 @@ export default function ReportPage() {
+               )}
+               {reportData.length > 0 && (
+                 <>
+-                  <button
++                  <button type="button"
+                     onClick={handleExportCSV}
+                     className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-white transition-colors hover:bg-neutral-800"
+                   >
+                     <Download className="h-3.5 w-3.5" /> CSV
+                   </button>
+-                  <button
++                  <button type="button"
+                     onClick={() => {
+                       const className = classes.find((c) => c.id === selectedClass)?.name || '';
+                       exportAbsensiPdf(
+diff --git a/src/fitur/guru/InputRapotGuru.tsx b/src/fitur/guru/InputRapotGuru.tsx
+index d521e89..9e82c14 100644
+--- a/src/fitur/guru/InputRapotGuru.tsx
++++ b/src/fitur/guru/InputRapotGuru.tsx
+@@ -693,7 +693,7 @@ export default function InputRapotGuru() {
+                         MATA PELAJARAN
+                       </span>
+                       <span className="text-black">|</span>
+-                      <button
++                      <button type="button"
+                         onClick={() =>
+                           exportRapotPdf(
+                             nilaiSiswa,
+@@ -708,7 +708,7 @@ export default function InputRapotGuru() {
+                       >
+                         <Download className="h-3 w-3" /> PDF
+                       </button>
+-                      <button
++                      <button type="button"
+                         onClick={() =>
+                           exportRapotCsv(
+                             nilaiSiswa,
+diff --git a/src/fitur/guru/KotakSuratGuru.tsx b/src/fitur/guru/KotakSuratGuru.tsx
+index d34e0eb..001559e 100644
+--- a/src/fitur/guru/KotakSuratGuru.tsx
++++ b/src/fitur/guru/KotakSuratGuru.tsx
+@@ -172,7 +172,7 @@ export default function KotakSuratGuru() {
+             <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+               Arsip Kalender
+             </span>
+-            <button
++            <button type="button"
+               onClick={() => setShowCalendar((prev) => !prev)}
+               className="mt-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+             >
+@@ -190,7 +190,7 @@ export default function KotakSuratGuru() {
+                   Arsip Bulanan
+                 </h2>
+                 <div className="flex items-center gap-1">
+-                  <button
++                  <button type="button"
+                     onClick={() => navigateMonth(-1)}
+                     className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                   >
+@@ -199,7 +199,7 @@ export default function KotakSuratGuru() {
+                   <span className="min-w-[100px] text-center text-[10px] font-bold text-black uppercase">
+                     {monthLabel}
+                   </span>
+-                  <button
++                  <button type="button"
+                     onClick={() => navigateMonth(1)}
+                     className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                   >
+@@ -225,7 +225,7 @@ export default function KotakSuratGuru() {
+                 {calendarData.weeks.map((week, wIdx) => (
+                   <div key={`${selectedMonth}_${wIdx}`} className="grid grid-cols-7 gap-1">
+                     {week.map((day, dIdx) => (
+-                      <button
++                      <button type="button"
+                         key={`${day.date}_${dIdx}`}
+                         disabled={day.day === 0}
+                         onClick={() => {
+@@ -262,7 +262,7 @@ export default function KotakSuratGuru() {
+               </div>
+ 
+               {selectedDate && (
+-                <button
++                <button type="button"
+                   onClick={() => {
+                     setSelectedDate(null);
+                     setSelectedLetterId('');
+@@ -285,7 +285,7 @@ export default function KotakSuratGuru() {
+             Filter Status:
+           </span>
+ 
+-          <button
++          <button type="button"
+             onClick={() => {
+               setSelectedStatus('semua');
+               setSelectedLetterId('');
+@@ -300,7 +300,7 @@ export default function KotakSuratGuru() {
+           </button>
+ 
+           {(['menunggu', 'disetujui', 'ditolak'] as const).map((status) => (
+-            <button
++            <button type="button"
+               key={status}
+               onClick={() => {
+                 setSelectedStatus(status);
+diff --git a/src/fitur/guru/ManajemenSiswa.tsx b/src/fitur/guru/ManajemenSiswa.tsx
+index 8b8885f..4c7f8c3 100644
+--- a/src/fitur/guru/ManajemenSiswa.tsx
++++ b/src/fitur/guru/ManajemenSiswa.tsx
+@@ -122,7 +122,7 @@ export default function StudentManagement() {
+             Kelola data profil, nomor induk, beserta akun akses siswa per kelas binaan Anda.
+           </p>
+         </div>
+-        <button
++        <button type="button"
+           onClick={openAddModal}
+           className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-800 sm:self-end"
+         >
+@@ -244,7 +244,7 @@ export default function StudentManagement() {
+                   </td>
+                   <td className="px-4 py-3 text-center">
+                     <div className="flex items-center justify-center gap-1">
+-                      <button
++                      <button type="button"
+                         onClick={() => openEditModal(student)}
+                         className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                         title="Ubah Data"
+@@ -254,13 +254,13 @@ export default function StudentManagement() {
+ 
+                       {deleteConfirm === student.id ? (
+                         <div className="flex items-center gap-1.5">
+-                          <button
++                          <button type="button"
+                             onClick={() => handleDelete(student.id)}
+                             className="rounded-md border-2 border-rose-600 bg-rose-600 px-2 py-1 text-[10px] font-bold text-white transition hover:bg-rose-700"
+                           >
+                             Ya
+                           </button>
+-                          <button
++                          <button type="button"
+                             onClick={() => setDeleteConfirm(null)}
+                             className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition hover:bg-neutral-100"
+                           >
+@@ -268,7 +268,7 @@ export default function StudentManagement() {
+                           </button>
+                         </div>
+                       ) : (
+-                        <button
++                        <button type="button"
+                           onClick={() => setDeleteConfirm(student.id)}
+                           className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-rose-600 hover:bg-rose-50 hover:text-rose-600"
+                           title="Hapus Data"
+@@ -317,7 +317,7 @@ export default function StudentManagement() {
+                 )}
+                 {editingStudent ? 'Sunting Berkas Siswa' : 'Registrasi Siswa Baru'}
+               </h2>
+-              <button
++              <button type="button"
+                 onClick={() => setShowModal(false)}
+                 className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+               >
+@@ -401,13 +401,13 @@ export default function StudentManagement() {
+ 
+             {/* Footer Aksi Modal */}
+             <div className="flex justify-end gap-2.5 border-t-2 border-black bg-white p-4">
+-              <button
++              <button type="button"
+                 onClick={() => setShowModal(false)}
+                 className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+               >
+                 Batal
+               </button>
+-              <button
++              <button type="button"
+                 onClick={handleSave}
+                 className="rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition hover:bg-neutral-800"
+               >
+diff --git a/src/fitur/guru/ProfilGuru.tsx b/src/fitur/guru/ProfilGuru.tsx
+index 7d7ed9b..88a765b 100644
+--- a/src/fitur/guru/ProfilGuru.tsx
++++ b/src/fitur/guru/ProfilGuru.tsx
+@@ -138,7 +138,7 @@ export default function TeacherProfilePage() {
+             )}
+             <p className="text-xs font-bold">{message.text}</p>
+           </div>
+-          <button onClick={() => setMessage(null)} className="transition-opacity hover:opacity-70">
++          <button type="button" onClick={() => setMessage(null)} className="transition-opacity hover:opacity-70">
+             <X className="h-4 w-4" />
+           </button>
+         </div>
+diff --git a/src/fitur/murid/ProfilMurid.tsx b/src/fitur/murid/ProfilMurid.tsx
+index d9d5490..b516887 100644
+--- a/src/fitur/murid/ProfilMurid.tsx
++++ b/src/fitur/murid/ProfilMurid.tsx
+@@ -294,7 +294,7 @@ export default function ProfilePage() {
+             )}
+             <p className="text-xs font-bold text-black">{message.text}</p>
+           </div>
+-          <button
++          <button type="button"
+             onClick={() => setMessage(null)}
+             className="rounded-md p-1 text-black transition-colors hover:text-blue-600"
+           >
+diff --git a/src/fitur/orang-tua/DasborOrangTua.tsx b/src/fitur/orang-tua/DasborOrangTua.tsx
+index 260e2cf..810d948 100644
+--- a/src/fitur/orang-tua/DasborOrangTua.tsx
++++ b/src/fitur/orang-tua/DasborOrangTua.tsx
+@@ -429,7 +429,7 @@ export default function DasborOrangTua({ onNavigate }: { onNavigate?: (page: str
+                   <p className="font-mono text-[10px] font-bold text-black">
+                     {waliKelas?.phone || '+62 --- ---- ----'}
+                   </p>
+-                  <button
++                  <button type="button"
+                     onClick={() => onNavigate?.('personal-messages')}
+                     className="cursor-pointer rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
+                   >
+diff --git a/src/fitur/orang-tua/ProfileOrangTuaPage.tsx b/src/fitur/orang-tua/ProfileOrangTuaPage.tsx
+index 1c9f6aa..06c557e 100644
+--- a/src/fitur/orang-tua/ProfileOrangTuaPage.tsx
++++ b/src/fitur/orang-tua/ProfileOrangTuaPage.tsx
+@@ -396,7 +396,7 @@ export default function ProfileOrangTuaPage({
+             </div>
+             <p className="text-xs font-bold">{message.text}</p>
+           </div>
+-          <button
++          <button type="button"
+             onClick={() => setMessage(null)}
+             className="rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:bg-neutral-100"
+             aria-label="Tutup notifikasi"
+@@ -642,7 +642,7 @@ export default function ProfileOrangTuaPage({
+                 </p>
+               </div>
+             </div>
+-            <button
++            <button type="button"
+               onClick={() => onNavigate?.('personal-messages')}
+               className="mt-3 w-full rounded-md border-2 border-black bg-black py-2 text-[10px] font-bold tracking-wider text-white uppercase transition-colors hover:bg-neutral-900"
+             >
+diff --git a/src/fitur/pengaturan/PengaturanAkun.tsx b/src/fitur/pengaturan/PengaturanAkun.tsx
+index 8fe0ff9..1af6f9b 100644
+--- a/src/fitur/pengaturan/PengaturanAkun.tsx
++++ b/src/fitur/pengaturan/PengaturanAkun.tsx
+@@ -387,7 +387,7 @@ export default function PengaturanAkun() {
+         {error && <p className="text-sm text-red-600">{error}</p>}
+         {message && <p className="text-sm text-emerald-600">{message}</p>}
+ 
+-        <button
++        <button type="button"
+           onClick={user.role === 'teacher' ? handleSaveTeacher : handleSaveStudent}
+           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+         >
+diff --git a/src/fitur/perpustakaan/BantuanPerpustakaan.tsx b/src/fitur/perpustakaan/BantuanPerpustakaan.tsx
+index 070db2a..0569d4b 100644
+--- a/src/fitur/perpustakaan/BantuanPerpustakaan.tsx
++++ b/src/fitur/perpustakaan/BantuanPerpustakaan.tsx
+@@ -301,7 +301,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
+           {/* FIX #14 — Hapus px-24 kaku, ganti dengan text-center murni */}
+           <div className="relative mb-6 border-b-4 border-double border-gray-900 pt-12 pb-5 text-center sm:pt-10">
+             {/* FIX #6 — aria-label deskriptif */}
+-            <button
++            <button type="button"
+               onClick={onClose}
+               aria-label="Tutup halaman bantuan perpustakaan"
+               className="absolute top-3 right-0 flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-gray-900 bg-white px-3 py-2 text-xs font-bold tracking-wider text-gray-900 uppercase transition hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:outline-none"
+@@ -347,7 +347,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
+             {TAB_CONFIG.map((tab) => {
+               const isActive = activeTab === tab.id;
+               return (
+-                <button
++                <button type="button"
+                   key={tab.id}
+                   role="tab"
+                   aria-selected={isActive}
+@@ -398,7 +398,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
+                    */
+                   <div key={faq.id} className="rounded-xl border border-gray-200 bg-gray-50">
+                     <dt>
+-                      <button
++                      <button type="button"
+                         id={triggerId}
+                         onClick={() => toggleFaq(faq.id)}
+                         aria-expanded={isOpen}
+diff --git a/src/fitur/perpustakaan/DashboardPerpustakaan.tsx b/src/fitur/perpustakaan/DashboardPerpustakaan.tsx
+index bd8dcab..e1a37af 100644
+--- a/src/fitur/perpustakaan/DashboardPerpustakaan.tsx
++++ b/src/fitur/perpustakaan/DashboardPerpustakaan.tsx
+@@ -303,7 +303,7 @@ export default function DashboardPerpustakaan({
+             </div>
+ 
+             <div className="flex items-center gap-1 border-l border-neutral-200 pl-3">
+-              <button
++              <button type="button"
+                 onClick={onBackToPortal}
+                 aria-label="Kembali ke Portal Akademik"
+                 className="flex items-center gap-1.5 rounded px-2 py-1.5 text-xs font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
+@@ -311,7 +311,7 @@ export default function DashboardPerpustakaan({
+                 <LayoutDashboard className="h-3.5 w-3.5" aria-hidden="true" />
+                 <span className="hidden sm:inline">Portal</span>
+               </button>
+-              <button
++              <button type="button"
+                 onClick={onLogout}
+                 aria-label="Keluar dari Perpustakaan"
+                 className="flex items-center gap-1.5 rounded px-2 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:text-red-800"
+diff --git a/src/fitur/perpustakaan/components/BookDetailModal.tsx b/src/fitur/perpustakaan/components/BookDetailModal.tsx
+index d14d686..2fa9113 100644
+--- a/src/fitur/perpustakaan/components/BookDetailModal.tsx
++++ b/src/fitur/perpustakaan/components/BookDetailModal.tsx
+@@ -145,7 +145,7 @@ export default function BookDetailModal({
+           <h2 id={titleId} className="text-sm font-bold text-neutral-900">
+             Detail Buku
+           </h2>
+-          <button
++          <button type="button"
+             onClick={onClose}
+             aria-label="Tutup detail buku"
+             className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
+@@ -225,7 +225,7 @@ export default function BookDetailModal({
+               {/* ── Aksi ── */}
+               <div className="mt-auto flex gap-2 border-t border-neutral-100 pt-4">
+                 {/* Keranjang */}
+-                <button
++                <button type="button"
+                   onClick={() => onToggleCart(book.id)}
+                   disabled={isUnavailable}
+                   aria-label={
+@@ -251,7 +251,7 @@ export default function BookDetailModal({
+                 </button>
+ 
+                 {/* Pinjam */}
+-                <button
++                <button type="button"
+                   onClick={() => onBorrow(book.id, book.title)}
+                   disabled={isUnavailable || isBorrowed}
+                   aria-label={
+diff --git a/src/fitur/perpustakaan/components/PerpustakaanSidebar.tsx b/src/fitur/perpustakaan/components/PerpustakaanSidebar.tsx
+index 49c7166..3685aad 100644
+--- a/src/fitur/perpustakaan/components/PerpustakaanSidebar.tsx
++++ b/src/fitur/perpustakaan/components/PerpustakaanSidebar.tsx
+@@ -60,7 +60,7 @@ const NavItem: React.FC<{
+   badge?: number;
+   onClick: () => void;
+ }> = ({ item, isActive, badge, onClick }) => (
+-  <button
++  <button type="button"
+     onClick={onClick}
+     aria-current={isActive ? 'page' : undefined}
+     className={[
+@@ -181,7 +181,7 @@ export default function PerpustakaanSidebar({
+             <span className="mb-2 block px-1 text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
+               Penanda Buku
+             </span>
+-            <button
++            <button type="button"
+               onClick={() => onChangeTab('keranjang')}
+               aria-current={activeTab === 'keranjang' ? 'page' : undefined}
+               className={[
+@@ -232,7 +232,7 @@ export default function PerpustakaanSidebar({
+             item.key === 'pinjaman' ? pendingCount : item.key === 'keranjang' ? cartCount : 0;
+ 
+           return (
+-            <button
++            <button type="button"
+               key={item.key}
+               onClick={() => onChangeTab(item.key)}
+               aria-current={isActive ? 'page' : undefined}
+diff --git a/src/fitur/perpustakaan/pages/KatalogPage.tsx b/src/fitur/perpustakaan/pages/KatalogPage.tsx
+index 1dab430..b93e33f 100644
+--- a/src/fitur/perpustakaan/pages/KatalogPage.tsx
++++ b/src/fitur/perpustakaan/pages/KatalogPage.tsx
+@@ -51,7 +51,7 @@ const EmptyState: React.FC<{ hasQuery: boolean; onReset: () => void }> = ({
+       </p>
+     </div>
+     {hasQuery && (
+-      <button
++      <button type="button"
+         onClick={onReset}
+         className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
+       >
+@@ -164,7 +164,7 @@ export default function KatalogPage({
+         {categories.map((cat) => {
+           const isActive = selectedCategory === cat;
+           return (
+-            <button
++            <button type="button"
+               key={cat}
+               onClick={() => onCategoryChange(cat)}
+               aria-pressed={isActive}
+@@ -251,7 +251,7 @@ export default function KatalogPage({
+             className="w-full rounded-lg border border-neutral-300 bg-white py-2 pr-9 pl-9 text-xs transition outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+           />
+           {searchQuery && (
+-            <button
++            <button type="button"
+               onClick={() => onSearchChange('')}
+               aria-label="Hapus pencarian"
+               className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-neutral-400 transition hover:text-neutral-700 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
+diff --git a/src/fitur/perpustakaan/pages/KeranjangPage.tsx b/src/fitur/perpustakaan/pages/KeranjangPage.tsx
+index 3d3f5ff..61390ef 100644
+--- a/src/fitur/perpustakaan/pages/KeranjangPage.tsx
++++ b/src/fitur/perpustakaan/pages/KeranjangPage.tsx
+@@ -26,7 +26,7 @@ const EmptyState: React.FC<{ onOpenKatalog: () => void }> = ({ onOpenKatalog })
+         Gunakan ikon keranjang pada Katalog Literatur untuk menandai buku.
+       </p>
+     </div>
+-    <button
++    <button type="button"
+       onClick={onOpenKatalog}
+       className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-xs font-semibold text-neutral-800 transition hover:border-neutral-500 hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
+     >
+@@ -55,13 +55,13 @@ const ConfirmBanner: React.FC<{
+       </p>
+     </div>
+     <div className="flex shrink-0 gap-2">
+-      <button
++      <button type="button"
+         onClick={onCancel}
+         className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:outline-none"
+       >
+         Batal
+       </button>
+-      <button
++      <button type="button"
+         onClick={onConfirm}
+         className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
+       >
+@@ -219,7 +219,7 @@ export default function KeranjangPage({
+ 
+                     {/* Hapus */}
+                     <td className="px-4 py-3 text-right">
+-                      <button
++                      <button type="button"
+                         onClick={() => onRemoveFromCart(book.id)}
+                         aria-label={`Hapus "${book.title}" dari keranjang`}
+                         className="rounded-lg p-1.5 text-red-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
+@@ -242,7 +242,7 @@ export default function KeranjangPage({
+               <span className="ml-2 text-amber-700">({outOfStockCount} tidak tersedia)</span>
+             )}
+           </div>
+-          <button
++          <button type="button"
+             onClick={() => setShowConfirm(true)}
+             disabled={cartBooks.length === 0 || cartBooks.length === outOfStockCount}
+             aria-label="Ajukan semua pinjaman dalam keranjang"
+diff --git a/src/fitur/perpustakaan/pages/PinjamanPage.tsx b/src/fitur/perpustakaan/pages/PinjamanPage.tsx
+index 47bfbc3..bd1e79c 100644
+--- a/src/fitur/perpustakaan/pages/PinjamanPage.tsx
++++ b/src/fitur/perpustakaan/pages/PinjamanPage.tsx
+@@ -144,7 +144,7 @@ const ActionCell: React.FC<{
+ }> = ({ loan, bookTitle, onReturn }) => {
+   if (loan.status === 'dipinjam') {
+     return (
+-      <button
++      <button type="button"
+         onClick={() => onReturn(loan.id, bookTitle)}
+         aria-label={`Kembalikan buku "${bookTitle}"`}
+         className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-2.5 py-1.5 text-xs font-medium text-neutral-700 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+diff --git a/src/fitur/tamu/pages/guest/Berita.tsx b/src/fitur/tamu/pages/guest/Berita.tsx
+index dea7fbc..44f5070 100644
+--- a/src/fitur/tamu/pages/guest/Berita.tsx
++++ b/src/fitur/tamu/pages/guest/Berita.tsx
+@@ -68,7 +68,7 @@ export default function Berita() {
+           />
+         </div>
+         <div className="flex gap-2">
+-          <button
++          <button type="button"
+             onClick={() => setFilterKategori('')}
+             className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
+               !filterKategori
+@@ -79,7 +79,7 @@ export default function Berita() {
+             Semua
+           </button>
+           {kategoris.map((k) => (
+-            <button
++            <button type="button"
+               key={k}
+               onClick={() => setFilterKategori(k)}
+               className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${

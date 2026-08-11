@@ -253,7 +253,7 @@ export default function InputRapotGuru() {
                 setSelectedClassId(e.target.value);
                 setSelectedStudentId('');
               }}
-              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {teacherClasses.map((cls) => (
                 <option key={cls.id} value={cls.id}>
@@ -271,7 +271,7 @@ export default function InputRapotGuru() {
             <select
               value={tahunAjaran}
               onChange={(e) => setTahunAjaran(e.target.value)}
-              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {tahunOptions.map((ta) => (
                 <option key={ta} value={ta}>
@@ -288,7 +288,7 @@ export default function InputRapotGuru() {
             <select
               value={semester}
               onChange={(e) => setSemester(e.target.value as 'ganjil' | 'genap')}
-              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="mt-0.5 w-full cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="ganjil">GANJIL</option>
               <option value="genap">GENAP</option>
@@ -319,7 +319,7 @@ export default function InputRapotGuru() {
               value={searchStudent}
               onChange={(e) => setSearchStudent(e.target.value)}
               placeholder="Cari nama atau NIS..."
-              className="w-full rounded-md border-2 border-black bg-white py-1.5 pr-3 pl-8 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white py-1.5 pr-3 pl-8 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             />
           </div>
 
@@ -337,8 +337,8 @@ export default function InputRapotGuru() {
                   }}
                   className={`w-full cursor-pointer border bg-white px-3 py-2 text-left transition-colors ${
                     isSelected
-                      ? 'border-blue-600 font-bold'
-                      : 'border-transparent font-semibold hover:border-blue-600'
+                      ? 'border-black bg-neutral-100 font-bold'
+                      : 'border-transparent font-semibold hover:border-black'
                   }`}
                 >
                   <span className="truncate text-xs font-bold text-black uppercase">{s.name}</span>
@@ -423,7 +423,7 @@ export default function InputRapotGuru() {
                             setFormMapel(val);
                           }
                         }}
-                        className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                        className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                       >
                         <option value="">-- Pilih Mapel --</option>
                         {availableMapel.map((mapel) => (
@@ -440,7 +440,7 @@ export default function InputRapotGuru() {
                           value={manualMapel}
                           onChange={(e) => setManualMapel(e.target.value)}
                           placeholder="Ketik mapel khusus..."
-                          className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                          className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                           autoFocus
                         />
                         <button
@@ -450,7 +450,7 @@ export default function InputRapotGuru() {
                             setFormMapel('');
                             setManualMapel('');
                           }}
-                          className="text-[9px] font-bold tracking-wide text-black uppercase hover:text-blue-600 hover:underline"
+                          className="text-[9px] font-bold tracking-wide text-black uppercase hover:text-black hover:underline"
                         >
                           [ Kembali ke Pilihan ]
                         </button>
@@ -471,7 +471,7 @@ export default function InputRapotGuru() {
                         const val = e.target.value;
                         setFormTugas(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
                       }}
-                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     />
                   </div>
 
@@ -488,7 +488,7 @@ export default function InputRapotGuru() {
                         const val = e.target.value;
                         setFormUTS(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
                       }}
-                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     />
                   </div>
 
@@ -505,7 +505,7 @@ export default function InputRapotGuru() {
                         const val = e.target.value;
                         setFormUAS(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
                       }}
-                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                      className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                     />
                   </div>
 
@@ -547,7 +547,7 @@ export default function InputRapotGuru() {
                     value={formCatatan}
                     onChange={(e) => setFormCatatan(e.target.value)}
                     placeholder="Input catatan guru mengenai perkembangan akademis siswa..."
-                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                    className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                   />
                 </div>
 
@@ -556,7 +556,7 @@ export default function InputRapotGuru() {
                     type="button"
                     onClick={handleSimpanNilai}
                     disabled={!mapelToSubmit}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60"
                   >
                     <Save className="h-3.5 w-3.5" />
                     COMMIT_RECORD
@@ -565,7 +565,7 @@ export default function InputRapotGuru() {
                     <button
                       type="button"
                       onClick={resetForm}
-                      className="cursor-pointer rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                      className="cursor-pointer rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                     >
                       ABORT
                     </button>
@@ -650,7 +650,7 @@ export default function InputRapotGuru() {
                               <button
                                 type="button"
                                 onClick={() => handleEditNilai(item)}
-                                className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                                className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                                 title="Edit record"
                               >
                                 <Edit2 className="h-3 w-3" />
@@ -658,7 +658,7 @@ export default function InputRapotGuru() {
                               <button
                                 type="button"
                                 onClick={() => handleHapusNilai(item.id)}
-                                className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                                className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                                 title="Hapus record"
                               >
                                 <Trash2 className="h-3 w-3" />
@@ -703,7 +703,7 @@ export default function InputRapotGuru() {
                             semester
                           )
                         }
-                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Export PDF"
                       >
                         <Download className="h-3 w-3" /> PDF
@@ -715,7 +715,7 @@ export default function InputRapotGuru() {
                             `Rapot_${(selectedStudent?.name || 'siswa').replace(/\s+/g, '_')}_${tahunAjaran}_${semester}.csv`
                           )
                         }
-                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Export CSV (Excel)"
                       >
                         <Download className="h-3 w-3" /> CSV

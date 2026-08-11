@@ -279,7 +279,7 @@ export default function ProfilePage() {
           className={`flex items-center justify-between rounded-md border p-4 shadow-sm transition-all duration-300 ${
             message.type === 'success'
               ? 'border-black bg-white text-black'
-              : 'border-blue-600 bg-white text-blue-600'
+              : 'border-black bg-black text-white'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                 <CheckCircle className="h-4 w-4" />
               </div>
             ) : (
-              <div className="rounded-full bg-blue-600 p-1 text-white">
+              <div className="rounded-full bg-black p-1 text-white">
                 <AlertCircle className="h-4 w-4" />
               </div>
             )}
@@ -296,7 +296,7 @@ export default function ProfilePage() {
           </div>
           <button type="button"
             onClick={() => setMessage(null)}
-            className="rounded-md p-1 text-black transition-colors hover:text-blue-600"
+            className="rounded-md p-1 text-black transition-colors hover:text-black"
           >
             <X className="h-4 w-4" />
           </button>
@@ -355,7 +355,7 @@ export default function ProfilePage() {
           </div>
 
           <label
-            className={`inline-flex items-center justify-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 ${
+            className={`inline-flex items-center justify-center gap-2 rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 ${
               isUploadingAvatar ? 'cursor-not-allowed bg-white opacity-60' : 'cursor-pointer'
             }`}
           >
@@ -455,17 +455,17 @@ export default function ProfilePage() {
             {/* Input Name */}
             <div>
               <label className="mb-1.5 block text-xs font-bold tracking-wider text-black uppercase">
-                Nama Lengkap <span className="text-blue-600">*</span>
+                Nama Lengkap <span className="text-black">*</span>
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-blue-600 focus:outline-none"
+                className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-black focus:outline-none"
                 placeholder="Masukkan nama lengkap Anda"
               />
               {errors.name && (
-                <p className="mt-1.5 flex items-center gap-1 text-xs font-bold text-blue-600">
+                <p className="mt-1.5 flex items-center gap-1 text-xs font-bold text-black">
                   <AlertCircle className="h-3.5 w-3.5" /> {errors.name}
                 </p>
               )}
@@ -482,10 +482,10 @@ export default function ProfilePage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="nama@domain.com"
-                  className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-blue-600 focus:outline-none"
+                  className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-black focus:outline-none"
                 />
                 {errors.email && (
-                  <p className="mt-1.5 text-xs font-bold text-blue-600">{errors.email}</p>
+                  <p className="mt-1.5 text-xs font-bold text-black">{errors.email}</p>
                 )}
               </div>
 
@@ -498,10 +498,10 @@ export default function ProfilePage() {
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder="08xxxxxxxxxx"
-                  className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-blue-600 focus:outline-none"
+                  className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-black focus:outline-none"
                 />
                 {errors.phone && (
-                  <p className="mt-1.5 text-xs font-bold text-blue-600">{errors.phone}</p>
+                  <p className="mt-1.5 text-xs font-bold text-black">{errors.phone}</p>
                 )}
               </div>
             </div>
@@ -516,7 +516,7 @@ export default function ProfilePage() {
                 value={formData.parentName}
                 onChange={(e) => handleInputChange('parentName', e.target.value)}
                 placeholder="Nama ayah, ibu, atau wali"
-                className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-blue-600 focus:outline-none"
+                className="w-full rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-black focus:outline-none"
               />
             </div>
 
@@ -531,10 +531,10 @@ export default function ProfilePage() {
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Tuliskan alamat rumah domisili saat ini..."
                 maxLength={500}
-                className="w-full resize-none rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-blue-600 focus:outline-none"
+                className="w-full resize-none rounded-md border border-black bg-white px-4 py-2.5 text-xs font-bold text-black transition-colors placeholder:text-black/50 focus:border-black focus:outline-none"
               />
               <div className="mt-1 flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-600">{errors.address || ''}</span>
+                <span className="text-xs font-bold text-black">{errors.address || ''}</span>
                 <span className="text-xs font-bold text-black">{formData.address.length}/500</span>
               </div>
             </div>
@@ -559,7 +559,7 @@ export default function ProfilePage() {
                     setIsDirty(false);
                   }
                 }}
-                className="rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="rounded-md border border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
               >
                 Batalkan
               </button>
@@ -569,7 +569,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleSaveProfile}
               disabled={isSaving || !isDirty}
-              className={`inline-flex items-center gap-2 rounded-md border border-black bg-white px-5 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 ${
+              className={`inline-flex items-center gap-2 rounded-md border border-black bg-white px-5 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 ${
                 isSaving || !isDirty
                   ? 'cursor-not-allowed bg-white opacity-60 hover:border-black hover:text-black'
                   : ''

@@ -151,7 +151,7 @@ export default function BimbinganKonseling({
             <select
               value={selectedStudentId}
               onChange={(e) => setSelectedStudentId(e.target.value)}
-              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black"
             >
               <option value="">— Pilih Siswa —</option>
               {students.map((s) => (
@@ -170,7 +170,7 @@ export default function BimbinganKonseling({
               <select
                 value={jenis}
                 onChange={(e) => setJenis(e.target.value as CatatanBK['jenis'])}
-                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black"
               >
                 <option value="pelanggaran">Pelanggaran</option>
                 <option value="prestasi">Prestasi</option>
@@ -185,7 +185,7 @@ export default function BimbinganKonseling({
                 min={1}
                 value={poin}
                 onChange={(e) => setPoin(e.target.value)}
-                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black"
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function BimbinganKonseling({
               list="bk-kategori"
               onChange={(e) => setKategori(e.target.value)}
               placeholder="Contoh: Kedisiplinan"
-              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-black"
             />
             <datalist id="bk-kategori">
               {KATEGORI_SUGGESTIONS.map((k) => (
@@ -218,7 +218,7 @@ export default function BimbinganKonseling({
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
               placeholder="Uraikan kejadian/pencapaian secara singkat..."
-              className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-blue-600"
+              className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-black"
             />
           </div>
 
@@ -230,7 +230,7 @@ export default function BimbinganKonseling({
               type="date"
               value={tanggal}
               onChange={(e) => setTanggal(e.target.value)}
-              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black"
             />
           </div>
 
@@ -245,7 +245,7 @@ export default function BimbinganKonseling({
 
           {feedback && (
             <p
-              className={`font-mono text-xs font-bold ${feedback.startsWith('Berhasil') ? 'text-blue-600' : 'text-black'}`}
+              className={`font-mono text-xs font-bold ${feedback.startsWith('Berhasil') ? 'text-black' : 'text-black'}`}
             >
               {feedback}
             </p>

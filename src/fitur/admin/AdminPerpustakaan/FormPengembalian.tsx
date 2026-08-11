@@ -176,7 +176,7 @@ export function FormPengembalian({
                   onChange={(e) => handleMemberSearchChange(e.target.value)}
                   onFocus={() => setShowMemberDropdown(true)}
                   placeholder="Ketik nama atau NIS siswa yang meminjam..."
-                  className="w-full rounded-md border-2 border-black bg-white py-2 pr-8 pl-9 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white py-2 pr-8 pl-9 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
                 {memberSearch && (
                   <button
@@ -187,7 +187,7 @@ export function FormPengembalian({
                       setShowMemberDropdown(false);
                       setStruk(null);
                     }}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-black hover:text-blue-600"
+                    className="absolute top-1/2 right-2 -translate-y-1/2 text-black hover:text-black"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -274,7 +274,7 @@ export function FormPengembalian({
                   setMemberSearch('');
                   setStruk(null);
                 }}
-                className="rounded-md border-2 border-black bg-white p-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                className="rounded-md border-2 border-black bg-white p-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                 title="Ganti siswa"
               >
                 <X className="h-4 w-4" />

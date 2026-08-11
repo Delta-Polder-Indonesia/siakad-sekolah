@@ -183,7 +183,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
   const selectedTeacherEdit = selectedTeacher ? teacherEdits[selectedTeacher.id] : null;
 
   const inputClass =
-    'w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none transition-colors placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600';
+    'w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none transition-colors placeholder:text-black/40 focus:border-black focus:bg-neutral-50';
 
   return (
     <div className="rounded-md border-2 border-black bg-white p-4">
@@ -222,7 +222,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                   }}
                   className={`block w-full rounded-md border-2 px-3 py-2.5 text-left transition-colors select-none ${
                     isActive
-                      ? 'border-blue-600 bg-white text-black'
+                      ? 'border-black bg-black text-white'
                       : 'border-black bg-white text-black hover:bg-neutral-100'
                   }`}
                 >
@@ -251,7 +251,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                   Ubah Data Akun Guru
                 </h3>
                 <p className="mt-0.5 text-[10px] font-bold text-black/60">
-                  ID Guru: <span className="font-mono text-blue-600">{selectedTeacher.id}</span>
+                  ID Guru: <span className="font-mono text-black">{selectedTeacher.id}</span>
                 </p>
               </div>
 
@@ -336,7 +336,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                   {classes.map((item) => (
                     <label
                       key={item.id}
-                      className="flex cursor-pointer items-center gap-2 text-xs font-bold text-black select-none hover:text-blue-600"
+                      className="flex cursor-pointer items-center gap-2 text-xs font-bold text-black select-none hover:text-black"
                     >
                       <input
                         type="checkbox"
@@ -380,7 +380,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                           setLocalNotice(null);
                           setShowConfirm(false);
                         }}
-                        className="w-48 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                        className="w-48 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                       >
                         <option value="">— Tidak ada wali —</option>
                         {teachers.map((t) => (
@@ -417,7 +417,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                         <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-black" />
                         <p className="text-[10px] leading-tight font-bold text-black">
                           Simpan perubahan data akun untuk guru{' '}
-                          <span className="font-mono text-blue-600">
+                          <span className="font-mono text-black">
                             {selectedTeacherEdit.name}
                           </span>
                           ?

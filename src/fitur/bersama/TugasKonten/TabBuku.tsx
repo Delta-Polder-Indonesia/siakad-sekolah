@@ -20,7 +20,7 @@ export default function TabBuku({ assignment }: { assignment: OnlineAssignment }
         <div key={index} className="rounded-md border-2 border-black bg-white p-3.5">
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs leading-tight font-bold text-black">{book.title}</p>
-            <BookOpen className="h-4 w-4 shrink-0 text-blue-600" />
+            <BookOpen className="h-4 w-4 shrink-0 text-black" />
           </div>
           <p className="mt-1 text-[11px] font-medium text-black">
             {book.author} {book.year ? `· ${book.year}` : ''}

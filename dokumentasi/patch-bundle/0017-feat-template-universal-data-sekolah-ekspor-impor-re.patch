@@ -1,0 +1,814 @@
+From 146f9a92f6925aee30bc426162008873b07019e7 Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 06:43:37 +0000
+Subject: [PATCH 17/19] feat: template universal - data sekolah
+ (ekspor/impor/reset)
+
+- dataTools.ts: collectMasterData/exportMasterData/importMasterData/
+  resetAllData('demo'|'empty') + validasi struktur & hash password
+- TabDataSekolah: 3 section (ekspor JSON, impor dengan ringkasan hasil,
+  reset demo / kosongkan semua); identitas sekolah tidak ikut ter-reset
+- Menu admin > Sistem > Data Sekolah
+- +9 test: dataTools (8) & render tab (1)
+
+diff --git a/REVIEW_KODE.md b/REVIEW_KODE.md
+index c449b72..0a4fb95 100644
+--- a/REVIEW_KODE.md
++++ b/REVIEW_KODE.md
+@@ -434,4 +434,37 @@ Prioritas bergeser dari "sambungkan backend" → **"gampang di-branding & disetu
+ - Perubahan jenjang penuh yang mengubah struktur konten (SD→SMK) tetap butuh build
+   ulang (ubah `jenjang` di `dataSekolah.ts`); setelan jenjang di panel untuk identitas.
+ 
++---
++
++## 12. Template Universal — Data Sekolah: Ekspor / Impor / Reset ✅
++
++**Tujuan:** "pindah sekolah" dalam hitungan menit — sekolah pembeli tinggal
++impor data lama, tanpa input manual.
++
++### Fitur baru (menu admin → Sistem → Data Sekolah)
++1. **Ekspor Data Master** → unduh JSON berisi guru, siswa, kelas, roster
++   (`data-master-sekolah-YYYY-MM-DD.json`). Bisa untuk cadangan atau pindah instalasi.
++2. **Impor Data Master** → unggah file hasil ekspor; validasi struktur & field
++   wajib (id/name/nip/nis/classId); password polos otomatis di-hash (yang sudah
++   hash 64-hex dipertahankan); koleksi master DIGANTI total; ringkasan hasil
++   (jumlah guru/siswa/kelas/roster) ditampilkan.
++3. **Reset / Kosongkan Data**:
++   - `Reset ke Data Demo` → factory reset (seed contoh bawaan lagi)
++   - `Kosongkan Semua Data` → database kosong, siap diisi sekolah pembeli
++   - Keduanya menjaga **identitas sekolah** (config/school) tetap utuh.
++
++### Catatan teknis
++- Logika murni di `src/data/store/core/dataTools.ts` (bisa diuji unit).
++- Semua key localStorage aplikasi dibersihkan saat reset (`APP_STORAGE_KEYS`).
++- Setelah reset, aplikasi reload otomatis agar semua komponen konsisten.
++
++### Test baru (+9)
++- `dataTools.test.ts` (8): ekspor valid, impor+ganti+hashing, hash dipertahankan,
++  tolak file bukan SIAKAD, tolak data tak lengkap, reset empty, reset demo,
++  collectMasterData.
++- `TabDataSekolah.test.tsx` (1 render): 3 section tampil.
++
++### Verifikasi
++- FE: 288 test (27 file) ✅ · lint 0 error ✅ · build ✅
++
+ *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
+diff --git a/dokumentasi/PANDUAN_PERSIAPAN_SEKOLAH.md b/dokumentasi/PANDUAN_PERSIAPAN_SEKOLAH.md
+new file mode 100644
+index 0000000..709cdfc
+--- /dev/null
++++ b/dokumentasi/PANDUAN_PERSIAPAN_SEKOLAH.md
+@@ -0,0 +1,95 @@
++# 📋 CHECKLIST PERSIAPAN SEKOLAH — Paket SIAKAD Cloud
++
++> Dokumen ini diisi oleh pihak sekolah (pembeli) dan dikirim kembali ke tim
++> pengembang **sebelum** proses instalasi dimulai. Semakin lengkap datanya,
++> semakin cepat aplikasi siap dipakai.
++
++---
++
++## A. Data Dasar Sekolah
++
++| Item | Contoh | Diisi Sekolah |
++|---|---|---|
++| Nama resmi sekolah | SMA Negeri 1 Medan | |
++| Singkatan / nama umum | SMAN 1 Medan | |
++| Jenjang | SD / SMP / SMA / SMK | |
++| Status | Negeri / Swasta | |
++| NPSN | 10210881 | |
++| Tahun ajaran berjalan | 2026/2027 | |
++| Alamat lengkap | Jl. ... No. ..., Kec. ..., Kota ... | |
++| Telepon sekolah | (061) 1234567 | |
++| Domain email sekolah | sman1medan.sch.id | |
++| **Logo sekolah** (PNG/JPG, maks 300KB) | file: logo.png | |
++
++## B. Akun Administrator
++
++| Item | Keterangan |
++|---|---|
++| Username admin yang diinginkan | |
++| Email admin (untuk notifikasi) | |
++
++## C. Data Guru & Pegawai (paling penting)
++
++Bisa berupa file Excel/CSV dengan kolom:
++`nama | NIP | mata pelajaran | email | password awal (boleh kosong, default dibuatkan)`
++
++> Tips: bisa diekspor dari Dapodik sekolah.
++
++## D. Data Siswa & Orang Tua
++
++Bisa berupa file Excel/CSV dengan kolom:
++`NISN | nama | jenis kelamin | kelas | nama ayah | nama ibu | nama wali | no HP orang tua | password awal`
++
++## E. Struktur Akademik
++
++| Item | Contoh |
++|---|---|
++| Daftar kelas & rombongan belajar | X-1, X-2, XI IPA-1, ... |
++| Wali kelas per kelas | |
++| Mata pelajaran yang diajarkan | |
++| Jadwal/roster pelajaran (jika sudah ada) | |
++
++## F. Data Awal (opsional, bisa menyusul)
++
++- [ ] Absensi semester berjalan
++- [ ] Nilai/rapot semester sebelumnya
++- [ ] Data buku perpustakaan
++- [ ] Data tagihan/SPP
++- [ ] Pengumuman awal
++
++## G. Teknis & Hosting
++
++| Item | Pilihan / Diisi |
++|---|---|
++| Domain yang diinginkan | contoh: siakad.sekolah.sch.id |
++| Hosting backend | Diurus tim pengembang (Railway/Render) |
++| Database | Diurus tim pengembang (PostgreSQL/Neon) |
++| Siapa penanggung jawab sekolah? | Nama + no HP + email |
++
++---
++
++## Alur Serah Terima
++
++```
++1. Sekolah isi checklist ini + kirim data (A-F)
++2. Tim pengembang setup: deploy backend, buat database, seed data
++3. Frontend dibuild dengan identitas sekolah & di-deploy
++4. Uji coba bersama admin sekolah (1-2 hari)
++5. Pelatihan admin & guru (via video call / panduan)
++6. Serah terima + dokumen cara pakai
++```
++
++## Biaya yang Perlu Diketahui Sekolah (Paket Cloud)
++
++| Komponen | Estimasi/bulan | Ditanggung |
++|---|---|---|
++| Server backend (Railway/Render) | Rp 30-80rb | sekolah / termasuk langganan |
++| Database (Neon/PostgreSQL) | Rp 20-70rb | sekolah / termasuk langganan |
++| Domain .sch.id | gratis* | sekolah |
++| Pemeliharaan & backup | sesuai kesepakatan | sekolah |
++
++\* domain .sch.id umumnya gratis untuk sekolah negeri via Kemdikbud.
++
++---
++
++*Dokumen pendukung: PANDUAN_PENGGUNA.md (cara pakai aplikasi) & PANDUAN_INSTALL.md (untuk tim teknis).*
+diff --git a/src/data/store/core/dataTools.test.ts b/src/data/store/core/dataTools.test.ts
+new file mode 100644
+index 0000000..648a6ac
+--- /dev/null
++++ b/src/data/store/core/dataTools.test.ts
+@@ -0,0 +1,98 @@
++/**
++ * Unit test dataTools — ekspor/impor/reset data (template universal).
++ */
++import { describe, it, expect, beforeEach } from 'vitest';
++import {
++  collectMasterData,
++  exportMasterData,
++  importMasterData,
++  resetAllData,
++} from './dataTools';
++import { readDB, initializeData, STORAGE_KEY } from './db';
++
++const SAMPLE = {
++  version: 1 as const,
++  exportedAt: new Date().toISOString(),
++  app: 'siakad' as const,
++  teachers: [
++    { id: 't1', name: 'Pak Andi', nip: '19800101', subject: 'Matematika', password: 'rahasia123', classIds: [] },
++  ],
++  students: [
++    { id: 's1', name: 'Budi', nis: '2026001', classId: 'c1', gender: 'L' as const, password: 'siswa123', parentPassword: 'ortu123' },
++  ],
++  classes: [{ id: 'c1', name: 'X-1', grade: 'X', teacherId: 't1' }],
++  classRosters: [{ id: 'r1', classId: 'c1', studentId: 's1', subject: 'Matematika', teacherId: 't1' }],
++};
++
++describe('dataTools (ekspor/impor/reset)', () => {
++  beforeEach(async () => {
++    localStorage.clear();
++    await initializeData(); // seed demo
++  });
++
++  it('exportMasterData menghasilkan JSON valid berisi koleksi master', () => {
++    const raw = exportMasterData();
++    const parsed = JSON.parse(raw);
++    expect(parsed.app).toBe('siakad');
++    expect(Array.isArray(parsed.teachers)).toBe(true);
++    expect(Array.isArray(parsed.students)).toBe(true);
++    expect(parsed.teachers.length).toBeGreaterThan(0); // seed demo ada guru
++  });
++
++  it('importMasterData mengganti koleksi master & meng-hash password polos', async () => {
++    const summary = await importMasterData(JSON.stringify(SAMPLE));
++    expect(summary.teachers).toBe(1);
++    expect(summary.students).toBe(1);
++    expect(summary.classes).toBe(1);
++
++    const db = readDB();
++    expect(db.teachers).toHaveLength(1);
++    expect(db.teachers[0].name).toBe('Pak Andi');
++    // password sudah di-hash (64 hex) — bukan plaintext
++    expect(db.teachers[0].password).toMatch(/^[0-9a-f]{64}$/);
++    expect(db.teachers[0].password).not.toBe('rahasia123');
++    expect(db.students[0].password).toMatch(/^[0-9a-f]{64}$/);
++    expect(db.students[0].parentPassword).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it('importMasterData mempertahankan password yang sudah di-hash', async () => {
++    const hashed = 'a'.repeat(64);
++    const sample = JSON.parse(JSON.stringify(SAMPLE));
++    sample.teachers[0].password = hashed;
++    await importMasterData(JSON.stringify(sample));
++    expect(readDB().teachers[0].password).toBe(hashed);
++  });
++
++  it('importMasterData menolak file yang bukan ekspor SIAKAD', async () => {
++    await expect(importMasterData('{"foo":"bar"}')).rejects.toThrow();
++    await expect(importMasterData('bukan json')).rejects.toThrow();
++  });
++
++  it('importMasterData menolak data guru tidak lengkap', async () => {
++    const bad = JSON.parse(JSON.stringify(SAMPLE));
++    bad.teachers[0].nip = '';
++    await expect(importMasterData(JSON.stringify(bad))).rejects.toThrow(/guru/);
++  });
++
++  it("resetAllData('empty') mengosongkan semua koleksi", async () => {
++    await resetAllData('empty');
++    const db = readDB();
++    expect(db.teachers).toHaveLength(0);
++    expect(db.students).toHaveLength(0);
++    expect(db.classes).toHaveLength(0);
++  });
++
++  it("resetAllData('demo') mengembalikan data contoh", async () => {
++    await resetAllData('empty');
++    await resetAllData('demo');
++    const db = readDB();
++    expect(db.teachers.length).toBeGreaterThan(0);
++    expect(db.students.length).toBeGreaterThan(0);
++  });
++
++  it('collectMasterData membaca dari DB saat ini', () => {
++    const data = collectMasterData();
++    expect(data.app).toBe('siakad');
++    expect(data.exportedAt).toBeTruthy();
++  });
++});
+diff --git a/src/data/store/core/dataTools.ts b/src/data/store/core/dataTools.ts
+new file mode 100644
+index 0000000..3d2620e
+--- /dev/null
++++ b/src/data/store/core/dataTools.ts
+@@ -0,0 +1,266 @@
++/**
++ * ============================================================================
++ * DATA TOOLS — Ekspor, Impor & Reset data (untuk setup sekolah baru)
++ * ============================================================================
++ *
++ * Fitur kunci template universal: pindah data sekolah dalam hitungan menit.
++ *
++ *  - exportMasterData():  simpan data master (guru/siswa/kelas/roster) ke JSON
++ *  - importMasterData():  baca JSON hasil ekspor → hash password polos →
++ *                         TIMPA koleksi master di database lokal
++ *  - resetAllData():      'demo'  → kembalikan ke data contoh bawaan (factory)
++ *                         'empty' → kosongkan semua data (siap diisi sekolah)
++ *
++ * Catatan: identitas sekolah (config/school.ts) TIDAK ikut di-reset —
++ * branding sekolah pembeli tetap tersimpan.
++ * ============================================================================
++ */
++import {
++  readDB,
++  writeDB,
++  hashPassword,
++  initializeData,
++  type Database,
++  STORAGE_KEY,
++  SURAT_KEY,
++  BK_KEY,
++  EKSKUL_KEY,
++  EKSKUL_MEMBER_KEY,
++  EKSKUL_HADIR_KEY,
++  TAHUN_AJARAN_KEY,
++  MAPEL_KEY,
++  TAGIHAN_KEY,
++  PENGATURAN_TAGIHAN_KEY,
++  PENGUMUMAN_ADMIN_KEY,
++  SUBMISSION_KEY,
++  QUIZ_RESULT_KEY,
++  RAPOT_KEY,
++  STUDENT_CLASS_MUTATION_KEY,
++  STUDENT_STATUS_MUTATION_KEY,
++  PPDB_AUDIT_KEY,
++  PPDB_ADMIN_SESSION_KEY,
++  PPDB_ADMIN_LOCK_KEY,
++  PRESENCE_KEY,
++  TYPING_KEY,
++  CHAT_READ_KEY,
++} from './db';
++import { initialData } from './seedData';
++import type { Teacher, Student, ClassRoom, ClassRosterItem } from '../../../types';
++
++// ==================== EKSPOR ====================
++
++export interface MasterDataExport {
++  version: 1;
++  exportedAt: string;
++  app: 'siakad';
++  teachers: Teacher[];
++  students: Student[];
++  classes: ClassRoom[];
++  classRosters: ClassRosterItem[];
++}
++
++/** Baca data master dari DB → objek siap diekspor. */
++export function collectMasterData(): MasterDataExport {
++  const db = readDB();
++  return {
++    version: 1,
++    exportedAt: new Date().toISOString(),
++    app: 'siakad',
++    teachers: db.teachers,
++    students: db.students,
++    classes: db.classes,
++    classRosters: db.classRosters,
++  };
++}
++
++/** Unduh data master sebagai file JSON (via browser). */
++export function exportMasterData(): string {
++  const data = collectMasterData();
++  return JSON.stringify(data, null, 2);
++}
++
++export function masterDataFilename(): string {
++  return `data-master-sekolah-${new Date().toISOString().slice(0, 10)}.json`;
++}
++
++// ==================== IMPOR ====================
++
++const HEX64 = /^[0-9a-f]{64}$/;
++
++/** Hash password bila masih plaintext (bukan hash SHA-256 64-hex). */
++async function ensureHashed(pw: string | undefined | null): Promise<string> {
++  const value = (pw ?? '').trim();
++  if (!value) return value;
++  if (HEX64.test(value)) return value; // sudah ter-hash
++  return hashPassword(value);
++}
++
++export interface ImportSummary {
++  teachers: number;
++  students: number;
++  classes: number;
++  classRosters: number;
++  replaced: boolean;
++}
++
++/**
++ * Impor data master dari string JSON hasil ekspor.
++ * - Validasi struktur & field wajib; lempar Error dengan pesan jelas bila rusak.
++ * - Password plaintext di-hash; yang sudah hash (64 hex) dipertahankan.
++ * - Koleksi master DIGANTI total dengan data impor (sekolah baru = bersih dulu).
++ */
++export async function importMasterData(raw: string): Promise<ImportSummary> {
++  let parsed: unknown;
++  try {
++    parsed = JSON.parse(raw);
++  } catch {
++    throw new Error('File bukan JSON yang valid. Gunakan file hasil Ekspor Data Master.');
++  }
++
++  if (!parsed || typeof parsed !== 'object') {
++    throw new Error('Struktur file tidak dikenali.');
++  }
++  const data = parsed as Partial<MasterDataExport>;
++  if (data.app !== 'siakad' || !Array.isArray(data.teachers) || !Array.isArray(data.students)) {
++    throw new Error(
++      'File bukan hasil Ekspor SIAKAD. Ekspor ulang dari menu Data Sekolah → Ekspor Data Master.'
++    );
++  }
++
++  // Validasi field wajib per entitas
++  for (const t of data.teachers) {
++    if (!t?.id || !t?.name || !t?.nip) {
++      throw new Error('Data guru tidak lengkap (butuh id, name, nip). Periksa file ekspor.');
++    }
++  }
++  for (const s of data.students) {
++    if (!s?.id || !s?.name || !s?.nis || !s?.classId) {
++      throw new Error('Data siswa tidak lengkap (butuh id, name, nis, classId). Periksa file ekspor.');
++    }
++  }
++  for (const c of data.classes ?? []) {
++    if (!c?.id || !c?.name) {
++      throw new Error('Data kelas tidak lengkap (butuh id, name). Periksa file ekspor.');
++    }
++  }
++
++  // Hash password
++  const teachers = await Promise.all(
++    (data.teachers as Teacher[]).map(async (t) => ({
++      ...t,
++      password: await ensureHashed(t.password),
++    }))
++  );
++  const students = await Promise.all(
++    (data.students as Student[]).map(async (s) => ({
++      ...s,
++      password: await ensureHashed(s.password),
++      parentPassword: s.parentPassword ? await ensureHashed(s.parentPassword) : undefined,
++    }))
++  );
++
++  const db = readDB();
++  db.teachers = teachers as Teacher[];
++  db.students = students as Student[];
++  db.classes = (data.classes ?? []) as ClassRoom[];
++  db.classRosters = (data.classRosters ?? []) as ClassRosterItem[];
++  writeDB(db);
++
++  return {
++    teachers: teachers.length,
++    students: students.length,
++    classes: db.classes.length,
++    classRosters: db.classRosters.length,
++    replaced: true,
++  };
++}
++
++// ==================== RESET ====================
++
++/** Semua key localStorage milik aplikasi (untuk dibersihkan saat reset). */
++const APP_STORAGE_KEYS = [
++  STORAGE_KEY,
++  SURAT_KEY,
++  BK_KEY,
++  EKSKUL_KEY,
++  EKSKUL_MEMBER_KEY,
++  EKSKUL_HADIR_KEY,
++  TAHUN_AJARAN_KEY,
++  MAPEL_KEY,
++  TAGIHAN_KEY,
++  PENGATURAN_TAGIHAN_KEY,
++  PENGUMUMAN_ADMIN_KEY,
++  SUBMISSION_KEY,
++  QUIZ_RESULT_KEY,
++  RAPOT_KEY,
++  STUDENT_CLASS_MUTATION_KEY,
++  STUDENT_STATUS_MUTATION_KEY,
++  PPDB_AUDIT_KEY,
++  PPDB_ADMIN_SESSION_KEY,
++  PPDB_ADMIN_LOCK_KEY,
++  PRESENCE_KEY,
++  TYPING_KEY,
++  CHAT_READ_KEY,
++  '__seed_ids',
++];
++
++function clearAppStorage(): void {
++  for (const key of APP_STORAGE_KEYS) {
++    try {
++      localStorage.removeItem(key);
++    } catch {
++      // abaikan
++    }
++  }
++}
++
++/** Template database kosong (semua koleksi dikosongkan, struktur tetap). */
++function emptyDatabase(): Database {
++  return {
++    ...initialData,
++    announcements: [],
++    teachers: [],
++    classes: [],
++    students: [],
++    ppdbApplications: [],
++    ppdbNotifications: [],
++    adminSettings: { email: '' },
++    attendances: [],
++    classRosters: [],
++    classAnnouncements: [],
++    onlineAssignments: [],
++    assignmentDiscussions: [],
++    chatGroups: [],
++    groupChatMessages: [],
++    privateMessages: [],
++    studentPresence: {},
++    chatReadState: {},
++    typingState: {},
++    books: [],
++    libraryMembers: [],
++    libraryTransactions: [],
++    messages: [],
++    attendance: [],
++    tasks: [],
++    bills: [],
++    grades: [],
++    schedule: [],
++    _version: 2,
++  };
++}
++
++/**
++ * Reset data aplikasi.
++ * @param mode 'demo'  → hapus semua key, lalu seed ulang data contoh bawaan
++ *               'empty' → hapus semua key, tulis database kosong (siap diisi)
++ * @returns pesan ringkas untuk ditampilkan ke pengguna
++ */
++export async function resetAllData(mode: 'demo' | 'empty'): Promise<string> {
++  clearAppStorage();
++  if (mode === 'demo') {
++    await initializeData();
++    return 'Data dikembalikan ke contoh bawaan (factory reset).';
++  }
++  writeDB(emptyDatabase());
++  return 'Semua data telah dikosongkan. Silakan impor data sekolah Anda.';
++}
+diff --git a/src/fitur/admin/PanelAdminModal.tsx b/src/fitur/admin/PanelAdminModal.tsx
+index 29fbc9e..58da876 100644
+--- a/src/fitur/admin/PanelAdminModal.tsx
++++ b/src/fitur/admin/PanelAdminModal.tsx
+@@ -35,6 +35,7 @@ import TabPengumumanAdmin from './components/TabPengumumanAdmin';
+ import TabAkunSiswa from './components/TabAkunSiswa';
+ import TabAkunOrangTua from './components/TabAkunOrangTua';
+ import TabSetupSekolah from './components/TabSetupSekolah';
++import TabDataSekolah from './components/TabDataSekolah';
+ import TabKelolaRoster from './components/TabKelolaRoster';
+ import TabRiwayatLogin from './components/TabRiwayatLogin';
+ import TabMasterAkademik from './components/TabMasterAkademik';
+@@ -57,6 +58,7 @@ type TeacherAdminTab =
+   | 'akun-siswa'
+   | 'akun-orang-tua'
+   | 'setup-sekolah'
++  | 'data-sekolah'
+   | 'kelola-roster'
+   | 'riwayat-login'
+   | 'ppdb-admin'
+@@ -130,7 +132,10 @@ const MENU_MASTER_GROUPS = [
+   },
+   {
+     title: 'Sistem',
+-    items: [{ id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings }],
++    items: [
++      { id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings },
++      { id: 'data-sekolah', label: 'Data Sekolah', icon: Database },
++    ],
+   },
+ ] as const;
+ 
+@@ -385,6 +390,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
+               )}
+               {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
+               {activeTab === 'setup-sekolah' && <TabSetupSekolah setNotice={handleNotice} />}
++              {activeTab === 'data-sekolah' && <TabDataSekolah setNotice={handleNotice} />}
+ 
+               {/* Menu Perpustakaan */}
+               <Suspense
+diff --git a/src/fitur/admin/components/TabDataSekolah.test.tsx b/src/fitur/admin/components/TabDataSekolah.test.tsx
+new file mode 100644
+index 0000000..965fd5e
+--- /dev/null
++++ b/src/fitur/admin/components/TabDataSekolah.test.tsx
+@@ -0,0 +1,31 @@
++/**
++ * Smoke test render TabDataSekolah (ekspor/impor/reset).
++ */
++import { describe, it, expect, beforeEach } from 'vitest';
++import { render, screen } from '@testing-library/react';
++import TabDataSekolah from './TabDataSekolah';
++import { ToastProvider } from '../../../components/ui';
++
++function renderTab() {
++  return render(
++    <ToastProvider>
++      <TabDataSekolah />
++    </ToastProvider>
++  );
++}
++
++describe('TabDataSekolah (template universal)', () => {
++  beforeEach(() => {
++    localStorage.clear();
++  });
++
++  it('menampilkan 3 section: ekspor, impor, reset', () => {
++    renderTab();
++    expect(screen.getByText('Ekspor Data Master')).toBeTruthy();
++    expect(screen.getByText('Impor Data Master')).toBeTruthy();
++    expect(screen.getByText('Reset / Kosongkan Data')).toBeTruthy();
++    expect(screen.getByText('Ekspor Data Master (.json)')).toBeTruthy();
++    expect(screen.getByText('Kosongkan Semua Data')).toBeTruthy();
++    expect(screen.getByText('Reset ke Data Demo')).toBeTruthy();
++  });
++});
+diff --git a/src/fitur/admin/components/TabDataSekolah.tsx b/src/fitur/admin/components/TabDataSekolah.tsx
+new file mode 100644
+index 0000000..710f93e
+--- /dev/null
++++ b/src/fitur/admin/components/TabDataSekolah.tsx
+@@ -0,0 +1,196 @@
++/**
++ * TAB DATA SEKOLAH — Ekspor, Impor & Reset data.
++ *
++ * Untuk setup sekolah baru (template universal):
++ *   1. Ekspor data master sekolah lama (guru/siswa/kelas/roster) → file JSON
++ *   2. Reset/kosongkan data demo
++ *   3. Impor file hasil ekspor → data sekolah pembeli masuk dalam hitungan menit
++ */
++import { useState, type ChangeEvent } from 'react';
++import { Download, Upload, Trash2, RotateCcw, Info, Database } from 'lucide-react';
++import {
++  exportMasterData,
++  masterDataFilename,
++  importMasterData,
++  resetAllData,
++  type ImportSummary,
++} from '../../../data/store/core/dataTools';
++import { useToast } from '../../../components/ui';
++
++interface TabDataSekolahProps {
++  setNotice?: (message: string) => void;
++}
++
++/** Unduh string sebagai file (helper lokal). */
++function downloadTextFile(content: string, filename: string) {
++  const blob = new Blob([content], { type: 'application/json;charset=utf-8;' });
++  const url = URL.createObjectURL(blob);
++  const link = document.createElement('a');
++  link.href = url;
++  link.download = filename;
++  document.body.appendChild(link);
++  link.click();
++  document.body.removeChild(link);
++  URL.revokeObjectURL(url);
++}
++
++export default function TabDataSekolah({ setNotice }: TabDataSekolahProps) {
++  const { showToast } = useToast();
++  const [importing, setImporting] = useState(false);
++  const [fileName, setFileName] = useState('');
++  const [lastSummary, setLastSummary] = useState<ImportSummary | null>(null);
++
++  const handleExport = () => {
++    try {
++      downloadTextFile(exportMasterData(), masterDataFilename());
++      showToast('success', 'Data master berhasil diekspor.');
++    } catch {
++      showToast('error', 'Gagal mengekspor data.');
++    }
++  };
++
++  const handleImportFile = (e: ChangeEvent<HTMLInputElement>) => {
++    const file = e.target.files?.[0];
++    e.target.value = '';
++    if (!file) return;
++    setFileName(file.name);
++    setLastSummary(null);
++    const reader = new FileReader();
++    reader.onload = async () => {
++      try {
++        const summary = await importMasterData(String(reader.result ?? ''));
++        setLastSummary(summary);
++        showToast('success', `Impor berhasil: ${summary.teachers} guru, ${summary.students} siswa.`);
++        setNotice?.('Data master berhasil diimpor.');
++      } catch (err) {
++        showToast('error', err instanceof Error ? err.message : 'Gagal mengimpor file.');
++      } finally {
++        setImporting(false);
++      }
++    };
++    reader.readAsText(file);
++  };
++
++  const handleReset = async (mode: 'demo' | 'empty') => {
++    const msg =
++      mode === 'demo'
++        ? 'Kembalikan SEMUA data ke contoh bawaan? Data yang Anda tambahkan akan hilang (identitas sekolah tetap aman).'
++        : 'KOSONGKAN semua data (guru, siswa, kelas, nilai, dll)? Identitas sekolah tetap aman. Lanjutkan?';
++    if (!window.confirm(msg)) return;
++    setImporting(true);
++    try {
++      const result = await resetAllData(mode);
++      showToast('success', result);
++      setNotice?.(result);
++      // Muat ulang agar seluruh aplikasi membaca state baru yang konsisten.
++      setTimeout(() => window.location.reload(), 1200);
++    } catch {
++      showToast('error', 'Gagal melakukan reset data.');
++    } finally {
++      setImporting(false);
++    }
++  };
++
++  return (
++    <div className="mx-auto w-full max-w-2xl space-y-5 p-5">
++      {/* Info */}
++      <div className="flex items-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-[11px] leading-relaxed text-blue-900">
++        <Info className="mt-0.5 h-4 w-4 shrink-0" />
++        <p>
++          <b>Alur setup sekolah baru:</b> (1) Ekspor data master sekolah lama → (2) Kosongkan
++          data → (3) Impor file tadi. Data guru, siswa, kelas & roster pindah dalam hitungan
++          menit. <b>Identitas sekolah (nama/logo) tidak ikut ter-reset.</b>
++        </p>
++      </div>
++
++      {/* Ekspor */}
++      <section className="rounded-xl border-2 border-black bg-white p-4">
++        <div className="mb-2 flex items-center gap-2">
++          <Download className="h-4 w-4 text-black" />
++          <h3 className="text-xs font-bold tracking-wide text-black uppercase">Ekspor Data Master</h3>
++        </div>
++        <p className="mb-3 text-[11px] leading-relaxed text-neutral-600">
++          Simpan data guru, siswa, kelas & roster ke file JSON. File ini bisa diimpor ke
++          instalasi SIAKAD lain (sekolah baru) atau dijadikan cadangan.
++        </p>
++        <button
++          type="button"
++          onClick={handleExport}
++          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-[11px] font-bold text-black transition-colors hover:bg-black hover:text-white"
++        >
++          <Download className="h-3.5 w-3.5" /> Ekspor Data Master (.json)
++        </button>
++      </section>
++
++      {/* Impor */}
++      <section className="rounded-xl border-2 border-black bg-white p-4">
++        <div className="mb-2 flex items-center gap-2">
++          <Upload className="h-4 w-4 text-black" />
++          <h3 className="text-xs font-bold tracking-wide text-black uppercase">Impor Data Master</h3>
++        </div>
++        <p className="mb-3 text-[11px] leading-relaxed text-neutral-600">
++          Unggah file hasil ekspor. Data guru/siswa/kelas/roster akan <b>mengganti</b> data yang
++          ada sekarang. Password polos otomatis di-hash. <b>Saran:</b> kosongkan data dulu
++          sebelum impor agar bersih.
++        </p>
++        <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-black px-4 py-2 text-[11px] font-bold text-white transition-colors hover:bg-neutral-800">
++          <Upload className="h-3.5 w-3.5" />
++          {importing ? 'Memproses...' : 'Pilih File JSON'}
++          <input
++            type="file"
++            accept="application/json,.json"
++            className="hidden"
++            disabled={importing}
++            onChange={handleImportFile}
++          />
++        </label>
++        {fileName && (
++          <p className="mt-2 text-[10px] text-neutral-500">File dipilih: {fileName}</p>
++        )}
++        {lastSummary && (
++          <div className="mt-3 rounded-lg border border-green-300 bg-green-50 p-3 text-[11px] text-green-900">
++            <p className="font-bold">✅ Impor berhasil:</p>
++            <ul className="mt-1 list-inside list-disc">
++              <li>{lastSummary.teachers} guru</li>
++              <li>{lastSummary.students} siswa</li>
++              <li>{lastSummary.classes} kelas</li>
++              <li>{lastSummary.classRosters} baris roster</li>
++            </ul>
++          </div>
++        )}
++      </section>
++
++      {/* Reset */}
++      <section className="rounded-xl border-2 border-red-200 bg-red-50/40 p-4">
++        <div className="mb-2 flex items-center gap-2">
++          <Database className="h-4 w-4 text-red-700" />
++          <h3 className="text-xs font-bold tracking-wide text-red-800 uppercase">
++            Reset / Kosongkan Data
++          </h3>
++        </div>
++        <p className="mb-3 text-[11px] leading-relaxed text-red-800/80">
++          Untuk menyiapkan instalasi baru. Kedua aksi <b>tidak bisa dibatalkan</b> — pastikan
++          sudah mengekspor data bila masih dibutuhkan. Identitas sekolah (nama/logo) tetap aman.
++        </p>
++        <div className="flex flex-wrap gap-3">
++          <button
++            type="button"
++            onClick={() => handleReset('demo')}
++            disabled={importing}
++            className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-600 px-4 py-2 text-[11px] font-bold text-amber-700 transition-colors hover:bg-amber-600 hover:text-white disabled:opacity-40"
++          >
++            <RotateCcw className="h-3.5 w-3.5" /> Reset ke Data Demo
++          </button>
++          <button
++            type="button"
++            onClick={() => handleReset('empty')}
++            disabled={importing}
++            className="inline-flex items-center gap-1.5 rounded-md border-2 border-red-600 px-4 py-2 text-[11px] font-bold text-red-700 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-40"
++          >
++            <Trash2 className="h-3.5 w-3.5" /> Kosongkan Semua Data
++          </button>
++        </div>
++      </section>
++    </div>
++  );
++}
+-- 
+2.47.3
+

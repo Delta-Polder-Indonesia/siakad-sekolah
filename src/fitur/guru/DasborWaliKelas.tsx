@@ -39,7 +39,7 @@ const STATUS_META: Record<StudentStatus, { label: string; icon: typeof UserCheck
   lulus: {
     label: 'Lulus',
     icon: GraduationCap,
-    cls: 'border-2 border-blue-600 bg-white text-blue-700',
+    cls: 'border-2 border-black bg-black text-white',
   },
   pindah: {
     label: 'Pindah',
@@ -307,7 +307,7 @@ export default function DasborWaliKelas({ onNavigate }: PageProps) {
             <button
               type="button"
               onClick={() => onNavigate?.('student-management')}
-              className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+              className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
             >
               Kelola Siswa <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -394,7 +394,7 @@ export default function DasborWaliKelas({ onNavigate }: PageProps) {
             <button
               type="button"
               onClick={() => onNavigate?.('school-announcements')}
-              className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600"
+              className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
             >
               Lihat Semua <ChevronRight className="h-3.5 w-3.5" />
             </button>

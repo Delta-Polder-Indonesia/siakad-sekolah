@@ -73,7 +73,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
         <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase">Notifikasi</h3>
         <button type="button"
           onClick={handleMarkAllRead}
-          className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800"
+          className="flex items-center gap-1 text-[11px] text-black hover:text-blue-800"
         >
           <CheckCheck className="h-3.5 w-3.5" /> Tandai Dibaca
         </button>
@@ -117,7 +117,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
             onNavigate('school-announcements');
             onClose();
           }}
-          className="text-[11px] text-blue-600 hover:text-blue-800"
+          className="text-[11px] text-black hover:text-blue-800"
         >
           Lihat Semua Pengumuman
         </button>

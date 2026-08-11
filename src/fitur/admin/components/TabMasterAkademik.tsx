@@ -163,7 +163,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
               value={tahun}
               onChange={(e) => setTahun(e.target.value)}
               placeholder="2025/2026"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="space-y-1">
@@ -173,7 +173,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
             <select
               value={semester}
               onChange={(e) => setSemester(e.target.value as 'ganjil' | 'genap')}
-              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               <option value="ganjil">Ganjil</option>
               <option value="genap">Genap</option>
@@ -192,7 +192,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
             <button
               type="button"
               onClick={simpanTahun}
-              className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 sm:w-auto"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 sm:w-auto"
             >
               <Plus className="h-3.5 w-3.5" />
               Tambah Tahun Ajaran
@@ -226,14 +226,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                         <button
                           type="button"
                           onClick={simpanEditTahun}
-                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600"
+                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black"
                         >
                           Simpan
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditTahunId(null)}
-                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600"
+                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black"
                         >
                           Batal
                         </button>
@@ -268,14 +268,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                             <button
                               type="button"
                               onClick={() => setAktifTarget(null)}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Batal
                             </button>
                             <button
                               type="button"
                               onClick={confirmAktif}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Ya, Aktifkan
                             </button>
@@ -294,14 +294,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                             <button
                               type="button"
                               onClick={() => setDeleteTarget(null)}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Batal
                             </button>
                             <button
                               type="button"
                               onClick={confirmDelete}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Ya, Hapus
                             </button>
@@ -314,7 +314,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                           setEditTahunId(item.id);
                           setEditTahunValue(item.tahun);
                         }}
-                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Ubah Tahun Ajaran"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -323,7 +323,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                         <button
                           type="button"
                           onClick={() => jadikanAktifHandler(item.id)}
-                          className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                          className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                           title="Jadikan Aktif"
                         >
                           <Star className="h-3.5 w-3.5" />
@@ -332,7 +332,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                       <button
                         type="button"
                         onClick={() => setDeleteTarget({ kind: 'tahun', id: item.id })}
-                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Hapus Tahun Ajaran"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -377,7 +377,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
               value={mapelNama}
               onChange={(e) => setMapelNama(e.target.value)}
               placeholder="Matematika"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="space-y-1">
@@ -387,7 +387,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
               value={mapelKode}
               onChange={(e) => setMapelKode(e.target.value)}
               placeholder="MTK"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="space-y-1">
@@ -399,14 +399,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
               value={mapelKelompok}
               onChange={(e) => setMapelKelompok(e.target.value)}
               placeholder="Wajib / Peminatan"
-              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
             />
           </div>
           <div className="flex justify-end">
             <button
               type="button"
               onClick={simpanMapel}
-              className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 sm:w-auto"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 sm:w-auto"
             >
               <Plus className="h-3.5 w-3.5" />
               Tambah Mapel
@@ -446,14 +446,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                         <button
                           type="button"
                           onClick={simpanEditMapel}
-                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600"
+                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black"
                         >
                           Simpan
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditMapelId(null)}
-                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600"
+                          className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-black"
                         >
                           Batal
                         </button>
@@ -482,14 +482,14 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                             <button
                               type="button"
                               onClick={() => setDeleteTarget(null)}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Batal
                             </button>
                             <button
                               type="button"
                               onClick={confirmDelete}
-                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                              className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
                             >
                               Ya, Hapus
                             </button>
@@ -504,7 +504,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                           setEditMapelKode(item.kode);
                           setEditMapelKelompok(item.kelompok || '');
                         }}
-                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Ubah Mata Pelajaran"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -512,7 +512,7 @@ export default function TabMasterAkademik({ setNotice }: { setNotice: (msg: stri
                       <button
                         type="button"
                         onClick={() => setDeleteTarget({ kind: 'mapel', id: item.id })}
-                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
+                        className="shrink-0 rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-black hover:bg-neutral-100"
                         title="Hapus Mata Pelajaran"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

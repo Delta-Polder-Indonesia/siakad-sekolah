@@ -94,7 +94,7 @@ export default function KirimSuratMurid() {
 
   const statusStyle = {
     menunggu: 'text-black bg-white border-2 border-black',
-    disetujui: 'text-blue-600 bg-white border-2 border-blue-600',
+    disetujui: 'text-black bg-white border-2 border-black',
     ditolak: 'text-white bg-black border-2 border-black',
   } as const;
 
@@ -155,7 +155,7 @@ export default function KirimSuratMurid() {
                 type="date"
                 value={letterDate}
                 onChange={(event) => setLetterDate(event.target.value)}
-                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black"
               />
             </div>
 
@@ -168,7 +168,7 @@ export default function KirimSuratMurid() {
                 onChange={(event) =>
                   setType(event.target.value as 'izin' | 'sakit' | 'dispensasi' | 'lainnya')
                 }
-                className="w-full appearance-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-blue-600"
+                className="w-full appearance-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none focus:border-black"
                 style={{
                   backgroundImage:
                     "url(\"data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
@@ -194,7 +194,7 @@ export default function KirimSuratMurid() {
               value={subject}
               onChange={(event) => setSubject(event.target.value)}
               placeholder="Contoh: Surat keterangan sakit dari dokter klinik"
-              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-blue-600"
+              className="w-full rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-black"
             />
           </div>
 
@@ -207,7 +207,7 @@ export default function KirimSuratMurid() {
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder="Tuliskan alasan ketidakhadiran Anda secara ringkas dan jelas di sini..."
-              className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-blue-600"
+              className="w-full resize-none rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/50 focus:border-black"
             />
           </div>
 
@@ -227,7 +227,7 @@ export default function KirimSuratMurid() {
               type="button"
               onClick={handleSubmit}
               disabled={isSaving}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60"
             >
               {isSaving ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -240,7 +240,7 @@ export default function KirimSuratMurid() {
             {feedback && (
               <p
                 className={`font-mono text-xs font-bold ${
-                  feedback.startsWith('Berhasil') ? 'text-blue-600' : 'text-black'
+                  feedback.startsWith('Berhasil') ? 'text-black' : 'text-black'
                 }`}
               >
                 {feedback}

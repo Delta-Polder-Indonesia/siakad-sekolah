@@ -93,7 +93,7 @@ export default function AturRosterGuru() {
             <select
               value={selectedClassId}
               onChange={(e) => setSelectedClassId(e.target.value)}
-              className="mt-0.5 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+              className="mt-0.5 cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none focus:border-black focus:bg-neutral-50"
             >
               {teacherClasses.map((cls) => (
                 <option key={cls.id} value={cls.id}>
@@ -125,7 +125,7 @@ export default function AturRosterGuru() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Contoh: Matematika Diskrit"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function AturRosterGuru() {
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
                 placeholder="Contoh: LAB_KOM_02"
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
             </div>
 
@@ -149,7 +149,7 @@ export default function AturRosterGuru() {
               <select
                 value={dayOfWeek}
                 onChange={(e) => setDayOfWeek(e.target.value)}
-                className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                className="w-full cursor-pointer rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
               >
                 {schoolDayOptions.map((day) => (
                   <option key={day.value} value={day.value}>
@@ -168,13 +168,13 @@ export default function AturRosterGuru() {
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                 />
                 <input
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
                 />
               </div>
             </div>
@@ -210,7 +210,7 @@ export default function AturRosterGuru() {
                     </p>
 
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px]">
-                      <span className="rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 font-bold text-blue-700 uppercase">
+                      <span className="rounded-md border-2 border-black bg-white px-1.5 py-0.5 font-bold text-black uppercase">
                         {dayNames[item.dayOfWeek] || 'HARI_NULL'}
                       </span>
                       <span className="flex items-center gap-1 font-mono font-bold text-black">

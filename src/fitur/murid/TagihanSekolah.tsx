@@ -298,7 +298,7 @@ export default function TagihanSekolahPage() {
                 setSelectedBillIds([]);
                 setInfoMessage('');
               }}
-              className="cursor-pointer rounded-md border border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:text-blue-600 focus:outline-none"
+              className="cursor-pointer rounded-md border border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 focus:outline-none"
             >
               {availableYears.map((year) => (
                 <option key={year} value={year} className="font-bold text-black">
@@ -348,7 +348,7 @@ export default function TagihanSekolahPage() {
             <button
               type="button"
               onClick={handleUnduhDaftarTahunanPdf}
-              className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+              className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
             >
               PDF
             </button>
@@ -358,7 +358,7 @@ export default function TagihanSekolahPage() {
                 if (!user) return;
                 exportTagihanPdf(bills, user.name, activeYear, MONTH_NAMES);
               }}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-blue-600 bg-blue-600 px-2 py-0.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-black px-2 py-0.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
             >
               <Download className="h-3 w-3" />
               Export Laporan
@@ -420,8 +420,8 @@ export default function TagihanSekolahPage() {
                             onClick={() => handleToggleSelectBill(item.id)}
                             className={`inline-block w-[76px] cursor-pointer rounded-md border-2 bg-white py-0.5 text-center text-xs font-bold transition-colors hover:bg-neutral-100 ${
                               isSelected
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-black text-black hover:border-blue-600 hover:text-blue-600'
+                                ? 'border-black bg-black text-white'
+                                : 'border-black text-black hover:border-black hover:bg-neutral-100'
                             }`}
                           >
                             {isSelected ? '✓ Terpilih' : 'Pilih Bulan'}
@@ -430,7 +430,7 @@ export default function TagihanSekolahPage() {
                           <button
                             type="button"
                             onClick={() => handleUnduhBuktiPdf(item as TagihanSekolah)}
-                            className="inline-block w-[76px] cursor-pointer rounded-md border-2 border-black bg-white py-0.5 text-center text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
+                            className="inline-block w-[76px] cursor-pointer rounded-md border-2 border-black bg-white py-0.5 text-center text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black"
                           >
                             Unduh Resi
                           </button>
@@ -466,7 +466,7 @@ export default function TagihanSekolahPage() {
                 onClick={() => setSelectedMethod(method.value)}
                 className={`flex cursor-pointer items-center justify-center rounded-md border-2 p-2 text-center transition-colors hover:bg-neutral-100 ${
                   isTarget
-                    ? 'border-blue-600 bg-white text-black'
+                    ? 'border-black bg-black text-white'
                     : 'border-black bg-white text-black'
                 }`}
               >
@@ -509,7 +509,7 @@ export default function TagihanSekolahPage() {
             type="button"
             onClick={handleBayarMulti}
             disabled={billsToPay.length === 0}
-            className="cursor-pointer self-start rounded-md border-2 border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60 disabled:hover:border-black md:self-auto"
+            className="cursor-pointer self-start rounded-md border-2 border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-black disabled:opacity-60 disabled:hover:border-black md:self-auto"
           >
             Eksekusi Transaksi ({billsToPay.length})
           </button>

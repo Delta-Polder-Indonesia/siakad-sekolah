@@ -265,7 +265,7 @@ export default function DasborOrangTua({ onNavigate }: { onNavigate?: (page: str
                 type="button"
                 onClick={handleExportPdf}
                 disabled={!handleExportPdf}
-                className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Ekspor PDF
               </button>

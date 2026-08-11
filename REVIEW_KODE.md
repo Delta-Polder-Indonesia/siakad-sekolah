@@ -556,4 +556,38 @@ yang dikerjakan (tanpa emoji / efek mengambang — hanya icon):
 3. Terapkan `StatCard` ke dasbor lain setelah polanya disamakan.
 4. Hapus 350 tombol tanpa onClick yang dibiarkan? (itu submit button — aman).
 
+---
+
+## 16. Penyeragaman Markup — Hitam-Putih di Semua Halaman Role ✅
+
+**Tujuan user:** tidak ada lagi "belang-belang" antar halaman (guru/murid/
+orang tua/admin) — markup diseragamkan agar terlihat profesional.
+
+### Akar masalah yang ditemukan
+1. **Aksen biru campur hitam**: 29+ tombol/tab/input memakai `bg-blue-600`/
+   `border-blue-600`/`hover:border-blue-600`, mayoritas lain hitam.
+2. **Komponen design system (Button/Card/Input/Badge/Table) bergaya slate/blue**
+   — tidak cocok dengan gaya aplikasi → tidak pernah dipakai → tiap halaman
+   menulis markup manual dengan variasi kecil (10px vs xs, dsb).
+
+### Yang dikerjakan
+1. **Semua aksen biru struktural → hitam** (±480 penggantian di ~90 file):
+   tombol, tab aktif, focus/hover input, pill, banner, badge struktural.
+   Warna data (legend chart, dot "Hadir", kalender hari ini, status badge)
+   TETAP berwarna karena itu informasi.
+2. **Design system disamakan ke hitam-putih**: Button (primary=hitam,
+   secondary=putih), Card, Input, Badge, Table — kini cocok & siap dipakai.
+3. **Komponen baru**: `PageHeader` (header halaman), `SectionTitle` (judul
+   seksi), `StatCard` (kartu statistik) — diekspor dari `components/ui`.
+4. **`dokumentasi/STANDAR_MARKUP.md`** — satu-satunya acuan gaya markup:
+   komponen wajib, pola baku, aturan (type=button, alt, tanpa emoji/animasi).
+
+### Verifikasi
+- FE: 292 test (28 file) ✅ · lint 0 error ✅ · build ✅
+
+### Catatan
+- Konsistensi penuh ke depan dijaga lewat STANDAR_MARKUP.md + komponen.
+- Adopsi komponen ke semua halaman bisa bertahap (halaman baru WAJIB pakai;
+  halaman lama direfactor saat disentuh).
+
 *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*

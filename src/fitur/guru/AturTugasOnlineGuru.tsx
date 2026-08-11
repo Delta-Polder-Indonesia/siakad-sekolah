@@ -248,7 +248,7 @@ export default function AturTugasOnlineGuru() {
                 value={assignmentTitle}
                 onChange={(e) => setAssignmentTitle(e.target.value)}
                 placeholder="Ketik nama atau topik penugasan formal..."
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
               />
             </div>
 
@@ -266,7 +266,7 @@ export default function AturTugasOnlineGuru() {
                 onChange={(e) => setAssignmentDescription(e.target.value)}
                 placeholder="Tulis instruksi langkah pengerjaan tugas atau butir soal di sini..."
                 rows={4}
-                className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function AturTugasOnlineGuru() {
                 type="date"
                 value={assignmentDueDate}
                 onChange={(e) => setAssignmentDueDate(e.target.value)}
-                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none focus:border-blue-600"
+                className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black outline-none focus:border-black"
               />
             </div>
           </section>
@@ -302,7 +302,7 @@ export default function AturTugasOnlineGuru() {
               onChange={(e) => setSummary(e.target.value)}
               placeholder="Rangkuman inti materi: tujuan pembelajaran, poin penting, glosarium..."
               rows={8}
-              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+              className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
             />
           </section>
         );
@@ -318,7 +318,7 @@ export default function AturTugasOnlineGuru() {
               <button
                 type="button"
                 onClick={addBook}
-                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-50"
+                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-bold text-black transition-colors hover:bg-blue-50"
               >
                 <Plus className="h-3 w-3" /> Tambah
               </button>
@@ -345,26 +345,26 @@ export default function AturTugasOnlineGuru() {
                   value={book.title}
                   onChange={(e) => updateBook(bIndex, { title: e.target.value })}
                   placeholder="Judul buku"
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
                 <input
                   value={book.author}
                   onChange={(e) => updateBook(bIndex, { author: e.target.value })}
                   placeholder="Pengarang"
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
                 <div className="flex gap-1.5">
                   <input
                     value={book.year || ''}
                     onChange={(e) => updateBook(bIndex, { year: e.target.value })}
                     placeholder="Tahun"
-                    className="w-20 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                    className="w-20 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                   />
                   <input
                     value={book.link || ''}
                     onChange={(e) => updateBook(bIndex, { link: e.target.value })}
                     placeholder="Tautan URL (opsional)"
-                    className="min-w-0 flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                    className="min-w-0 flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                   />
                 </div>
               </div>
@@ -383,7 +383,7 @@ export default function AturTugasOnlineGuru() {
               <button
                 type="button"
                 onClick={addVideo}
-                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-50"
+                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-bold text-black transition-colors hover:bg-blue-50"
               >
                 <Plus className="h-3 w-3" /> Tambah
               </button>
@@ -412,19 +412,19 @@ export default function AturTugasOnlineGuru() {
                   value={video.title}
                   onChange={(e) => updateVideo(vIndex, { title: e.target.value })}
                   placeholder="Judul video"
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
                 <input
                   value={video.url}
                   onChange={(e) => updateVideo(vIndex, { url: e.target.value })}
                   placeholder="URL YouTube (contoh: https://youtube.com/watch?v=...)"
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
                 <input
                   value={video.description || ''}
                   onChange={(e) => updateVideo(vIndex, { description: e.target.value })}
                   placeholder="Deskripsi singkat (opsional)"
-                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
               </div>
             ))}
@@ -488,7 +488,7 @@ export default function AturTugasOnlineGuru() {
               <button
                 type="button"
                 onClick={addExercise}
-                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-50"
+                className="inline-flex cursor-pointer items-center gap-0.5 rounded-md border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-bold text-black transition-colors hover:bg-blue-50"
               >
                 <Plus className="h-3 w-3" /> Tambah Soal
               </button>
@@ -516,7 +516,7 @@ export default function AturTugasOnlineGuru() {
                   onChange={(e) => updateExercise(eIndex, { question: e.target.value })}
                   placeholder="Tulis butir soal..."
                   rows={2}
-                  className="w-full resize-none rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                  className="w-full resize-none rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] leading-relaxed font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                 />
                 {exercise.options.map((option, oIndex) => (
                   <div key={oIndex} className="flex items-center gap-1.5">
@@ -526,8 +526,8 @@ export default function AturTugasOnlineGuru() {
                       title="Tandai sebagai kunci jawaban"
                       className={`flex shrink-0 cursor-pointer items-center gap-1 rounded-md border px-1.5 py-1 text-[10px] font-bold transition-colors ${
                         exercise.correctIndex === oIndex
-                          ? 'border-blue-600 bg-blue-600 text-white'
-                          : 'border-black bg-white text-black hover:border-blue-600 hover:text-blue-600'
+                          ? 'border-black bg-black text-white'
+                          : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100'
                       }`}
                     >
                       <CircleDot className="h-3 w-3" /> Kunci
@@ -536,7 +536,7 @@ export default function AturTugasOnlineGuru() {
                       value={option}
                       onChange={(e) => updateOption(eIndex, oIndex, e.target.value)}
                       placeholder={`Pilihan ${String.fromCharCode(65 + oIndex)}`}
-                      className="min-w-0 flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-blue-600"
+                      className="min-w-0 flex-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black outline-none placeholder:text-black/40 focus:border-black"
                     />
                     <button
                       type="button"
@@ -551,7 +551,7 @@ export default function AturTugasOnlineGuru() {
                 <button
                   type="button"
                   onClick={() => addOption(eIndex)}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-blue-600 bg-white px-1.5 py-0.5 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-50"
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-bold text-black transition-colors hover:bg-blue-50"
                 >
                   <PlusCircle className="h-3 w-3" /> Tambah Pilihan
                 </button>
@@ -572,7 +572,7 @@ export default function AturTugasOnlineGuru() {
                   value={selectedClassId}
                   onChange={(e) => setSelectedClassId(e.target.value)}
                   title="Target Kelas"
-                  className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 hover:text-blue-600 focus:border-blue-600"
+                  className="cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black uppercase transition-colors outline-none hover:border-black hover:bg-neutral-100 focus:border-black"
                 >
                   {teacherClasses.map((cls) => (
                     <option key={cls.id} value={cls.id} className="font-bold text-black">
@@ -592,7 +592,7 @@ export default function AturTugasOnlineGuru() {
                 value={selectedFeedAssignmentId}
                 onChange={(e) => setSelectedFeedAssignmentId(e.target.value)}
                 title="Pilih tugas untuk membuka diskusi"
-                className="max-w-[280px] cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 hover:text-blue-600 focus:border-blue-600"
+                className="max-w-[280px] cursor-pointer rounded-md border-2 border-black bg-white px-2 py-1 text-xs font-bold text-black uppercase transition-colors outline-none hover:border-black hover:bg-neutral-100 focus:border-black"
               >
                 {classAssignments.map((item) => (
                   <option key={item.id} value={item.id} className="font-bold text-black">
@@ -630,9 +630,9 @@ export default function AturTugasOnlineGuru() {
                       leftFooter={
                         <div className="space-y-2">
                           {editingAssignmentId && (
-                            <div className="flex items-center justify-between gap-2 rounded-md border-2 border-blue-600 bg-white p-1.5">
+                            <div className="flex items-center justify-between gap-2 rounded-md border-2 border-black bg-white p-1.5">
                               <div className="flex min-w-0 items-center gap-1.5">
-                                <Pencil className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                                <Pencil className="h-3.5 w-3.5 shrink-0 text-black" />
                                 <span className="truncate text-[10px] font-bold text-black">
                                   Mode Edit — memperbarui tugas yang sudah terbit
                                 </span>
@@ -655,7 +655,7 @@ export default function AturTugasOnlineGuru() {
                               !assignmentDescription.trim() ||
                               !assignmentDueDate
                             }
-                            className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border-2 border-blue-600 bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black disabled:opacity-60"
+                            className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black disabled:opacity-60"
                           >
                             {isPublishing ? (
                               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -708,7 +708,7 @@ export default function AturTugasOnlineGuru() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center justify-center gap-2 rounded-md border-2 bg-white px-3 py-2 text-xs font-bold text-black transition-all ${
-                isActive ? 'border-blue-600' : 'border-black hover:bg-neutral-100'
+                isActive ? 'border-black bg-black text-white' : 'border-black bg-white hover:bg-neutral-100'
               }`}
             >
               <Icon className="h-4 w-4 shrink-0 text-black" />

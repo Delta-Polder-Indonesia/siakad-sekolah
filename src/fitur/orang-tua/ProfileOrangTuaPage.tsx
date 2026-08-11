@@ -479,7 +479,7 @@ export default function ProfileOrangTuaPage({
             className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 px-3 py-2 text-xs font-bold transition-colors ${
               isUploadingAvatar
                 ? 'cursor-not-allowed border-black bg-neutral-100 text-black/40'
-                : 'border-black bg-white text-black hover:border-blue-600 hover:bg-neutral-100'
+                : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100'
             }`}
           >
             {isUploadingAvatar ? (
@@ -673,7 +673,7 @@ export default function ProfileOrangTuaPage({
                 className={`w-full rounded-md border-2 bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 ${
                   errors.name
                     ? 'border-rose-600 hover:border-rose-600 focus:border-rose-600'
-                    : 'border-black hover:border-blue-600 focus:border-blue-600'
+                    : 'border-black focus:border-black focus:bg-neutral-50'
                 }`}
                 placeholder="Masukkan nama lengkap siswa"
               />
@@ -698,7 +698,7 @@ export default function ProfileOrangTuaPage({
                   className={`w-full rounded-md border-2 bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 ${
                     errors.email
                       ? 'border-rose-600 hover:border-rose-600 focus:border-rose-600'
-                      : 'border-black hover:border-blue-600 focus:border-blue-600'
+                      : 'border-black focus:border-black focus:bg-neutral-50'
                   }`}
                 />
                 {errors.email && (
@@ -718,7 +718,7 @@ export default function ProfileOrangTuaPage({
                   className={`w-full rounded-md border-2 bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 ${
                     errors.phone
                       ? 'border-rose-600 hover:border-rose-600 focus:border-rose-600'
-                      : 'border-black hover:border-blue-600 focus:border-blue-600'
+                      : 'border-black focus:border-black focus:bg-neutral-50'
                   }`}
                 />
                 {errors.phone && (
@@ -738,7 +738,7 @@ export default function ProfileOrangTuaPage({
                   value={formData.parentName}
                   onChange={(e) => handleInputChange('parentName', e.target.value)}
                   placeholder="Nama ayah, ibu, atau wali"
-                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
               <div>
@@ -750,7 +750,7 @@ export default function ProfileOrangTuaPage({
                   value={formData.parentFullKtpName}
                   onChange={(e) => handleInputChange('parentFullKtpName', e.target.value)}
                   placeholder="Nama lengkap sesuai identitas resmi"
-                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                  className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
                 />
               </div>
             </div>
@@ -783,7 +783,7 @@ export default function ProfileOrangTuaPage({
                 className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 px-3 py-2 text-[10px] font-bold transition-colors ${
                   isUploadingAvatar
                     ? 'cursor-not-allowed border-black bg-neutral-100 text-black/40'
-                    : 'border-black bg-white text-black hover:border-blue-600 hover:bg-neutral-100'
+                    : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100'
                 }`}
               >
                 {isUploadingAvatar ? (
@@ -818,7 +818,7 @@ export default function ProfileOrangTuaPage({
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Tuliskan alamat rumah domisili saat ini..."
                 maxLength={500}
-                className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
+                className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs leading-relaxed font-bold text-black transition-colors outline-none placeholder:text-black/40 focus:border-black focus:bg-neutral-50"
               />
               <div className="mt-1 flex items-center justify-between">
                 <span className="text-[10px] font-bold text-rose-600">{errors.address || ''}</span>
@@ -892,7 +892,7 @@ export default function ProfileOrangTuaPage({
             type="button"
             onClick={handleExportPdf}
             disabled={!handleExportPdf}
-            className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Ekspor PDF
           </button>

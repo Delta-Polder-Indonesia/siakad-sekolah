@@ -103,7 +103,7 @@ export default function JurnalMengajarGuru() {
               setSelectedClassId(e.target.value);
               setSelectedSubject('');
             }}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           >
             <option value="">Pilih Kelas</option>
             {classes.map((c) => (
@@ -122,7 +122,7 @@ export default function JurnalMengajarGuru() {
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
             disabled={!selectedClassId}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-black/50"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-black/50"
           >
             <option value="">Pilih Mapel</option>
             {subjects.map((s) => (
@@ -141,7 +141,7 @@ export default function JurnalMengajarGuru() {
             type="date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none hover:border-blue-600 focus:border-blue-600"
+            className="w-full rounded-md border-2 border-black bg-white px-2.5 py-1.5 font-mono text-xs font-bold text-black transition-colors outline-none focus:border-black focus:bg-neutral-50"
           />
         </label>
       </div>
@@ -186,7 +186,7 @@ export default function JurnalMengajarGuru() {
                   type="button"
                   onClick={handleExportPdf}
                   disabled={notes.length === 0}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-blue-600 bg-blue-600 px-2.5 py-1 text-xs font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-black px-2.5 py-1 text-xs font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Download className="h-3 w-3" /> PDF
                 </button>
@@ -194,7 +194,7 @@ export default function JurnalMengajarGuru() {
                   type="button"
                   onClick={handleExportCsv}
                   disabled={notes.length === 0}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100 hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Download className="h-3 w-3" /> CSV
                 </button>

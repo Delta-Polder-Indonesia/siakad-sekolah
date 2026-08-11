@@ -1,0 +1,198 @@
+From 6ab3f084f6338227043608d07db1bc9761c56b07 Mon Sep 17 00:00:00 2001
+From: Bintang Toba <anakkostbgusop@gmail.com>
+Date: Tue, 11 Aug 2026 05:43:52 +0000
+Subject: [PATCH 06/19] refactor(fe): lazyPage generik + hapus 4x 'as any' di
+ App.tsx
+
+- lazyPage<P extends PageProps> mempertahankan tipe props komponen asal
+  (PanelAdminModal butuh scope, BukuTamuPage butuh defaultTab)
+- Hapus cast any yang tidak perlu: PerpusDashboard (member.nis/className
+  sudah ada di tipe), PerpusDetailBuku (Record<string, BookDetail>),
+  apiConfig (import.meta.env), misc (PengumumanAdmin)
+
+diff --git a/src/App.tsx b/src/App.tsx
+index 125b71e..63faa88 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -10,6 +10,7 @@ import { NotificationProvider } from './fitur/bersama/NotificationProvider';
+ import ErrorBoundary from './components/common/ErrorBoundary';
+ import { FeedbackButton } from './fitur/halaman/feedback';
+ import { ToastProvider, lazyPage } from './components/ui';
++import type { AdminGuruPanelProps } from './fitur/admin/PanelAdminModal';
+ 
+ // ── Lazy-loaded page components (split by role) ──
+ // Each chunk is loaded only when the user navigates to that page.
+@@ -80,12 +81,15 @@ const LazyStrukturOrganisasi = lazyPage(
+ );
+ 
+ // Admin pages (lazy loaded)
+-const LazyAdminMasterPanel = lazyPage(() => import('./fitur/admin/PanelAdminModal'));
++// PanelAdminModal butuh prop `scope` tambahan — lazyPage generik menjaga tipe props-nya.
++const LazyAdminMasterPanel = lazyPage<AdminGuruPanelProps & PageProps>(
++  () => import('./fitur/admin/PanelAdminModal')
++);
+ 
+ // ── Wrappers for pages with special prop handling ──
+ 
+ const AdminDashboardPage: ComponentType<PageProps> = () => (
+-  <LazyAdminMasterPanel {...({ scope: 'teacher' } as any)} />
++  <LazyAdminMasterPanel scope="teacher" />
+ );
+ 
+ const GuestDashboardWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
+@@ -95,17 +99,17 @@ const GuestDashboardWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
+ 
+ const BukuTamuPageWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
+   if (!onNavigate) return null;
+-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'form' } as any)} />;
++  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="form" />;
+ };
+ 
+ const DaftarTamuWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
+   if (!onNavigate) return null;
+-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'list' } as any)} />;
++  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="list" />;
+ };
+ 
+ const StatistikTamuWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
+   if (!onNavigate) return null;
+-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'stats' } as any)} />;
++  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="stats" />;
+ };
+ 
+ // ── Page registries per role ──
+diff --git a/src/components/ui/LazyLoad.tsx b/src/components/ui/LazyLoad.tsx
+index 6cb56d1..d94960a 100644
+--- a/src/components/ui/LazyLoad.tsx
++++ b/src/components/ui/LazyLoad.tsx
+@@ -28,15 +28,16 @@ export function PageSkeleton() {
+  *   const MyPage = lazyPage(() => import('./MyPage'));
+  *   PAGES = { myPage: MyPage };
+  *
+- * Returns ComponentType<PageProps> — the lazy component receives all PageProps
+- * via the spread operator from the wrapping component.
++ * Generik: tipe props komponen asal dipertahankan (P). Default P = PageProps,
++ * dan halaman dengan props tambahan (mis. PanelAdminModal butuh `scope`)
++ * bisa dipakai dengan `lazyPage<ExtraProps & PageProps>(...)`.
+  */
+ // eslint-disable-next-line react-refresh/only-export-components
+-export function lazyPage(
+-  importFn: () => Promise<{ default: ComponentType<any> }>
+-): ComponentType<PageProps> {
+-  const LazyComp: LazyExoticComponent<ComponentType<any>> = lazy(importFn);
+-  const LazyPageComponent = (props: PageProps) => (
++export function lazyPage<P extends PageProps = PageProps>(
++  importFn: () => Promise<{ default: ComponentType<P> }>
++): ComponentType<P> {
++  const LazyComp: LazyExoticComponent<ComponentType<P>> = lazy(importFn);
++  const LazyPageComponent = (props: P) => (
+     <Suspense fallback={<PageSkeleton />}>
+       <LazyComp {...props} />
+     </Suspense>
+diff --git a/src/data/store/core/misc.ts b/src/data/store/core/misc.ts
+index 9a9f048..065e210 100644
+--- a/src/data/store/core/misc.ts
++++ b/src/data/store/core/misc.ts
+@@ -162,7 +162,7 @@ export function getPengumumanAdminUntukGuru(classIds: string[]): PengumumanAdmin
+   );
+ }
+ 
+-export function addPengumumanAdmin(item: any): boolean {
++export function addPengumumanAdmin(item: PengumumanAdmin): boolean {
+   const all = getPengumumanAdmin();
+   all.push(item);
+   try {
+diff --git a/src/fitur/admin/AdminPerpustakaan/PerpusDashboard.tsx b/src/fitur/admin/AdminPerpustakaan/PerpusDashboard.tsx
+index b79e8ae..c3327ef 100644
+--- a/src/fitur/admin/AdminPerpustakaan/PerpusDashboard.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/PerpusDashboard.tsx
+@@ -103,8 +103,8 @@ export default function PerpusDashboard() {
+     const member = members.find((m) => m.id === memberId);
+     return {
+       name: student?.name || member?.name || 'Tidak Diketahui',
+-      nis: student?.nis || (member as any)?.nis || '-',
+-      className: (student as any)?.className || (member as any)?.className || '-',
++      nis: student?.nis || member?.nis || '-',
++      className: student?.className || member?.className || '-',
+     };
+   };
+ 
+diff --git a/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx b/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
+index 470f06f..8ef9229 100644
+--- a/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
++++ b/src/fitur/admin/AdminPerpustakaan/PerpusDetailBuku.tsx
+@@ -5,7 +5,21 @@ interface PerpusDetailBukuProps {
+   onBack: () => void;
+ }
+ 
+-const BOOK_DETAILS: Record<string, any> = {
++interface BookDetail {
++  judul: string;
++  pengarang: string;
++  isbn: string;
++  tahun: string;
++  kategori: string;
++  rak: string;
++  penerbit: string;
++  jumlah: number;
++  sinopsis: string;
++  cover: string;
++  ebook?: string;
++}
++
++const BOOK_DETAILS: Record<string, BookDetail> = {
+   B0009: {
+     judul: 'Mau Order Pustaka Digital',
+     pengarang: 'Masri',
+@@ -84,8 +98,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
+           <img
+             src={book.cover}
+             alt={book.judul}
+-            className="h-64 w-48 rounded-md border-2 border-black object-cover"
+-          />
++            className="h-64 w-48 rounded-md border-2 border-black object-cover"  loading="lazy" decoding="async" />
+         </div>
+ 
+         {/* Details */}
+diff --git a/src/fitur/admin/PanelAdminModal.tsx b/src/fitur/admin/PanelAdminModal.tsx
+index 49b60c5..72c0673 100644
+--- a/src/fitur/admin/PanelAdminModal.tsx
++++ b/src/fitur/admin/PanelAdminModal.tsx
+@@ -68,7 +68,7 @@ type TeacherAdminTab =
+   | 'perpus-transaksi-kembali'
+   | 'perpus-detail';
+ 
+-interface AdminGuruPanelProps {
++export interface AdminGuruPanelProps {
+   scope: 'teacher' | 'student';
+   open?: boolean;
+   onClose?: () => void;
+diff --git a/src/fitur/tamu/pages/BukuTamuPage.tsx b/src/fitur/tamu/pages/BukuTamuPage.tsx
+index d849e15..ae9d79d 100644
+--- a/src/fitur/tamu/pages/BukuTamuPage.tsx
++++ b/src/fitur/tamu/pages/BukuTamuPage.tsx
+@@ -15,7 +15,7 @@ import BukuTamuList from '../components/BukuTamuList';
+ import { useGuestBook } from '../context/GuestBookContext';
+ import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
+ 
+-interface BukuTamuPageProps {
++export interface BukuTamuPageProps {
+   onNavigate: (page: string) => void;
+   defaultTab?: 'form' | 'list' | 'stats';
+ }
+diff --git a/src/services/apiConfig.ts b/src/services/apiConfig.ts
+index cbb2f24..7b1e36e 100644
+--- a/src/services/apiConfig.ts
++++ b/src/services/apiConfig.ts
+@@ -3,7 +3,7 @@
+ // Prefer `import.meta.env` (Vite), but fall back to `process.env` for tests
+ // running in Node (Vitest with `--environment=node`).
+ const RAW_BASE =
+-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
++  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
+   (typeof process !== 'undefined' && process.env?.VITE_API_BASE_URL) ||
+   '';
+ 
+-- 
+2.47.3
+
