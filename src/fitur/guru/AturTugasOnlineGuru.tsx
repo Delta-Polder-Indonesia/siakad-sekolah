@@ -6,7 +6,8 @@ import {
   deleteOnlineAssignment,
   getClasses,
   getOnlineAssignmentsByClass,
-  getTeachers,
+  getTeacherByUser,
+  getLocalTeacherId,
 } from '../../data/services';
 import type {
   AssignmentAttachment,
@@ -69,7 +70,7 @@ export default function AturTugasOnlineGuru() {
 
   // Sinkronisasi data manifest kelas binaan guru
   const teacherClasses = useMemo(() => {
-    const teacher = getTeachers().find((item) => item.id === user?.id);
+    const teacher = getTeacherByUser(user);
     return getClasses().filter((item) => teacher?.classIds.includes(item.id));
   }, [user, storeVersion]);
 
@@ -192,7 +193,7 @@ export default function AturTugasOnlineGuru() {
         title: assignmentTitle.trim(),
         description: assignmentDescription.trim(),
         dueDate: assignmentDueDate,
-        createdBy: user.id,
+        createdBy: getLocalTeacherId(user) || user.id,
         createdAt: editingAssignmentId
           ? (classAssignments.find((item) => item.id === editingAssignmentId)?.createdAt ??
             Date.now())
@@ -708,7 +709,7 @@ export default function AturTugasOnlineGuru() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center justify-center gap-2 rounded-md border-2 bg-white px-3 py-2 text-xs font-bold text-black transition-all ${
-                isActive ? 'border-black bg-black text-white' : 'border-black bg-white hover:bg-neutral-100'
+                isActive ? 'border-black bg-neutral-200 text-black' : 'border-black bg-white hover:bg-neutral-100'
               }`}
             >
               <Icon className="h-4 w-4 shrink-0 text-black" />

@@ -7,7 +7,11 @@ import {
   getDiscussionsByAssignment,
   getChatGroupsByClass,
   getGroupMessages,
-  getStudents,
+  getStudentByUser,
+  getTeacherByUser,
+  getLocalTeacherId,
+  getLocalStudentId,
+  getParentStudentId,
   getScopeLastRead,
   markScopeRead,
 } from '../../data/services';
@@ -32,6 +36,22 @@ export interface NotifItem {
 
 const ITEM_READ_KEY = 'app_notification_item_read';
 const LEGACY_READ_KEY = 'app_notification_read_state';
+
+/**
+ * Id stabil untuk read-state notifikasi. Backend memakai CUID yang berbeda-beda,
+ * sedangkan read-state (localStorage) dipetakan per id — pakai id lokal agar
+ * state tetap konsisten antar sesi (mode lokal maupun backend).
+ */
+export function getNotificationUserId(user: AuthUser | null | undefined): string {
+  if (!user) return '';
+  if (user.role === 'teacher') return getLocalTeacherId(user) || user.id;
+  if (user.role === 'student') return getLocalStudentId(user) || user.id;
+  if (user.role === 'parent') {
+    const sid = getParentStudentId(user);
+    return sid ? `p_${sid}` : user.id;
+  }
+  return user.id;
+}
 
 /** Migrasi dari read-state lama (per kategori/timestamp) ke read-state per item. */
 export function migrateLegacyReadState(userId: string, items: NotifItem[]) {
@@ -195,10 +215,11 @@ export function getNotificationItems(user: AuthUser | null): NotifItem[] {
     });
 
   if (user.role === 'teacher') {
-    const own = getAllOnlineAssignments().filter((a) => a.createdBy === user.id);
+    const selfId = getLocalTeacherId(user) || user.id;
+    const own = getAllOnlineAssignments().filter((a) => a.createdBy === selfId);
     own.forEach((a) => {
       getDiscussionsByAssignment(a.id)
-        .filter((d) => d.authorId !== user.id)
+        .filter((d) => d.authorId !== selfId)
         .forEach((d) => {
           result.push({
             id: `disc-${d.id}`,
@@ -214,13 +235,14 @@ export function getNotificationItems(user: AuthUser | null): NotifItem[] {
         });
     });
   } else if (user.role === 'student') {
-    const student = getStudents().find((s) => s.id === user.id);
+    const student = getStudentByUser(user);
     if (student) {
+      const selfId = getLocalStudentId(user) || user.id;
       getAllOnlineAssignments()
         .filter((a) => a.classId === student.classId)
         .forEach((a) => {
           getDiscussionsByAssignment(a.id)
-            .filter((d) => d.role === 'teacher' && d.authorId !== user.id)
+            .filter((d) => d.role === 'teacher' && d.authorId !== selfId)
             .forEach((d) => {
               result.push({
                 id: `disc-${d.id}`,
@@ -240,17 +262,18 @@ export function getNotificationItems(user: AuthUser | null): NotifItem[] {
 
   // D6: pesan grup — guru: semua grup di kelas tugas yang ia buat; murid: grup yang ia ikuti.
   if (user.role === 'teacher') {
+    const selfId = getLocalTeacherId(user) || user.id;
     const teacherClassIds = Array.from(
       new Set(
         getAllOnlineAssignments()
-          .filter((a) => a.createdBy === user.id)
+          .filter((a) => a.createdBy === selfId)
           .map((a) => a.classId)
       )
     );
     teacherClassIds.forEach((classId) => {
       getChatGroupsByClass(classId).forEach((group) => {
         getGroupMessages(group.id)
-          .filter((gm) => gm.authorId !== user.id)
+          .filter((gm) => gm.authorId !== selfId)
           .forEach((gm) => {
             result.push({
               id: `gmsg-${gm.id}`,
@@ -267,13 +290,14 @@ export function getNotificationItems(user: AuthUser | null): NotifItem[] {
       });
     });
   } else if (user.role === 'student') {
-    const student = getStudents().find((s) => s.id === user.id);
+    const student = getStudentByUser(user);
     if (student) {
+      const selfId = getLocalStudentId(user) || user.id;
       getChatGroupsByClass(student.classId)
-        .filter((group) => group.memberIds.includes(user.id))
+        .filter((group) => group.memberIds.includes(selfId))
         .forEach((group) => {
           getGroupMessages(group.id)
-            .filter((gm) => gm.authorId !== user.id)
+            .filter((gm) => gm.authorId !== selfId)
             .forEach((gm) => {
               result.push({
                 id: `gmsg-${gm.id}`,

@@ -5,7 +5,8 @@ import {
   deleteClassAnnouncement,
   getClassAnnouncements,
   getClasses,
-  getTeachers,
+  getTeacherByUser,
+  getLocalTeacherId,
 } from '../../data/services';
 import { Megaphone, Trash2, Calendar, Radio } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
@@ -19,7 +20,7 @@ export default function AturPengumumanGuru() {
 
   // Sinkronisasi data manifest kelas binaan guru
   const teacherClasses = useMemo(() => {
-    const teacher = getTeachers().find((item) => item.id === user?.id);
+    const teacher = getTeacherByUser(user);
     return getClasses().filter((item) => teacher?.classIds.includes(item.id));
   }, [user, storeVersion]);
 
@@ -42,7 +43,7 @@ export default function AturPengumumanGuru() {
       title: title.trim(),
       message: message.trim(),
       content: message.trim(), // alias for compatibility
-      createdBy: user.id,
+      createdBy: getLocalTeacherId(user) || user.id,
       createdAt: Date.now(),
     });
     setTitle('');

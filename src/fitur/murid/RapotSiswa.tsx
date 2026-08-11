@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getClasses,
   getNilaiRapotBySiswa,
-  getStudents,
+  getStudentByUser,
   getTahunAjaranRapotSiswa,
 } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
@@ -16,7 +16,7 @@ export default function RapotSiswa() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
 
-  const student = useMemo(() => getStudents().find((s) => s.id === user?.id), [user, storeVersion]);
+  const student = useMemo(() => getStudentByUser(user), [user, storeVersion]);
 
   const className = useMemo(() => {
     if (!student) return '-';
@@ -24,14 +24,14 @@ export default function RapotSiswa() {
   }, [student, storeVersion]);
 
   const tahunAjaranList = useMemo(() => {
-    if (!user) return [];
-    const list = getTahunAjaranRapotSiswa(user.id);
+    if (!student) return [];
+    const list = getTahunAjaranRapotSiswa(student.id);
     if (list.length === 0) {
       const y = new Date().getFullYear();
       return [`${y}/${y + 1}`];
     }
     return list;
-  }, [user, storeVersion]);
+  }, [student, storeVersion]);
 
   const [tahunAjaran, setTahunAjaran] = useState(
     () => tahunAjaranList[0] || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`
@@ -39,9 +39,9 @@ export default function RapotSiswa() {
   const [semester, setSemester] = useState<'ganjil' | 'genap'>('genap');
 
   const nilaiRapot = useMemo(() => {
-    if (!user) return [];
-    return getNilaiRapotBySiswa(user.id, tahunAjaran, semester);
-  }, [user, tahunAjaran, semester, storeVersion]);
+    if (!student) return [];
+    return getNilaiRapotBySiswa(student.id, tahunAjaran, semester);
+  }, [student, tahunAjaran, semester, storeVersion]);
 
   // Kalkulasi data summary ala KHS UNPAB
   const stats = useMemo(() => {

@@ -1359,6 +1359,33 @@ Bug: masuk halaman subpage (mis. `Wisata/AksaraPark`) menampilkan **bagian palin
 
 ---
 
+## 🗓️ Sesi 64 — Tombol Feedback Floating Hanya Muncul di Halaman Login — TUNTAS
+
+### ✅ Yang sudah selesai
+
+Masalah: tombol feedback melayang (kanan bawah) muncul di **semua halaman role** (murid, guru, ortu, admin) karena dirender di shell `App.tsx`. Saat diklik di role murid, halaman feedback tampil di area konten murid — bukan yang diinginkan.
+
+Keputusan user: **hapus tombol feedback dari halaman role** — cukup muncul di halaman depan (login) saja.
+
+#### 1. `src/App.tsx`
+- Hapus `import { FeedbackButton } from './fitur/halaman/feedback';`
+- Hapus `<FeedbackButton onNavigate={setActivePage} />` dari shell ber-autentikasi (semua role).
+
+#### 2. `src/fitur/autentikasi/LoginPage.tsx` — TIDAK diubah
+- Tombol feedback di login (baris 407) tetap ada → hanya halaman login yang punya floating feedback sekarang.
+- Alur `showFeedbackPage` → `FeedbackPage` (dengan tombol kembali) tetap berfungsi.
+
+### 📁 Files berubah
+| File | Perubahan |
+|------|-----------|
+| `src/App.tsx` | hapus import + render `FeedbackButton` dari shell role |
+
+### 🔍 Status
+- `tsc --noEmit`: ✅ 0 error
+- `eslint src/App.tsx`: ✅ 0 output
+
+---
+
 ## 📝 Cara lanjut besok
 
 1. Jalankan `npm run dev`

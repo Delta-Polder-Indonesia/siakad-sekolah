@@ -1,4 +1,4 @@
-export { getTeachers, getTeacherList, saveTeachers, updateTeacher } from './teacherService';
+export { getTeachers, getTeacherList, saveTeachers, updateTeacher, getTeacherByUser, getLocalTeacherId } from './teacherService';
 
 export {
   getStudents,
@@ -13,6 +13,10 @@ export {
   addStudentStatusMutation,
   setStudentStatus,
   generateStudentNis,
+  getStudentByUser,
+  getLocalStudentId,
+  getParentStudent,
+  getParentStudentId,
 } from './studentService';
 
 export { getClasses, saveClasses, setClassTeacherId } from './classService';

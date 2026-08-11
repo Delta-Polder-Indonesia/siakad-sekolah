@@ -3,6 +3,10 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import {
   getTeachers,
   getStudents,
+  getTeacherByUser,
+  getStudentByUser,
+  getParentStudent,
+  getLocalTeacherId,
   hashPassword,
   addLoginLog,
   setClassTeacherId,
@@ -94,9 +98,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         simpanSesi(authUser);
         // Sinkronkan kelas binaan (homeroom) backend ke store lokal agar dasbor wali
         // kelas & panel orang tua ikut konsisten setelah login via backend.
+        // Store memakai id guru lokal (mis. 't1'), bukan CUID backend.
         if (role === 'teacher' && portalResult.user.homeroomClassIds?.length) {
+          const localTeacherId = getLocalTeacherId(authUser);
           portalResult.user.homeroomClassIds.forEach((classId) =>
-            setClassTeacherId(classId, portalResult.user.id)
+            setClassTeacherId(classId, localTeacherId ?? authUser.id)
           );
         }
         addLoginLog(authUser.name, role, 'form');
@@ -245,20 +251,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let nextUser: AuthUser | null = null;
 
     if (user.role === 'teacher') {
-      const teacher = getTeachers().find((item) => item.id === user.id);
+      const teacher = getTeacherByUser(user);
       if (teacher && (teacher.name !== user.name || teacher.avatar !== user.avatar)) {
         nextUser = { ...user, name: teacher.name, avatar: teacher.avatar };
       }
     } else if (user.role === 'parent') {
-      const studentId = user.id.replace('p_', '');
-      const student = getStudents().find((item) => item.id === studentId);
+      const student = getParentStudent(user);
       const targetName = student?.parentName || user.name;
       const targetAvatar = student?.parentAvatar || student?.avatar || user.avatar;
       if (student && (targetName !== user.name || targetAvatar !== user.avatar)) {
         nextUser = { ...user, name: targetName, avatar: targetAvatar };
       }
     } else if (user.role === 'student') {
-      const student = getStudents().find((item) => item.id === user.id);
+      const student = getStudentByUser(user);
       if (student && (student.name !== user.name || student.avatar !== user.avatar)) {
         nextUser = { ...user, name: student.name, avatar: student.avatar };
       }

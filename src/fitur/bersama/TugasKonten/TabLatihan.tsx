@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import type { AuthUser } from '../../../types';
-import { getQuizResult, saveQuizResult } from '../../../data/services';
+import { getQuizResult, saveQuizResult, getLocalStudentId } from '../../../data/services';
 import type { OnlineAssignment } from '../../../data/services';
 import { useStoreVersion } from '../../../hooks/useStoreVersion';
 import { formatDateTime } from './tugasKonten';
@@ -17,16 +17,17 @@ interface TabLatihanProps {
 export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProps) {
   const storeVersion = useStoreVersion();
   const exercises = assignment.exercises ?? [];
+  const studentId = user ? getLocalStudentId(user) : undefined;
 
   const [quizAnswers, setQuizAnswers] = useState<number[]>(() =>
-    user ? (getQuizResult(assignment.id, user.id)?.answers ?? []) : []
+    studentId ? (getQuizResult(assignment.id, studentId)?.answers ?? []) : []
   );
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
   const quizResult = useMemo(
-    () => (user ? getQuizResult(assignment.id, user.id) : null),
-    [assignment.id, user, storeVersion]
+    () => (studentId ? getQuizResult(assignment.id, studentId) : null),
+    [assignment.id, studentId, storeVersion]
   );
 
   const quizDirty = useMemo(() => {
@@ -52,7 +53,7 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
   }
 
   const handleCheckQuiz = () => {
-    if (!user || !allAnswered) return;
+    if (!studentId || !allAnswered) return;
     setIsSaving(true);
     setSaveMessage('');
     try {
@@ -63,7 +64,7 @@ export default function TabLatihan({ assignment, user, onSaved }: TabLatihanProp
       );
       saveQuizResult({
         assignmentId: assignment.id,
-        studentId: user.id,
+        studentId: studentId,
         answers: quizAnswers,
         score,
         total,

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getAttendanceByStudent } from '../../data/services';
+import { getAttendanceByStudent, getLocalStudentId } from '../../data/services';
 import { Calendar, ChevronLeft, ChevronRight, Clock, Download, FileText, Info } from 'lucide-react';
 import { useToast } from '../../components/ui';
 import { exportToCsv } from '../../utils/export';
@@ -17,8 +17,9 @@ export default function HistoryPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const allAttendance = useMemo(() => {
-    if (!user) return [];
-    return getAttendanceByStudent(user.id).sort((a, b) => b.date.localeCompare(a.date));
+    const studentId = getLocalStudentId(user);
+    if (!studentId) return [];
+    return getAttendanceByStudent(studentId).sort((a, b) => b.date.localeCompare(a.date));
   }, [user, storeVersion]);
 
   const calendarData = useMemo(() => {

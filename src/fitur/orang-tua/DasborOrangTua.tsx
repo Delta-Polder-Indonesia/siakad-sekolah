@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getStudents,
+  getParentStudent,
   getAttendance,
   getTagihanSekolahBySiswa,
   getNilaiRapot,
@@ -30,9 +30,8 @@ import { exportRapotPdf } from '../../utils/export';
 
 export default function DasborOrangTua({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const { user } = useAuth();
-  const studentId = user?.id.replace('p_', '');
-
-  const student = useMemo(() => getStudents().find((s) => s.id === studentId), [studentId]);
+  const student = useMemo(() => getParentStudent(user), [user]);
+  const studentId = student?.id;
 
   const attendance = useMemo(
     () => getAttendance().filter((a) => a.studentId === studentId),

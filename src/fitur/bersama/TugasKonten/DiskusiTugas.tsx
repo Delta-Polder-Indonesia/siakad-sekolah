@@ -64,7 +64,7 @@ export default function DiskusiTugas({
     ? !!user
     : h.mode === 'forum'
       ? !!user
-      : !!user && !!h.selectedGroup && (h.isTeacher || h.selectedGroup.memberIds.includes(user.id));
+      : !!user && !!h.selectedGroup && (h.isTeacher || h.selectedGroup.memberIds.includes(h.selfId));
 
   return (
     <div
@@ -78,7 +78,7 @@ export default function DiskusiTugas({
         searchQuery={h.searchQuery}
         onSearchQueryChange={h.setSearchQuery}
         q={h.q}
-        user={user}
+        selfId={h.selfId}
         isTeacher={h.isTeacher}
         filteredStudents={h.filteredStudents}
         allStudents={h.students}
@@ -121,7 +121,7 @@ export default function DiskusiTugas({
           streamRef={h.streamRef}
           messages={h.filteredStream}
           q={h.q}
-          user={user}
+          selfId={h.selfId}
           mode={h.mode}
           privateTarget={h.privateTarget}
           editingId={h.editingId}

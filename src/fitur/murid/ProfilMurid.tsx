@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getClasses, getStudents, updateStudent } from '../../data/services';
+import { getClasses, getStudentByUser, updateStudent } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import {
   Camera,
@@ -52,7 +52,7 @@ export default function ProfilePage() {
 
   // Data Fetching
   const student = useMemo(
-    () => getStudents().find((item) => item.id === user?.id),
+    () => getStudentByUser(user),
     [user, storeVersion]
   );
 

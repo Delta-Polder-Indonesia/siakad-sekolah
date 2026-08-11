@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   getClasses,
-  getTeachers,
+  getTeacherByUser,
   getStudentsByClass,
   getNilaiRapotByKelas,
 } from '../../data/services';
@@ -31,7 +31,7 @@ export default function RekapNilaiGuru() {
     return `${y}/${y + 1}`;
   });
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user]);
 
   const classes = useMemo(
     () => getClasses().filter((c) => teacher?.classIds.includes(c.id)),

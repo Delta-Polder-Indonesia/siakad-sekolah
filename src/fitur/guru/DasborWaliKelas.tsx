@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getTeachers,
+  getTeacherByUser,
   getClasses,
   getStudentsByClass,
   getAttendanceByDateRange,
@@ -54,8 +54,8 @@ export default function DasborWaliKelas({ onNavigate }: PageProps) {
   const loading = storeVersion === 0;
 
   const teacher = useMemo(
-    () => getTeachers().find((t) => t.id === user?.id) ?? null,
-    [user?.id, storeVersion]
+    () => getTeacherByUser(user) ?? null,
+    [user, storeVersion]
   );
 
   const classes = useMemo(

@@ -2,7 +2,12 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { useNotifications } from './NotificationProvider';
-import { getNotificationItems, isItemRead, type NotifItem } from './notificationItems';
+import {
+  getNotificationItems,
+  getNotificationUserId,
+  isItemRead,
+  type NotifItem,
+} from './notificationItems';
 import { Mail, FileText, Megaphone, MessageSquare, Users, CheckCheck } from 'lucide-react';
 
 interface NotificationDropdownProps {
@@ -45,8 +50,9 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
   // Snapshot kunci yang tadinya belum dibaca agar titik biru (D3) tetap terlihat selama sesi buka.
   useEffect(() => {
     if (!user) return;
+    const notifUserId = getNotificationUserId(user);
     const unreadItems = items.filter(
-      (i) => !isItemRead(user.id, i) && !markedKeysRef.current.has(i.itemKey)
+      (i) => !isItemRead(notifUserId, i) && !markedKeysRef.current.has(i.itemKey)
     );
     if (unreadItems.length === 0) return;
     unreadItems.forEach((i) => markedKeysRef.current.add(i.itemKey));

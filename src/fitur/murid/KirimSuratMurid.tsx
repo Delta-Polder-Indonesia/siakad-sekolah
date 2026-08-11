@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { addSuratIzin, getClasses, getStudents, getSuratIzinByStudent } from '../../data/services';
+import { addSuratIzin, getClasses, getStudentByUser, getSuratIzinByStudent } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Send, Loader2, FileText, Calendar } from 'lucide-react';
 import { FileUpload } from '../../components/ui';
@@ -26,7 +26,7 @@ export default function KirimSuratMurid() {
   const [feedback, setFeedback] = useState('');
 
   const student = useMemo(
-    () => getStudents().find((item) => item.id === user?.id),
+    () => getStudentByUser(user),
     [user, storeVersion]
   );
 
@@ -36,9 +36,9 @@ export default function KirimSuratMurid() {
   }, [student, storeVersion]);
 
   const riwayatSurat = useMemo(() => {
-    if (!user) return [];
-    return [...getSuratIzinByStudent(user.id)].sort((a, b) => b.createdAt - a.createdAt);
-  }, [user, storeVersion]);
+    if (!student) return [];
+    return [...getSuratIzinByStudent(student.id)].sort((a, b) => b.createdAt - a.createdAt);
+  }, [student, storeVersion]);
 
   const handleSubmit = async () => {
     if (!user || !student || !subject.trim() || !message.trim()) {

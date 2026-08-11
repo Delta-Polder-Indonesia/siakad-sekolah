@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getStudents, getAttendanceByStudent, type AttendanceEntry } from '../../data/services';
+import { getParentStudent, getAttendanceByStudent, type AttendanceEntry } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { User, Calendar, Clock, Info } from 'lucide-react';
 import { DonutChart, BarChart } from '../../components/ui';
@@ -19,14 +19,10 @@ export default function RiwayatAbsensiAnak({
 }) {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
-  const studentId = user?.id.replace('p_', '');
+  const student = useMemo(() => getParentStudent(user), [user, storeVersion]);
+  const studentId = student?.id;
 
   const [monthFilter, setMonthFilter] = useState('');
-
-  const student = useMemo(
-    () => getStudents().find((s) => s.id === studentId),
-    [studentId, storeVersion]
-  );
 
   const allAttendance = useMemo(() => {
     if (!studentId) return [];

@@ -5,7 +5,7 @@ import {
   getClasses,
   getClassRosters,
   getStudents,
-  getTeachers,
+  getTeacherByUser,
 } from '../../data/services';
 import {
   AlertCircle,
@@ -47,13 +47,10 @@ export default function DasborGuru({ onNavigate }: PageProps) {
   const [selectedSchedule, setSelectedSchedule] = useState<JadwalHariIni | null>(null);
   const loading = storeVersion === 0;
 
-  const teacher = useMemo(() => {
-    const all = getTeachers();
-    const byId = all.find((item) => item.id === user?.id);
-    if (byId) return byId;
-    const byName = all.find((item) => item.name.toLowerCase() === (user?.name || '').toLowerCase());
-    return byName || all[0] || null;
-  }, [user?.id, user?.name, storeVersion]);
+  const teacher = useMemo(
+    () => getTeacherByUser(user) ?? null,
+    [user, storeVersion]
+  );
 
   const classIds = teacher?.classIds ?? [];
 

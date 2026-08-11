@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getStudents,
+  getParentStudent,
   getClasses,
   getTeachers,
   getAttendance,
@@ -78,13 +78,8 @@ export default function ProfileOrangTuaPage({
   const { user, refreshUser } = useAuth();
   const storeVersion = useStoreVersion();
 
-  const studentId = user?.id.replace('p_', '');
-
-  // Data Fetching
-  const student = useMemo(
-    () => getStudents().find((s) => s.id === studentId),
-    [studentId, storeVersion]
-  );
+  const student = useMemo(() => getParentStudent(user), [user, storeVersion]);
+  const studentId = student?.id;
 
   const className = useMemo(() => {
     if (!student) return '-';

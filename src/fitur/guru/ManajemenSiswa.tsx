@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getTeachers,
+  getTeacherByUser,
   getClasses,
   getStudentsByClass,
   addStudent,
@@ -29,7 +29,7 @@ export default function StudentManagement() {
   const [formClass, setFormClass] = useState('');
   const [formPassword, setFormPassword] = useState('siswa123');
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user]);
   const classes = useMemo(
     () => getClasses().filter((c) => teacher?.classIds.includes(c.id)),
     [teacher, storeVersion]

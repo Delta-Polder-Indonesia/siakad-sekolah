@@ -9,7 +9,6 @@ import Sidebar from './layout/Sidebar';
 import { GuestBookProvider } from './fitur/tamu/context/GuestBookContext';
 import { NotificationProvider } from './fitur/bersama/NotificationProvider';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import { FeedbackButton } from './fitur/halaman/feedback';
 import { ToastProvider, lazyPage } from './components/ui';
 import type { AdminGuruPanelProps } from './fitur/admin/PanelAdminModal';
 
@@ -297,7 +296,6 @@ function AppContent() {
                 </section>
               ) : null}
             </main>
-            <FeedbackButton onNavigate={setActivePage} />
           </div>
         </ToastProvider>
       </NotificationProvider>

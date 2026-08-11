@@ -1,18 +1,14 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getStudents, getCatatanBKByStudent, getTotalPoinBK } from '../../data/services';
+import { getParentStudent, getCatatanBKByStudent, getTotalPoinBK } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { ShieldAlert, ShieldCheck, Calendar, Award, User } from 'lucide-react';
 
 export default function CatatanBKAnak({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
-  const studentId = user?.id.replace('p_', '');
-
-  const student = useMemo(
-    () => getStudents().find((s) => s.id === studentId),
-    [studentId, storeVersion]
-  );
+  const student = useMemo(() => getParentStudent(user), [user, storeVersion]);
+  const studentId = student?.id;
 
   const records = useMemo(() => {
     if (!studentId) return [];

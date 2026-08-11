@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   getClasses,
-  getTeachers,
+  getTeacherByUser,
   getTeacherLessonNotes,
   getClassRosters,
 } from '../../data/services';
@@ -19,7 +19,7 @@ export default function JurnalMengajarGuru() {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user]);
 
   const classes = useMemo(
     () => getClasses().filter((c) => teacher?.classIds.includes(c.id)),

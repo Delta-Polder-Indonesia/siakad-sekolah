@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getTeachers,
+  getTeacherByUser,
+  getLocalTeacherId,
   getClasses,
   getStudentsByClass,
   getAttendanceByDate,
@@ -50,7 +51,7 @@ export default function AttendancePage() {
   const [saved, setSaved] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user]);
   const classes = useMemo(
     () => getClasses().filter((c) => teacher?.classIds.includes(c.id)),
     [teacher]
@@ -103,7 +104,7 @@ export default function AttendancePage() {
         date: selectedDate,
         status: attendanceMap[s.id],
         note: noteMap[s.id] || undefined,
-        markedBy: user.id,
+        markedBy: getLocalTeacherId(user) || user.id,
         timestamp: Date.now(),
       }));
 
@@ -285,7 +286,7 @@ export default function AttendancePage() {
                               onClick={() => setStatus(student.id, status)}
                               className={`inline-flex cursor-pointer items-center gap-1 rounded-md border-2 px-2 py-1 text-xs font-bold transition-colors ${
                                 isSelected
-                                  ? 'border-black bg-black text-white'
+                                  ? 'border-black bg-neutral-200 text-black'
                                   : 'border-black bg-white text-black hover:border-black hover:bg-neutral-100 hover:text-black'
                               }`}
                             >

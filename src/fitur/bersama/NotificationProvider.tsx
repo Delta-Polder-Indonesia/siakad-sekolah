@@ -3,6 +3,7 @@ import { subscribeStore, getUnreadNotificationCount } from '../../data/services'
 import { useAuth } from '../../context/AuthContext';
 import {
   getNotificationItems,
+  getNotificationUserId,
   markAllItemsRead,
   markItemsRead,
   isItemRead,
@@ -62,7 +63,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
 
     const items = getNotificationItems(user);
-    migrateLegacyReadState(user.id, items);
+    const notifUserId = getNotificationUserId(user);
+    migrateLegacyReadState(notifUserId, items);
 
     let messages = 0;
     let suratIzin = 0;
@@ -71,7 +73,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     let groupMessages = 0;
 
     for (const item of items) {
-      if (isItemRead(user.id, item)) continue;
+      if (isItemRead(notifUserId, item)) continue;
       if (item.type === 'message') messages += 1;
       else if (item.type === 'suratIzin') suratIzin += 1;
       else if (item.type === 'announcement') announcements += 1;
@@ -119,7 +121,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       const prefix = prefixByType[type];
       if (prefix === '') return;
       const items = getNotificationItems(user).filter((i) => i.itemKey.startsWith(prefix));
-      markItemsRead(user.id, items);
+      markItemsRead(getNotificationUserId(user), items);
       setReadVersion((v) => v + 1);
     },
     [user]
@@ -128,7 +130,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const markItemKeysRead = useCallback(
     (items: NotifItem[]) => {
       if (!user) return;
-      markItemsRead(user.id, items);
+      markItemsRead(getNotificationUserId(user), items);
       setReadVersion((v) => v + 1);
     },
     [user]
@@ -136,7 +138,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const markAllRead = useCallback(() => {
     if (!user) return;
-    markAllItemsRead(user.id, getNotificationItems(user));
+    markAllItemsRead(getNotificationUserId(user), getNotificationItems(user));
     setReadVersion((v) => v + 1);
   }, [user]);
 

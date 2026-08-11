@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   getOnlineAssignmentsByClass,
-  getStudents,
+  getStudentByUser,
   getSubmissionByAssignmentAndStudent,
   upsertAssignmentSubmission,
 } from '../../data/services';
@@ -63,7 +63,7 @@ export default function TaskPouchPage() {
   const [saveMessage, setSaveMessage] = useState('');
 
   const student = useMemo(
-    () => getStudents().find((item) => item.id === user?.id),
+    () => getStudentByUser(user),
     [user, storeVersion]
   );
 
@@ -93,12 +93,12 @@ export default function TaskPouchPage() {
   );
 
   const existingSubmission = useMemo(() => {
-    if (!user || !selectedTask || selectedTask.id === 'dummy') return null;
-    return getSubmissionByAssignmentAndStudent(selectedTask.id, user.id);
-  }, [selectedTask, user, storeVersion]);
+    if (!student || !selectedTask || selectedTask.id === 'dummy') return null;
+    return getSubmissionByAssignmentAndStudent(selectedTask.id, student.id);
+  }, [selectedTask, student, storeVersion]);
 
   const handleSubmitAnswer = async () => {
-    if (!user || !selectedTask || selectedTask.id === 'dummy' || !answerText.trim()) return;
+    if (!student || !selectedTask || selectedTask.id === 'dummy' || !answerText.trim()) return;
     setIsSaving(true);
     setSaveMessage('');
     try {
@@ -110,7 +110,7 @@ export default function TaskPouchPage() {
       upsertAssignmentSubmission({
         id: existingSubmission?.id || `sub_${Date.now()}`,
         assignmentId: selectedTask.id,
-        studentId: user.id,
+        studentId: student.id,
         answerText: answerText.trim(),
         attachmentName,
         attachmentDataUrl,
@@ -299,7 +299,7 @@ export default function TaskPouchPage() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center justify-center gap-2 rounded-md border-2 bg-white px-3 py-2 text-xs font-bold text-black transition-all ${
-                isActive ? 'border-black bg-black text-white' : 'border-black bg-white hover:bg-neutral-100'
+                isActive ? 'border-black bg-neutral-200 text-black' : 'border-black bg-white hover:bg-neutral-100'
               }`}
             >
               <Icon className="h-4 w-4 shrink-0 text-black" />

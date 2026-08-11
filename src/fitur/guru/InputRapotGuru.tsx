@@ -3,7 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getClasses,
   getStudentsByClass,
-  getTeachers,
+  getTeacherByUser,
+  getLocalTeacherId,
   getNilaiRapotByKelas,
   upsertNilaiRapot,
   deleteNilaiRapot,
@@ -81,7 +82,7 @@ export default function InputRapotGuru() {
   const [formCatatan, setFormCatatan] = useState<string>('');
 
   const teacherClasses = useMemo(() => {
-    const teacher = getTeachers().find((item) => item.id === user?.id);
+    const teacher = getTeacherByUser(user);
     return getClasses().filter((item) => teacher?.classIds.includes(item.id));
   }, [user, storeVersion]);
 
@@ -173,7 +174,7 @@ export default function InputRapotGuru() {
       nilaiAkhir,
       predikat,
       catatanGuru: formCatatan.trim() || undefined,
-      inputBy: user.id || 'SYSTEM_GURU',
+      inputBy: getLocalTeacherId(user) || user.id || 'SYSTEM_GURU',
       updatedAt: Date.now(),
     };
 

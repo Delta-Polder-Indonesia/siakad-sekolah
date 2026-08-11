@@ -6,6 +6,7 @@ import {
   bayarTagihanSekolah,
   getTagihanSekolahBySiswa,
   getTahunTagihanSiswa,
+  getLocalStudentId,
 } from '../../data/services';
 import type { TagihanSekolah } from '../../types';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
@@ -67,17 +68,19 @@ export default function TagihanSekolahPage() {
     useState<NonNullable<TagihanSekolah['paymentMethod']>>('atm');
   const [infoMessage, setInfoMessage] = useState<string>('');
 
+  const studentId = getLocalStudentId(user);
+
   const availableYears = useMemo(() => {
-    if (!user) return [];
-    return getTahunTagihanSiswa(user.id);
-  }, [user, storeVersion]);
+    if (!studentId) return [];
+    return getTahunTagihanSiswa(studentId);
+  }, [studentId, storeVersion]);
 
   const activeYear = selectedYear ?? availableYears[0] ?? new Date().getFullYear();
 
   const bills = useMemo(() => {
-    if (!user) return [];
-    return getTagihanSekolahBySiswa(user.id, activeYear);
-  }, [user, activeYear, storeVersion]);
+    if (!studentId) return [];
+    return getTagihanSekolahBySiswa(studentId, activeYear);
+  }, [studentId, activeYear, storeVersion]);
 
   const ringkasan = useMemo(() => {
     const lunas = bills.filter((item) => item.status === 'lunas');
@@ -215,7 +218,7 @@ export default function TagihanSekolahPage() {
     doc.setFontSize(11);
     doc.text(`Nama Siswa: ${user.name}`, marginX, cursorY);
     cursorY += 16;
-    doc.text(`ID Siswa: ${user.id}`, marginX, cursorY);
+    doc.text(`ID Siswa: ${studentId ?? user.id}`, marginX, cursorY);
 
     cursorY += 16;
     const tanggalCetak = new Intl.DateTimeFormat('id-ID', {
@@ -270,7 +273,7 @@ export default function TagihanSekolahPage() {
       cursorY
     );
 
-    const namaFile = `daftar-pembayaran-${activeYear}-${user.id}.pdf`;
+    const namaFile = `daftar-pembayaran-${activeYear}-${studentId ?? user.id}.pdf`;
     doc.save(namaFile);
   };
 

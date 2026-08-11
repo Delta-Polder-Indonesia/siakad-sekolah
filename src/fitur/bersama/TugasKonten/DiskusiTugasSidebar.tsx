@@ -4,7 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import { Search, Plus, Users, UserPlus, UserMinus, X } from 'lucide-react';
-import type { AuthUser, ChatGroup, Student } from '../../../types';
+import type { ChatGroup, Student } from '../../../types';
 import { isStudentOnline } from '../../../data/services';
 import { warnaNama } from '../../../codewarna/warnaNama';
 import { PresenceDot, type ChatMode, type PrivateTarget } from './DiskusiTugas.types';
@@ -14,7 +14,7 @@ interface DiskusiTugasSidebarProps {
   searchQuery: string;
   onSearchQueryChange: (v: string) => void;
   q: string;
-  user?: AuthUser | null;
+  selfId: string;
   isTeacher: boolean;
 
   // Mode forum: daftar siswa + chat privat
@@ -52,7 +52,7 @@ export default function DiskusiTugasSidebar(props: DiskusiTugasSidebarProps) {
     searchQuery,
     onSearchQueryChange,
     q,
-    user,
+    selfId,
     isTeacher,
     filteredStudents,
     allStudents,
@@ -181,7 +181,7 @@ export default function DiskusiTugasSidebar(props: DiskusiTugasSidebarProps) {
               )}{' '}
               {filteredGroups.map((group) => {
                 const isSelected = group.id === selectedGroupId;
-                const isMember = user ? group.memberIds.includes(user.id) : false;
+                const isMember = selfId ? group.memberIds.includes(selfId) : false;
                 const unread = groupUnreadMap[group.id] ?? 0;
                 return (
                   <div

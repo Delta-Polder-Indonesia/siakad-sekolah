@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getTeachers, updateTeacher } from '../../data/services';
+import { getTeacherByUser, updateTeacher } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import {
   Camera,
@@ -31,7 +31,7 @@ export default function TeacherProfilePage() {
   const { user, refreshUser } = useAuth();
   const storeVersion = useStoreVersion();
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user, storeVersion]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user, storeVersion]);
 
   const [formData, setFormData] = useState<TeacherProfileFormData>({
     name: '',

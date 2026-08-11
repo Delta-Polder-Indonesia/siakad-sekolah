@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  getTeachers,
+  getTeacherByUser,
   getClasses,
   getStudentsByClass,
   getAttendanceByDateRange,
@@ -24,7 +24,7 @@ export default function ReportPage() {
     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`
   );
 
-  const teacher = useMemo(() => getTeachers().find((t) => t.id === user?.id), [user]);
+  const teacher = useMemo(() => getTeacherByUser(user), [user]);
   const classes = useMemo(
     () => getClasses().filter((c) => teacher?.classIds.includes(c.id)),
     [teacher]
@@ -270,7 +270,7 @@ export default function ReportPage() {
                   type="button"
                   onClick={() => setReportMode('range')}
                   className={`rounded-md border-2 bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors hover:bg-neutral-100 ${
-                    reportMode === 'range' ? 'border-black bg-black text-white' : 'border-black'
+                    reportMode === 'range' ? 'border-black bg-neutral-200 text-black' : 'border-black'
                   }`}
                 >
                   Rentang Tanggal
@@ -279,7 +279,7 @@ export default function ReportPage() {
                   type="button"
                   onClick={() => setReportMode('monthly')}
                   className={`rounded-md border-2 bg-white px-3 py-1.5 font-mono text-xs font-bold text-black transition-colors hover:bg-neutral-100 ${
-                    reportMode === 'monthly' ? 'border-black bg-black text-white' : 'border-black'
+                    reportMode === 'monthly' ? 'border-black bg-neutral-200 text-black' : 'border-black'
                   }`}
                 >
                   Per Bulan

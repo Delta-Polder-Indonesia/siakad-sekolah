@@ -34,6 +34,8 @@ import {
   getTypingUsers,
   touchPresence,
   touchPresenceSilent,
+  getLocalTeacherId,
+  getLocalStudentId,
 } from '../../../data/services';
 import type {
   AuthUser,
@@ -78,6 +80,7 @@ export interface UseDiskusiTugasResult {
 
   // data turunan
   isTeacher: boolean;
+  selfId: string;
   discussions: AssignmentDiscussion[];
   groups: ChatGroup[];
   visibleGroups: ChatGroup[];
@@ -147,24 +150,33 @@ export function useDiskusiTugas(
 
   const isTeacher = user?.role === 'teacher';
 
+  // Identitas diri pada data chat/grup selalu memakai id lokal (backend memakai
+  // CUID yang tidak pernah cocok dengan id store lokal / memberIds grup).
+  const selfId = useMemo(() => {
+    if (!user) return '';
+    if (user.role === 'teacher') return getLocalTeacherId(user) || user.id;
+    if (user.role === 'student') return getLocalStudentId(user) || user.id;
+    return user.id;
+  }, [user]);
+
   // Presensi: tick berkala (10 dtk) + online/offline event → badge Aktif selalu segar.
   useEffect(() => {
     const tick = () => setPresenceTick((v) => v + 1);
     const id = window.setInterval(tick, 10000);
     const online = () => {
       tick();
-      if (user?.id) touchPresenceSilent(user.id);
+      if (selfId) touchPresenceSilent(selfId);
     };
     const offline = () => tick();
     window.addEventListener('online', online);
     window.addEventListener('offline', offline);
-    if (user?.id) touchPresence(user.id);
+    if (selfId) touchPresence(selfId);
     return () => {
       window.clearInterval(id);
       window.removeEventListener('online', online);
       window.removeEventListener('offline', offline);
     };
-  }, [user?.id]);
+  }, [selfId]);
 
   const discussions = useMemo(
     () => getDiscussionsByAssignment(assignment.id),
@@ -184,25 +196,25 @@ export function useDiskusiTugas(
     [groups, selectedGroupId]
   );
   const isMemberOfSelected = useMemo(
-    () => !!user && !!selectedGroup && selectedGroup.memberIds.includes(user.id),
-    [user, selectedGroup]
+    () => !!user && !!selectedGroup && selectedGroup.memberIds.includes(selfId),
+    [user, selectedGroup, selfId]
   );
   const groupMessages = useMemo(
     () => (selectedGroupId ? getGroupMessages(selectedGroupId) : []),
     [selectedGroupId, storeVersion]
   );
   const privateMessages = useMemo(
-    () => (privateTarget && user ? getPrivateMessages(user.id, privateTarget.id) : []),
-    [privateTarget, user, storeVersion]
+    () => (privateTarget && user ? getPrivateMessages(selfId, privateTarget.id) : []),
+    [privateTarget, selfId, storeVersion]
   );
   const privateUnreadMap = useMemo(() => {
     if (!user) return {};
     const map: Record<string, number> = {};
     for (const student of students) {
-      map[student.id] = getUnreadPrivateCount(user.id, student.id);
+      map[student.id] = getUnreadPrivateCount(selfId, student.id);
     }
     return map;
-  }, [students, user, storeVersion]);
+  }, [students, selfId, storeVersion]);
 
   const streamLength =
     mode === 'forum'
@@ -219,24 +231,24 @@ export function useDiskusiTugas(
 
   // Tandai forum sudah dibaca saat aktif melihatnya.
   useEffect(() => {
-    if (mode === 'forum' && user?.id && discussions.length > 0) {
-      markScopeRead(`forum:${assignment.id}`, user.id);
+    if (mode === 'forum' && selfId && discussions.length > 0) {
+      markScopeRead(`forum:${assignment.id}`, selfId);
     }
-  }, [mode, assignment.id, user?.id, discussions.length]);
+  }, [mode, assignment.id, selfId, discussions.length]);
 
   // Tandai grup sudah dibaca saat dipilih.
   useEffect(() => {
-    if (mode === 'group' && user?.id && selectedGroupId && groupMessages.length > 0) {
-      markScopeRead(`group:${selectedGroupId}`, user.id);
+    if (mode === 'group' && selfId && selectedGroupId && groupMessages.length > 0) {
+      markScopeRead(`group:${selectedGroupId}`, selfId);
     }
-  }, [mode, selectedGroupId, user?.id, groupMessages.length]);
+  }, [mode, selectedGroupId, selfId, groupMessages.length]);
 
   // C14: tandai chat privat sudah dibaca saat dibuka.
   useEffect(() => {
-    if (privateTarget && user?.id && privateMessages.length > 0) {
-      markScopeRead(`private:${user.id}|${privateTarget.id}`, user.id);
+    if (privateTarget && selfId && privateMessages.length > 0) {
+      markScopeRead(`private:${selfId}|${privateTarget.id}`, selfId);
     }
-  }, [privateTarget, user?.id, privateMessages.length]);
+  }, [privateTarget, selfId, privateMessages.length]);
 
   // C13: tutup menu opsi pesan saat klik di luar.
   useEffect(() => {
@@ -248,7 +260,7 @@ export function useDiskusiTugas(
 
   // C15: scope percakapan aktif (forum / grup / private).
   const activeScopeKey = privateTarget
-    ? `private:${user?.id ?? ''}|${privateTarget.id}`
+    ? `private:${selfId}|${privateTarget.id}`
     : mode === 'forum'
       ? `forum:${assignment.id}`
       : selectedGroupId
@@ -261,33 +273,33 @@ export function useDiskusiTugas(
       setTypingUsers([]);
       return;
     }
-    const refresh = () => setTypingUsers(getTypingUsers(activeScopeKey, user?.id ?? ''));
+    const refresh = () => setTypingUsers(getTypingUsers(activeScopeKey, selfId));
     refresh();
     const id = window.setInterval(refresh, 1500);
     return () => window.clearInterval(id);
-  }, [activeScopeKey, user?.id]);
+  }, [activeScopeKey, selfId]);
 
   // C15: hentikan status ketikan saat meninggalkan percakapan.
   useEffect(() => {
     return () => {
       if (typingRef.current) {
-        clearTyping(typingRef.current, user?.id ?? '');
+        clearTyping(typingRef.current, selfId);
         typingRef.current = null;
       }
     };
-  }, [user?.id]);
+  }, [selfId]);
 
   // C15: tandai user sedang mengetik (throttle via timestamp di store) + beri jeda hidup.
   const handleTyping = () => {
     if (!activeScopeKey || !user) return;
     typingRef.current = activeScopeKey;
-    setTyping(activeScopeKey, user.id, user.name || 'Pengguna', user.role || 'guest');
+    setTyping(activeScopeKey, selfId, user.name || 'Pengguna', user.role || 'guest');
   };
 
   // C15: bersihkan status ketikan setelah kirim.
   const handleStopTyping = () => {
-    if (typingRef.current && user) {
-      clearTyping(typingRef.current, user.id);
+    if (typingRef.current) {
+      clearTyping(typingRef.current, selfId);
       typingRef.current = null;
     }
     setTypingUsers([]);
@@ -312,7 +324,7 @@ export function useDiskusiTugas(
     addAssignmentDiscussion({
       id: `disc_${Date.now()}`,
       assignmentId: assignment.id,
-      authorId: user.id,
+      authorId: selfId,
       authorName: user.name || 'Pengguna',
       role: user.role || 'guest',
       message: text,
@@ -330,12 +342,12 @@ export function useDiskusiTugas(
     const text = draft.trim();
     const hasContent = text || pendingAttachment;
     if (!hasContent) return;
-    const isMember = selectedGroup.memberIds.includes(user.id);
+    const isMember = selectedGroup.memberIds.includes(selfId);
     if (!isMember && !isTeacher) return;
     addGroupMessage({
       id: `gm_${Date.now()}`,
       groupId: selectedGroup.id,
-      authorId: user.id,
+      authorId: selfId,
       authorName: user.name || 'Pengguna',
       role: user.role || 'guest',
       message: text,
@@ -355,7 +367,7 @@ export function useDiskusiTugas(
     if (!hasContent) return;
     addPrivateMessage({
       id: `pm_${Date.now()}`,
-      senderId: user.id,
+      senderId: selfId,
       receiverId: privateTarget.id,
       authorName: user.name || 'Pengguna',
       role: user.role || 'guest',
@@ -439,7 +451,7 @@ export function useDiskusiTugas(
         classId: assignment.classId,
         name: name.trim(),
         memberIds: [],
-        createdBy: user.id,
+        createdBy: selfId,
         createdAt: Date.now(),
       });
     }
@@ -459,11 +471,11 @@ export function useDiskusiTugas(
     if (isTeacher || !user) return;
     const group = groups.find((g) => g.id === groupId);
     if (!group) return;
-    if (group.memberIds.includes(user.id)) {
-      removeGroupMember(groupId, user.id);
+    if (group.memberIds.includes(selfId)) {
+      removeGroupMember(groupId, selfId);
       if (selectedGroupId === groupId) setSelectedGroupId('');
     } else {
-      addGroupMember(groupId, user.id);
+      addGroupMember(groupId, selfId);
       setSelectedGroupId(groupId);
     }
   };
@@ -515,20 +527,20 @@ export function useDiskusiTugas(
   // B6: jumlah pesan belum dibaca per forum & per grup.
   const forumScopeKey = `forum:${assignment.id}`;
   const forumUnread = useMemo(
-    () => getUnreadCountForScope(forumScopeKey, user?.id ?? '', discussions),
-    [forumScopeKey, user?.id, discussions, storeVersion]
+    () => getUnreadCountForScope(forumScopeKey, selfId, discussions),
+    [forumScopeKey, selfId, discussions, storeVersion]
   );
   const groupUnreadMap = useMemo(() => {
     const map: Record<string, number> = {};
     for (const group of groups) {
       map[group.id] = getUnreadCountForScope(
         `group:${group.id}`,
-        user?.id ?? '',
+        selfId,
         getGroupMessages(group.id)
       );
     }
     return map;
-  }, [groups, user?.id, storeVersion]);
+  }, [groups, selfId, storeVersion]);
 
   return {
     draft,
@@ -555,6 +567,7 @@ export function useDiskusiTugas(
     fileInputRef,
     typingUsers,
     isTeacher,
+    selfId,
     discussions,
     groups,
     visibleGroups,

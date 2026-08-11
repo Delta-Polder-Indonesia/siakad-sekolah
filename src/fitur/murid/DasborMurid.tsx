@@ -4,7 +4,7 @@ import {
   getClassAnnouncements,
   getClassRosters,
   getClasses,
-  getStudents,
+  getStudentByUser,
   getAttendanceByStudent,
   getTeachers,
 } from '../../data/services';
@@ -45,16 +45,16 @@ export default function StudentDashboard({ onNavigate }: PageProps) {
     };
   }, []);
 
-  const student = useMemo(() => getStudents().find((s) => s.id === user?.id), [user, storeVersion]);
+  const student = useMemo(() => getStudentByUser(user), [user, storeVersion]);
   const className = useMemo(() => {
     if (!student) return '';
     return getClasses().find((c) => c.id === student.classId)?.name || '';
   }, [student, storeVersion]);
 
   const allAttendance = useMemo(() => {
-    if (!user) return [];
-    return getAttendanceByStudent(user.id).sort((a, b) => b.date.localeCompare(a.date));
-  }, [user, storeVersion]);
+    if (!student) return [];
+    return getAttendanceByStudent(student.id).sort((a, b) => b.date.localeCompare(a.date));
+  }, [student, storeVersion]);
 
   const classRosters = useMemo(() => {
     if (!student) return [];

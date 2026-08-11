@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   getEkskulTersedia,
+  getLocalStudentId,
   daftarEkskul,
   keluarEkskul,
   getEkskulKehadiranByStudent,
@@ -20,7 +21,7 @@ export default function EkskulSiswa() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
   const [feedback, setFeedback] = useState('');
-  const studentId = user?.id || '';
+  const studentId = getLocalStudentId(user) || '';
 
   const tersedia = useMemo(
     () => (studentId ? getEkskulTersedia(studentId) : []),

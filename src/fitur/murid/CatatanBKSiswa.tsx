@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getCatatanBKByStudent, getTotalPoinBK } from '../../data/services';
+import { getCatatanBKByStudent, getLocalStudentId, getTotalPoinBK } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { ShieldAlert, ShieldCheck, Calendar, Award } from 'lucide-react';
 
@@ -8,12 +8,14 @@ export default function CatatanBKSiswa() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
 
-  const records = useMemo(() => {
-    if (!user) return [];
-    return getCatatanBKByStudent(user.id);
-  }, [user, storeVersion]);
+  const studentId = getLocalStudentId(user);
 
-  const totalPoin = useMemo(() => (user ? getTotalPoinBK(user.id) : 0), [user, storeVersion]);
+  const records = useMemo(() => {
+    if (!studentId) return [];
+    return getCatatanBKByStudent(studentId);
+  }, [studentId, storeVersion]);
+
+  const totalPoin = useMemo(() => (studentId ? getTotalPoinBK(studentId) : 0), [studentId, storeVersion]);
 
   const stats = useMemo(() => {
     const prestasi = records.filter((r) => r.jenis === 'prestasi').length;

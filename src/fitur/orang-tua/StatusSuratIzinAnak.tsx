@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getStudents, getSuratIzinByStudent, type SuratIzin } from '../../data/services';
+import { getParentStudent, getSuratIzinByStudent, type SuratIzin } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { FileText, Calendar, Send, CheckCircle2, Clock } from 'lucide-react';
 
@@ -35,12 +35,8 @@ export default function StatusSuratIzinAnak({
 }) {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
-  const studentId = user?.id.replace('p_', '');
-
-  const student = useMemo(
-    () => getStudents().find((s) => s.id === studentId),
-    [studentId, storeVersion]
-  );
+  const student = useMemo(() => getParentStudent(user), [user, storeVersion]);
+  const studentId = student?.id;
 
   const letters = useMemo(() => {
     if (!studentId) return [];

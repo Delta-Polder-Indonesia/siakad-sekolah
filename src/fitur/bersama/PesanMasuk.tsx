@@ -6,6 +6,10 @@ import {
   getClasses,
   getPrivateMessages,
   addPrivateMessage,
+  getParentStudent,
+  getParentStudentId,
+  getLocalTeacherId,
+  getLocalStudentId,
 } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Search, Send, User } from 'lucide-react';
@@ -22,6 +26,19 @@ interface LocalMessage {
 export default function PesanMasuk() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
+
+  // Identitas diri pada store pesan selalu memakai id lokal agar konsisten
+  // dengan data pesan yang tersimpan (backend memakai CUID yang beda).
+  const selfId = useMemo(() => {
+    if (!user) return '';
+    if (user.role === 'parent') {
+      const studentId = getParentStudentId(user);
+      return studentId ? `p_${studentId}` : user.id;
+    }
+    if (user.role === 'teacher') return getLocalTeacherId(user) || user.id;
+    if (user.role === 'student') return getLocalStudentId(user) || user.id;
+    return user.id;
+  }, [user]);
 
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,9 +61,9 @@ export default function PesanMasuk() {
 
     // LOGIKA KHUSUS ORANG TUA: Hanya bisa chat Wali Kelas
     if (user?.role === 'parent') {
-      const studentId = user.id.replace('p_', '');
-      const student = students.find((s) => s.id === studentId);
-      if (student) {
+      const student = getParentStudent(user);
+      const studentId = student?.id;
+      if (studentId) {
         const schoolClass = classes.find((c) => c.id === student.classId);
         const waliKelas = teachers.find((t) => t.id === schoolClass?.teacherId);
         if (waliKelas) {
@@ -56,15 +73,15 @@ export default function PesanMasuk() {
       return [];
     }
 
-    return [...teachers, ...students].filter((u) => u.id !== user?.id);
-  }, [user]);
+    return [...teachers, ...students].filter((u) => u.id !== selfId);
+  }, [user, selfId]);
 
   // Semua pesan privat user (1 pintu: store privateMessages yang sama dengan
   // chat privat di DiskusiTugas), dipetakan ke bentuk render lokal.
   const messages = useMemo<LocalMessage[]>(() => {
     if (!user) return [];
     return allUsers.flatMap((contact) =>
-      getPrivateMessages(user.id, contact.id).map((m) => ({
+      getPrivateMessages(selfId, contact.id).map((m) => ({
         id: m.id,
         senderId: m.senderId,
         receiverId: m.receiverId,
@@ -73,21 +90,21 @@ export default function PesanMasuk() {
         timestamp: m.createdAt,
       }))
     );
-  }, [allUsers, user, storeVersion]);
+  }, [allUsers, selfId, storeVersion]);
 
   const unreadCounts = useMemo(() => {
     if (!user) return {} as Record<string, number>;
     const counts: Record<string, number> = {};
     messages.forEach((m) => {
-      if (m.senderId === user.id) return;
-      const contactId = m.senderId === user.id ? m.receiverId : m.senderId;
+      if (m.senderId === selfId) return;
+      const contactId = m.senderId === selfId ? m.receiverId : m.senderId;
       const lastRead = readTimestamps[contactId] || 0;
       if (m.timestamp > lastRead) {
         counts[contactId] = (counts[contactId] || 0) + 1;
       }
     });
     return counts;
-  }, [messages, readTimestamps, user]);
+  }, [messages, readTimestamps, selfId]);
 
   const filteredUsers = useMemo(() => {
     return allUsers.filter((u) => {
@@ -105,11 +122,11 @@ export default function PesanMasuk() {
     return messages
       .filter(
         (m) =>
-          (m.senderId === user.id && m.receiverId === activeChatId) ||
-          (m.senderId === activeChatId && m.receiverId === user.id)
+          (m.senderId === selfId && m.receiverId === activeChatId) ||
+          (m.senderId === activeChatId && m.receiverId === selfId)
       )
       .sort((a, b) => a.timestamp - b.timestamp);
-  }, [messages, activeChatId, user]);
+  }, [messages, activeChatId, selfId]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +134,7 @@ export default function PesanMasuk() {
 
     addPrivateMessage({
       id: `pm_${Date.now()}`,
-      senderId: user.id,
+      senderId: selfId,
       receiverId: activeChatId,
       authorName: user.name || 'Pengguna',
       role: user.role || 'guest',
@@ -248,7 +265,7 @@ export default function PesanMasuk() {
                 </div>
               ) : (
                 activeMessages.map((msg) => {
-                  const isMine = msg.senderId === user?.id;
+                  const isMine = msg.senderId === selfId;
                   return (
                     <div
                       key={msg.id}

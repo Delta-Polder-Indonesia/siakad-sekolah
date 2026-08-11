@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getStudents,
   getTeachers,
+  getTeacherByUser,
+  getStudentByUser,
   hashPassword,
   saveStudents,
   saveTeachers,
@@ -23,22 +25,9 @@ export default function PengaturanAkun() {
   const storeVersion = useStoreVersion();
 
   // Login via backend memakai id database (cuid), sedangkan store lokal memakai
-  // id sendiri (mis. 't1'). Cari juga via email sebagai fallback agar record di
-  // store tetap ketemu.
-  const teacher = useMemo(() => {
-    const list = getTeachers();
-    return (
-      list.find((item) => item.id === user?.id) ??
-      (user?.email ? list.find((item) => item.email === user.email) : undefined)
-    );
-  }, [user, storeVersion]);
-  const student = useMemo(() => {
-    const list = getStudents();
-    return (
-      list.find((item) => item.id === user?.id) ??
-      (user?.email ? list.find((item) => item.email === user.email) : undefined)
-    );
-  }, [user, storeVersion]);
+  // id sendiri (mis. 't1'). Helper resolver mencocokkan by id lalu by nama/email.
+  const teacher = useMemo(() => getTeacherByUser(user), [user, storeVersion]);
+  const student = useMemo(() => getStudentByUser(user), [user, storeVersion]);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');

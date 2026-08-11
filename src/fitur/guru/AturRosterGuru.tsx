@@ -5,7 +5,8 @@ import {
   deleteClassRoster,
   getClassRosters,
   getClasses,
-  getTeachers,
+  getTeacherByUser,
+  getLocalTeacherId,
 } from '../../data/services';
 import { Trash2, Plus, Calendar, Clock, MapPin } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
@@ -39,7 +40,7 @@ export default function AturRosterGuru() {
   const [room, setRoom] = useState('');
 
   const teacherClasses = useMemo(() => {
-    const teacher = getTeachers().find((item) => item.id === user?.id);
+    const teacher = getTeacherByUser(user);
     return getClasses().filter((item) => teacher?.classIds.includes(item.id));
   }, [user, storeVersion]);
 
@@ -65,7 +66,7 @@ export default function AturRosterGuru() {
       endTime,
       room: room.trim() || undefined,
       teacherName: user.name,
-      updatedBy: user.id,
+      updatedBy: getLocalTeacherId(user) || user.id,
       updatedAt: Date.now(),
     });
     setSubject('');

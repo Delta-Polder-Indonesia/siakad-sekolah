@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getClassRosters, getClasses, getStudents } from '../../data/services';
+import { getClassRosters, getClasses, getStudentByUser } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
 const schoolDays = [
@@ -23,7 +23,7 @@ export default function RosterPage() {
   const storeVersion = useStoreVersion();
   const [selectedDay, setSelectedDay] = useState(getDefaultDay);
 
-  const student = useMemo(() => getStudents().find((s) => s.id === user?.id), [user, storeVersion]);
+  const student = useMemo(() => getStudentByUser(user), [user, storeVersion]);
   const classRoom = useMemo(() => {
     if (!student) return undefined;
     return getClasses().find((c) => c.id === student.classId);

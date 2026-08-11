@@ -4,7 +4,7 @@ import {
   getClasses,
   getStudents,
   getSuratIzin,
-  getTeachers,
+  getTeacherByUser,
   updateStatusSuratIzin,
 } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
@@ -30,7 +30,7 @@ export default function KotakSuratGuru() {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
 
   const teacher = useMemo(() => {
-    return getTeachers().find((item) => item.id === user?.id);
+    return getTeacherByUser(user);
   }, [user, storeVersion]);
 
   const letters = useMemo(() => {

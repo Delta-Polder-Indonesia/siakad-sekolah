@@ -4,8 +4,8 @@ import {
   getPengumumanAdmin,
   getPengumumanAdminUntukGuru,
   getPengumumanAdminUntukKelas,
-  getStudents,
-  getTeachers,
+  getStudentByUser,
+  getTeacherByUser,
 } from '../../data/services';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { X, Megaphone } from 'lucide-react';
@@ -19,14 +19,14 @@ export default function PengumumanSekolah() {
   // Menghitung pengumuman berdasarkan role pengguna (Logika bisnis dipertahankan)
   const pengumumanAdmin = useMemo(() => {
     if (user?.role === 'student') {
-      const student = getStudents().find((s) => s.id === user.id);
+      const student = getStudentByUser(user);
       if (student) return getPengumumanAdminUntukKelas(student.classId);
     } else if (user?.role === 'teacher') {
-      const teacher = getTeachers().find((t) => t.id === user.id);
+      const teacher = getTeacherByUser(user);
       if (teacher) return getPengumumanAdminUntukGuru(teacher.classIds);
     }
     return getPengumumanAdmin();
-  }, [user?.role, user?.id, storeVersion]);
+  }, [user, storeVersion]);
 
   // Menutup modal preview menggunakan tombol Escape
   useEffect(() => {

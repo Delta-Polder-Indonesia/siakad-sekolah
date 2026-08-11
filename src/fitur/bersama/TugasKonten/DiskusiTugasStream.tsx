@@ -4,7 +4,6 @@
  */
 import type { RefObject } from 'react';
 import { MessageSquare, Users, Globe, MoreVertical, Pencil, Trash2, FileText } from 'lucide-react';
-import type { AuthUser } from '../../../types';
 import { warnaNama } from '../../../codewarna/warnaNama';
 import { formatDateTime, formatFileSize, roleLabel } from './tugasKonten';
 import {
@@ -21,7 +20,7 @@ interface DiskusiTugasStreamProps {
   streamRef: RefObject<HTMLDivElement | null>;
   messages: ChatStreamItem[];
   q: string;
-  user?: AuthUser | null;
+  selfId: string;
   mode: ChatMode;
   privateTarget: PrivateTarget | null;
   editingId: string | null;
@@ -40,7 +39,7 @@ export default function DiskusiTugasStream(props: DiskusiTugasStreamProps) {
     streamRef,
     messages,
     q,
-    user,
+    selfId,
     mode,
     privateTarget,
     editingId,
@@ -90,8 +89,8 @@ export default function DiskusiTugasStream(props: DiskusiTugasStreamProps) {
 
       {messages.map((item, index) => {
         const isMe = isPrivateMessage(item)
-          ? user?.id === item.senderId
-          : user?.id === item.authorId;
+          ? selfId === item.senderId
+          : selfId === item.authorId;
         const prev = index > 0 ? messages[index - 1] : null;
         const showDate = !prev || getDayKey(item.createdAt) !== getDayKey(prev.createdAt);
         const isEditing = editingId === item.id;
