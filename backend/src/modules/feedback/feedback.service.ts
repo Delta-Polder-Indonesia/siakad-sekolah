@@ -33,11 +33,37 @@ const serialize = (row: Feedback): SerializedFeedback => ({
   likedBy: parseLikedBy(row.likedBy),
 });
 
-export async function listFeedback(): Promise<SerializedFeedback[]> {
-  const rows = await prisma.feedback.findMany({
-    orderBy: { submittedAt: 'desc' },
-  });
-  return rows.map(serialize);
+export interface FeedbackListResult {
+  items: SerializedFeedback[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function listFeedback(
+  page = 1,
+  limit = 20
+): Promise<FeedbackListResult> {
+  const safePage = Math.max(1, Math.floor(page));
+  const safeLimit = Math.min(100, Math.max(1, Math.floor(limit)));
+
+  const [rows, total] = await Promise.all([
+    prisma.feedback.findMany({
+      orderBy: { submittedAt: 'desc' },
+      skip: (safePage - 1) * safeLimit,
+      take: safeLimit,
+    }),
+    prisma.feedback.count(),
+  ]);
+
+  return {
+    items: rows.map(serialize),
+    total,
+    page: safePage,
+    limit: safeLimit,
+    totalPages: Math.max(1, Math.ceil(total / safeLimit)),
+  };
 }
 
 export async function createFeedback(input: FeedbackInput): Promise<SerializedFeedback> {

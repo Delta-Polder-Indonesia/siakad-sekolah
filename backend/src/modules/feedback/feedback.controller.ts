@@ -4,6 +4,7 @@
 import type { RequestHandler } from 'express';
 import { z } from 'zod';
 import { ValidationError, NotFoundError } from '../../utils/errors.js';
+import { paginatedResponse } from '../../utils/response.js';
 import {
   listFeedback,
   createFeedback,
@@ -35,11 +36,23 @@ const updateStatusSchema = z.object({
   adminNotes: z.string().trim().max(2000).optional().nullable(),
 });
 
+// Query: /api/feedback?page=1&limit=20 (default page=1, limit=20, maks 100).
+// Response backward-compatible: `data` tetap array (frontend lama aman),
+// plus meta `pagination` untuk frontend yang butuh load-more / halaman.
+const listQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
 // GET /api/feedback
-export const handleListFeedback: RequestHandler = async (_req, res, next) => {
+export const handleListFeedback: RequestHandler = async (req, res, next) => {
   try {
-    const data = await listFeedback();
-    res.json({ ok: true, data });
+    const parsed = listQuerySchema.safeParse(req.query);
+    const page = parsed.success ? parsed.data.page : 1;
+    const limit = parsed.success ? parsed.data.limit : 20;
+
+    const { items, total } = await listFeedback(page, limit);
+    res.json(paginatedResponse(items, page, limit, total, 'Feedback berhasil dimuat'));
   } catch (err) {
     next(err);
   }

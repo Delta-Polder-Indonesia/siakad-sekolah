@@ -88,7 +88,12 @@ const toFeedback = (row: Record<string, unknown>): Feedback => {
 export async function fetchFeedbackReviews(): Promise<Feedback[]> {
   return withLocalFallback(
     async () => {
-      const body = await request<ApiResponse<Array<Record<string, unknown>>>>('/feedback');
+      // Minta halaman terbaru dengan limit tinggi (100) — backend mem-paginate
+      // dan mengembalikan meta `pagination`, tapi `data` tetap array sehingga
+      // pemakai lama tidak perlu berubah.
+      const body = await request<ApiResponse<Array<Record<string, unknown>>>>(
+        '/feedback?page=1&limit=100'
+      );
       return (body.data || []).map(toFeedback).filter((f) => f.rating && f.rating > 0);
     },
     () => getFeedbacksWithRatingLocal()
