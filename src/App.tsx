@@ -10,6 +10,7 @@ import { NotificationProvider } from './fitur/bersama/NotificationProvider';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { FeedbackButton } from './fitur/halaman/feedback';
 import { ToastProvider, lazyPage } from './components/ui';
+import type { AdminGuruPanelProps } from './fitur/admin/PanelAdminModal';
 
 // ── Lazy-loaded page components (split by role) ──
 // Each chunk is loaded only when the user navigates to that page.
@@ -80,12 +81,15 @@ const LazyStrukturOrganisasi = lazyPage(
 );
 
 // Admin pages (lazy loaded)
-const LazyAdminMasterPanel = lazyPage(() => import('./fitur/admin/PanelAdminModal'));
+// PanelAdminModal butuh prop `scope` tambahan — lazyPage generik menjaga tipe props-nya.
+const LazyAdminMasterPanel = lazyPage<AdminGuruPanelProps & PageProps>(
+  () => import('./fitur/admin/PanelAdminModal')
+);
 
 // ── Wrappers for pages with special prop handling ──
 
 const AdminDashboardPage: ComponentType<PageProps> = () => (
-  <LazyAdminMasterPanel {...({ scope: 'teacher' } as any)} />
+  <LazyAdminMasterPanel scope="teacher" />
 );
 
 const GuestDashboardWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
@@ -95,17 +99,17 @@ const GuestDashboardWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
 
 const BukuTamuPageWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
   if (!onNavigate) return null;
-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'form' } as any)} />;
+  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="form" />;
 };
 
 const DaftarTamuWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
   if (!onNavigate) return null;
-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'list' } as any)} />;
+  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="list" />;
 };
 
 const StatistikTamuWrapper: ComponentType<PageProps> = ({ onNavigate }) => {
   if (!onNavigate) return null;
-  return <LazyBukuTamuPage onNavigate={onNavigate} {...({ defaultTab: 'stats' } as any)} />;
+  return <LazyBukuTamuPage onNavigate={onNavigate} defaultTab="stats" />;
 };
 
 // ── Page registries per role ──

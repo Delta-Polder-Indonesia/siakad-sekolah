@@ -15,7 +15,7 @@ import BukuTamuList from '../components/BukuTamuList';
 import { useGuestBook } from '../context/GuestBookContext';
 import { namaSekolah } from '../../halaman/components/Profile/dataSekolah';
 
-interface BukuTamuPageProps {
+export interface BukuTamuPageProps {
   onNavigate: (page: string) => void;
   defaultTab?: 'form' | 'list' | 'stats';
 }

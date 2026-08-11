@@ -28,15 +28,16 @@ export function PageSkeleton() {
  *   const MyPage = lazyPage(() => import('./MyPage'));
  *   PAGES = { myPage: MyPage };
  *
- * Returns ComponentType<PageProps> — the lazy component receives all PageProps
- * via the spread operator from the wrapping component.
+ * Generik: tipe props komponen asal dipertahankan (P). Default P = PageProps,
+ * dan halaman dengan props tambahan (mis. PanelAdminModal butuh `scope`)
+ * bisa dipakai dengan `lazyPage<ExtraProps & PageProps>(...)`.
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function lazyPage(
-  importFn: () => Promise<{ default: ComponentType<any> }>
-): ComponentType<PageProps> {
-  const LazyComp: LazyExoticComponent<ComponentType<any>> = lazy(importFn);
-  const LazyPageComponent = (props: PageProps) => (
+export function lazyPage<P extends PageProps = PageProps>(
+  importFn: () => Promise<{ default: ComponentType<P> }>
+): ComponentType<P> {
+  const LazyComp: LazyExoticComponent<ComponentType<P>> = lazy(importFn);
+  const LazyPageComponent = (props: P) => (
     <Suspense fallback={<PageSkeleton />}>
       <LazyComp {...props} />
     </Suspense>

@@ -5,7 +5,21 @@ interface PerpusDetailBukuProps {
   onBack: () => void;
 }
 
-const BOOK_DETAILS: Record<string, any> = {
+interface BookDetail {
+  judul: string;
+  pengarang: string;
+  isbn: string;
+  tahun: string;
+  kategori: string;
+  rak: string;
+  penerbit: string;
+  jumlah: number;
+  sinopsis: string;
+  cover: string;
+  ebook?: string;
+}
+
+const BOOK_DETAILS: Record<string, BookDetail> = {
   B0009: {
     judul: 'Mau Order Pustaka Digital',
     pengarang: 'Masri',
@@ -84,8 +98,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
           <img
             src={book.cover}
             alt={book.judul}
-            className="h-64 w-48 rounded-md border-2 border-black object-cover"
-          />
+            className="h-64 w-48 rounded-md border-2 border-black object-cover"  loading="lazy" decoding="async" />
         </div>
 
         {/* Details */}

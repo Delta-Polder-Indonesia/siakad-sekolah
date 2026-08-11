@@ -68,7 +68,7 @@ type TeacherAdminTab =
   | 'perpus-transaksi-kembali'
   | 'perpus-detail';
 
-interface AdminGuruPanelProps {
+export interface AdminGuruPanelProps {
   scope: 'teacher' | 'student';
   open?: boolean;
   onClose?: () => void;

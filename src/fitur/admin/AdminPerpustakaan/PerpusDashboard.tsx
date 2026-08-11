@@ -103,8 +103,8 @@ export default function PerpusDashboard() {
     const member = members.find((m) => m.id === memberId);
     return {
       name: student?.name || member?.name || 'Tidak Diketahui',
-      nis: student?.nis || (member as any)?.nis || '-',
-      className: (student as any)?.className || (member as any)?.className || '-',
+      nis: student?.nis || member?.nis || '-',
+      className: student?.className || member?.className || '-',
     };
   };
 

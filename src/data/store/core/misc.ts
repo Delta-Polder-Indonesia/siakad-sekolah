@@ -162,7 +162,7 @@ export function getPengumumanAdminUntukGuru(classIds: string[]): PengumumanAdmin
   );
 }
 
-export function addPengumumanAdmin(item: any): boolean {
+export function addPengumumanAdmin(item: PengumumanAdmin): boolean {
   const all = getPengumumanAdmin();
   all.push(item);
   try {
