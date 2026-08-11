@@ -1,4 +1,4 @@
-import { getTeachers, getTeacherList, saveTeachers, updateTeacher } from '../store/core';
+import { getTeachers, getTeacherList, saveTeachers, updateTeacher } from '../store/core/teachers';
 import type { AuthUser, Teacher } from '../../types';
 
 export { getTeachers, getTeacherList, saveTeachers, updateTeacher };

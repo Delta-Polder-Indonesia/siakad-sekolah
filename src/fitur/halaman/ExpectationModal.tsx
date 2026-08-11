@@ -1,4 +1,5 @@
 // src/fitur/halaman/ExpectationModal.tsx
+import './global.css';
 import React, { useRef, useState, useEffect, lazy, Suspense, useCallback, useMemo } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { navItems } from './data/navigation/data';

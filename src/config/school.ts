@@ -23,7 +23,7 @@
  *     jenjang di sini dipakai untuk identitas & label dinamis.
  * ============================================================================
  */
-import { notifyStoreUpdated } from '../data/store/core/db';
+import { notifyStoreUpdated } from '../data/store/core/storeEvents';
 
 export type JenjangSekolah = 'SD' | 'SMP' | 'SMA' | 'SMK';
 

@@ -1,6 +1,9 @@
 import { initialData } from './seedData';
 import { initialCatatanBK } from './seedData';
 import { initialEkskul, initialEkskulMember, initialEkskulKehadiran } from './seedData';
+import { notifyStoreUpdated } from './storeEvents';
+
+export { notifyStoreUpdated, subscribeStore, store } from './storeEvents';
 // ==================== TYPES ====================
 // Type definitions moved to types.ts to avoid duplication
 // Import shared types from types.ts
@@ -153,7 +156,6 @@ export const PPDB_ADMIN_LOCK_KEY = 'portal-siswa-ppdb-admin-lock';
 export const PRESENCE_KEY = 'siakad-presence-v1';
 export const TYPING_KEY = 'siakad-typing-v1';
 export const CHAT_READ_KEY = 'siakad-chat-read-v1';
-const STORE_UPDATED_EVENT = 'absensi_store_updated';
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
 
 export const ADMIN_MAX_ATTEMPTS = Number(import.meta.env.VITE_ADMIN_MAX_ATTEMPTS || '5');
@@ -161,8 +163,6 @@ export const ADMIN_LOCK_MINUTES = Number(import.meta.env.VITE_ADMIN_LOCK_MINUTES
 export const ADMIN_SESSION_MINUTES = Number(import.meta.env.VITE_ADMIN_SESSION_MINUTES || '480');
 // Tanpa nilai env → PIN kosong → login admin PPDB mode lokal DIMATIKAN.
 export const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || '';
-
-let storeVersion = 0;
 
 // ==================== INTERFACES ====================
 
@@ -277,41 +277,6 @@ export async function hashPassword(plain: string): Promise<string> {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
-
-// Coalescing notifikasi: beberapa writeDB dalam satu frame (mis. keystroke
-// typing) cukup memicu SATU event → komponen (50+) re-render maks 1x per frame.
-// `storeVersion` tetap naik sinkron agar getSnapshot selalu akurat; event
-// (pemicu React untuk membandingkan snapshot) dijadwalkan per frame.
-let notifyScheduled = false;
-function dispatchStoreEvent() {
-  notifyScheduled = false;
-  window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
-}
-
-export function notifyStoreUpdated() {
-  storeVersion += 1;
-  if (notifyScheduled) return;
-  notifyScheduled = true;
-  if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(dispatchStoreEvent);
-  } else {
-    queueMicrotask(dispatchStoreEvent); // fallback environment non-browser
-  }
-}
-
-export function subscribeStore(listener: () => void) {
-  window.addEventListener(STORE_UPDATED_EVENT, listener);
-  window.addEventListener('storage', listener);
-  return () => {
-    window.removeEventListener(STORE_UPDATED_EVENT, listener);
-    window.removeEventListener('storage', listener);
-  };
-}
-
-export const store = {
-  getSnapshot: () => storeVersion,
-  subscribe: (listener: () => void) => subscribeStore(listener),
-};
 
 export function getStorageSummary(): RingkasanPenyimpananBrowser {
   let usedBytes = 0;

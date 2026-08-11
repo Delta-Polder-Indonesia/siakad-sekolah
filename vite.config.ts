@@ -7,6 +7,20 @@ export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     tailwindcss(),
+    {
+      name: 'async-css',
+      apply: 'build',
+      transformIndexHtml: {
+        order: 'post',
+        handler(html) {
+          return html.replace(
+            /<link rel="stylesheet"([^>]*?) href="([^"]+\.css)"([^>]*)>/g,
+            (_match, pre: string, href: string, post: string) =>
+              `<link rel="stylesheet"${pre} href="${href}"${post} media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${href}"></noscript>`
+          );
+        },
+      },
+    },
   ],
 
   // 2. Tambahkan blok resolve alias di sini
@@ -29,16 +43,33 @@ export default defineConfig(({ command }) => ({
   },
 
   // 2. OPTIMASI PEMINDAIAN FOLDER WINDOWS
+  preview: {
+    host: true,
+    allowedHosts: true,
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+          res.statusCode = 302;
+          res.setHeader('Location', '/siakad-sekolah/');
+          res.end();
+          return;
+        }
+        next();
+      });
+    },
+  },
+
   server: {
+    host: true,
+    allowedHosts: true,
     watch: {
       usePolling: false,
       ignored: ['**/node_modules/**', '**/.git/**'],
     },
     headers: {
-      // Security Headers untuk development
-      'Content-Security-Policy': "frame-ancestors 'none'",
+      // Preview/dev harus bisa di-iframe (Arena). Frame-deny tetap di
+      // public/_headers untuk deploy produksi.
       'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
@@ -71,31 +102,22 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // React ecosystem
-          if (id.includes('react') || id.includes('react-dom')) {
+          // Hanya pecah node_modules. JANGAN masukkan jspdf ke named chunk —
+          // named chunk bisa jadi shared dep entry (PSI: pdf-vendor di first load).
+          // jspdf tetap async chunk lewat dynamic import + modulePreload: false.
+          if (!id.includes('node_modules')) return undefined;
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/scheduler')) {
             return 'react-vendor';
           }
-          // PDF library
-          if (id.includes('jspdf')) {
-            return 'pdf-vendor';
-          }
-          // Icons
-          if (id.includes('lucide-react')) {
-            return 'icons-vendor';
-          }
-          // Google OAuth
           if (id.includes('@react-oauth/google')) {
             return 'google-vendor';
           }
-          // Maps
           if (id.includes('@react-google-maps/api')) {
             return 'maps-vendor';
           }
-          // QR code
-          if (id.includes('qrcode')) {
+          if (id.includes('node_modules/qrcode')) {
             return 'qrcode-vendor';
           }
-          // Return undefined untuk node_modules lain agar default Rollup handling
           return undefined;
         },
         // Cache headers untuk aset statis

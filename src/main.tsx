@@ -4,7 +4,6 @@ import { GlobalErrorHandler } from './utils/errorHandler';
 import { PerformanceMonitor } from './utils/performance';
 import App from './App';
 import './index.css';
-import './fitur/halaman/global.css';
 
 // Inisialisasi global error handler dan performance monitor sebelum aplikasi dirender
 GlobalErrorHandler.init();

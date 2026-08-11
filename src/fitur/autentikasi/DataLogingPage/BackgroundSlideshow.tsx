@@ -10,7 +10,7 @@ const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSli
       // so PSI does not download 5 full-bleed photos on first paint.
       if (!isActive && !(currentSlide > 0 && isNear)) return null;
 
-      const isLcp = index === 0 && currentSlide === 0;
+      const isHtmlLcp = index === 0;
       return (
         <div
           key={image.src}
@@ -19,29 +19,33 @@ const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSli
           }`}
           aria-hidden={!isActive}
         >
-          <picture>
-            {image.src.endsWith('.webp') && (
-              <source
-                type="image/webp"
-                srcSet={image.srcSet || image.src}
+          {/* Slide 0: gambar LCP sudah ada di index.html (#lcp-hero) agar
+              Lighthouse tidak menunggu JS. Jangan remount <img> yang sama. */}
+          {isHtmlLcp ? null : (
+            <picture>
+              {image.src.endsWith('.webp') && (
+                <source
+                  type="image/webp"
+                  srcSet={image.srcSet || image.src}
+                  sizes="100vw"
+                />
+              )}
+              <img
+                src={image.fallback || image.src}
+                alt={isActive ? image.caption : ''}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                fetchPriority="low"
+                decoding="async"
+                width={1920}
+                height={752}
                 sizes="100vw"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
-            )}
-            <img
-              src={image.fallback || image.src}
-              alt={isActive ? image.caption : ''}
-              className="h-full w-full object-cover"
-              loading={isLcp ? 'eager' : 'lazy'}
-              fetchPriority={isLcp ? 'high' : 'low'}
-              decoding={isLcp ? 'sync' : 'async'}
-              width={1920}
-              height={752}
-              sizes="100vw"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          </picture>
+            </picture>
+          )}
         </div>
       );
     })}

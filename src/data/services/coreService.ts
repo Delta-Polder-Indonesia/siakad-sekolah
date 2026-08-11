@@ -1,11 +1,10 @@
 import {
   initializeData,
   hashPassword,
-  subscribeStore,
   getStorageSummary,
   createId,
-  notifyStoreUpdated,
-} from '../store/core';
+} from '../store/core/db';
+import { subscribeStore, notifyStoreUpdated } from '../store/core/storeEvents';
 
 export {
   initializeData,
