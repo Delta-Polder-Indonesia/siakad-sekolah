@@ -538,7 +538,7 @@ export default function AgendaPage({ onNavigate, isActive }: PageProps & { isAct
       <div
         className="relative flex h-[390px] w-full shrink-0 items-center overflow-hidden bg-cover bg-center"
         style={{
-          backgroundImage: `url("${import.meta.env.BASE_URL}images/Dashboard/logo-profile.png")`,
+          backgroundImage: `url("${import.meta.env.BASE_URL}images/Dashboard/logo-profile.webp")`,
           backgroundPosition: 'center 30%', // 30% = geser sedikit ke bawah
         }}
       >

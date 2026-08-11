@@ -221,6 +221,7 @@ export type ValidRole = 'teacher' | 'student' | 'parent' | 'guest';
 
 export interface BackgroundImage {
   src: string;
+  fallback?: string;
   caption: string;
   description: string;
 }

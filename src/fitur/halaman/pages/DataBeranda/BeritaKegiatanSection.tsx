@@ -34,7 +34,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
       <section className="relative flex min-h-[300px] w-full items-center overflow-hidden bg-emerald-800 md:min-h-[380px]">
         {/* Foto Samping Kanan */}
         <img
-          src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/smknu_pkl-2024.png`}
+          src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/smknu_pkl-2024.webp`}
           alt="Banner Kegiatan"
           className="absolute top-0 right-0 z-[1] h-full w-full object-cover object-center md:w-1/2"  loading="lazy" decoding="async" />
 

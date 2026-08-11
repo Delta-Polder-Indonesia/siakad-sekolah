@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://delta-polder-indonesia.github.io/siakad-sekolah/sitemap.xml
+
+# Disallow admin/API internals
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl-delay for friendlier crawling (optional)
+# Crawl-delay: 2

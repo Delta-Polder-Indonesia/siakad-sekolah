@@ -3,13 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Portal SIAKAD SMA Negeri 1 Medan — Sistem Informasi Akademik untuk guru, siswa, orang tua, dan admin. Kelola absensi, nilai, tugas, PPDB, perpustakaan, dan pengumuman dalam satu portal modern."
+    />
+    <meta name="keywords" content="SIAKAD, SMA Negeri 1 Medan, sistem informasi akademik, sekolah, pendidikan, PPDB, e-learning, perpustakaan digital" />
+    <meta name="author" content="SMA Negeri 1 Medan" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://delta-polder-indonesia.github.io/siakad-sekolah/" />
+    <meta name="theme-color" content="#0b2f9f" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://delta-polder-indonesia.github.io/siakad-sekolah/" />
+    <meta property="og:title" content="Portal SIAKAD — SMA Negeri 1 Medan | Sekolah Unggul Masa Depan" />
+    <meta
+      property="og:description"
+      content="Portal resmi SMA Negeri 1 Medan. Akses absensi, rapor, tugas, PPDB online, perpustakaan digital, dan informasi sekolah dalam satu tempat."
+    />
+    <meta property="og:image" content="https://delta-polder-indonesia.github.io/siakad-sekolah/images/Dashboard/Konoha-1.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Portal SIAKAD" />
+    <meta property="og:locale" content="id_ID" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://delta-polder-indonesia.github.io/siakad-sekolah/" />
+    <meta name="twitter:title" content="Portal SIAKAD — SMA Negeri 1 Medan | Sekolah Unggul Masa Depan" />
+    <meta
+      name="twitter:description"
+      content="Sistem Informasi Akademik terpadu untuk guru, siswa, orang tua, dan admin — kelola pembelajaran, absensi, nilai, dan perpustakaan digital."
+    />
+    <meta name="twitter:image" content="https://delta-polder-indonesia.github.io/siakad-sekolah/images/Dashboard/Konoha-1.jpg" />
+
+    <!-- Favicons & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/images/logo/logo-sekolah.svg" />
+    <link rel="apple-touch-icon" href="/images/logo/logo-sekolah.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://accounts.google.com" />
+    <link rel="dns-prefetch" href="https://apis.google.com" />
+
+    <!-- Preload LCP image (BackgroundSlideshow first slide) for faster LCP -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/Dashboard/Konoha-1.webp"
+      imagesrcset="/images/Dashboard/Konoha-1.webp 1920w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/images/Dashboard/cyber-security-1923446_960_720.webp"
+      fetchpriority="high"
+    />
+
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com;
+      script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: blob: https: http:;
       font-src 'self' https://fonts.gstatic.com data:;
-      connect-src 'self' http://localhost http://localhost:4000 https://accounts.google.com https: ws://localhost ws://127.0.0.1;
+      connect-src 'self' https://accounts.google.com https: ws://localhost ws://127.0.0.1 http://localhost http://localhost:4000;
       frame-src https://accounts.google.com https://www.google.com https://www.youtube.com;
       object-src 'none';
       base-uri 'self';
@@ -17,25 +84,74 @@
       upgrade-insecure-requests;
     " />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <title>Portal SIAKAD</title>
 
-    <link rel="icon" type="image/png" href="/images/logo/logo-sekolah.svg" />
+    <title>Portal SIAKAD — SMA Negeri 1 Medan | Sistem Informasi Akademik Sekolah Unggul Masa Depan</title>
 
     <!-- Google Fonts - Lora (Book/Editorial Style) - Non-blocking -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "SMA Negeri 1 Medan",
+        "url": "https://delta-polder-indonesia.github.io/siakad-sekolah/",
+        "logo": "https://delta-polder-indonesia.github.io/siakad-sekolah/images/logo/logo-sekolah.svg",
+        "description": "Portal SIAKAD SMA Negeri 1 Medan — Sistem Informasi Akademik untuk guru, siswa, orang tua, dan admin.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Jl. Cik Ditiro No. 1, Madras Hulu",
+          "addressLocality": "Medan",
+          "addressRegion": "Sumatera Utara",
+          "postalCode": "20152",
+          "addressCountry": "ID"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+62-61-4510803",
+          "contactType": "customer service",
+          "email": "info@sman1medan.sch.id"
+        },
+        "sameAs": []
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Portal SIAKAD",
+        "url": "https://delta-polder-indonesia.github.io/siakad-sekolah/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://delta-polder-indonesia.github.io/siakad-sekolah/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <div style="padding:2rem;text-align:center;font-family:system-ui">
+        <h1>Portal SIAKAD — SMA Negeri 1 Medan</h1>
+        <p>Aplikasi ini memerlukan JavaScript untuk berjalan. Silakan aktifkan JavaScript di browser Anda.</p>
+        <p>Portal SIAKAD adalah Sistem Informasi Akademik untuk guru, siswa, orang tua, dan admin — kelola absensi, nilai, tugas, PPDB, dan perpustakaan digital.</p>
+      </div>
+    </noscript>
   </body>
 </html>

@@ -34,31 +34,45 @@ export default function HeroSection({ onRegister, onShowAgenda }: HeroSectionPro
       <section className="relative w-full overflow-hidden bg-[#2f454f] pt-[8rem] pb-[2rem] lg:pt-[10rem] lg:pb-[7rem]">
         {/* Lingkup animasi hero — layer dekoratif + gambar utama tengah */}
         <div className="hero-animation" aria-hidden="true">
-          {THEMES.map((theme, t) => (
-            <div
-              key={theme.label}
-              className={`theme js-theme ${theme.cls} ${currentIndex === t ? 'active' : ''}`}
-            >
-              {theme.layers.map(([cls, src]) => (
-                <img
-                  key={src}
-                  className={`theme--layer ${cls}`}
-                  src={img(src)}
-                  alt=""
-                  decoding="async"
-                  draggable="false"
-                />
-              ))}
-              {/* Gambar utama besar di tengah-bawah */}
-              <img
-                className="theme--layer blog"
-                src={img(theme.main)}
-                alt=""
-                decoding="async"
-                draggable="false"
-              />
-            </div>
-          ))}
+          {THEMES.map((theme, t) => {
+            const isActive = currentIndex === t;
+            const isFirst = t === 0;
+            return (
+              <div
+                key={theme.label}
+                className={`theme js-theme ${theme.cls} ${isActive ? 'active' : ''}`}
+              >
+                {theme.layers.map(([cls, src]) => (
+                  <img
+                    key={src}
+                    className={`theme--layer ${cls}`}
+                    src={img(src)}
+                    alt=""
+                    decoding="async"
+                    draggable="false"
+                    loading="lazy"
+                    width={120}
+                    height={120}
+                  />
+                ))}
+                {/* Gambar utama besar di tengah-bawah — WebP 12-27KB vs PNG 88-97KB */}
+                <picture>
+                  <source srcSet={img(theme.main)} type="image/webp" />
+                  <img
+                    className="theme--layer blog"
+                    src={img((theme as { fallback: string }).fallback || theme.main)}
+                    alt=""
+                    decoding="async"
+                    draggable="false"
+                    loading={isFirst ? 'eager' : 'lazy'}
+                    fetchPriority={isFirst ? 'high' : 'low'}
+                    width={600}
+                    height={400}
+                  />
+                </picture>
+              </div>
+            );
+          })}
         </div>
 
         <div className="relative z-10">
