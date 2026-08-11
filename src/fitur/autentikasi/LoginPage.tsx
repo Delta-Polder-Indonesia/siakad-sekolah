@@ -12,6 +12,7 @@ import {
   BACKGROUND_IMAGES,
   MAIN_NAV,
   SCHOOL_CONFIG,
+  SLIDESHOW_FIRST_DELAY_MS,
   SLIDESHOW_INTERVAL_MS,
   MAX_LOGIN_ATTEMPTS,
   LOCKOUT_DURATION_MS,
@@ -65,10 +66,17 @@ export default function LoginPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const start = window.setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
-    }, SLIDESHOW_INTERVAL_MS);
-    return () => clearInterval(interval);
+      interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
+      }, SLIDESHOW_INTERVAL_MS);
+    }, SLIDESHOW_FIRST_DELAY_MS);
+    return () => {
+      window.clearTimeout(start);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { LOGIN_ILLUSTRATION, Z_INDEX } from './constants';
+import { LOGIN_ILLUSTRATION, LOGIN_ILLUSTRATION_WEBP, Z_INDEX } from './constants';
 
 interface LoginIllustrationProps {
   isOpen: boolean;
@@ -28,18 +28,21 @@ const LoginIllustration = memo<LoginIllustrationProps>(({ isOpen }) => {
     >
       {/* Wrapper dengan lebar tepat (viewport - 440px lebar panel login) */}
       <div className="relative h-full overflow-hidden" style={{ width: 'calc(100vw - 440px)' }}>
-        {!hasError ? (
-          <img
-            src={LOGIN_ILLUSTRATION}
-            alt="Ilustrasi keamanan portal akademik"
-            className="h-full w-full object-cover transition-opacity duration-300"
-            loading="eager"
-            decoding="async"
-            width={960}
-            height={720}
-            onError={() => setHasError(true)}
-          />
-        ) : (
+        {isOpen && !hasError ? (
+          <picture>
+            <source srcSet={LOGIN_ILLUSTRATION_WEBP} type="image/webp" />
+            <img
+              src={LOGIN_ILLUSTRATION}
+              alt=""
+              className="h-full w-full object-cover transition-opacity duration-300"
+              loading="lazy"
+              decoding="async"
+              width={960}
+              height={720}
+              onError={() => setHasError(true)}
+            />
+          </picture>
+        ) : !isOpen ? null : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-12 text-center text-slate-400">
             <p className="text-sm font-medium tracking-wide">
               Portal Layanan Terpadu Siswa & Akademik
