@@ -467,4 +467,19 @@ impor data lama, tanpa input manual.
 ### Verifikasi
 - FE: 288 test (27 file) ✅ · lint 0 error ✅ · build ✅
 
+---
+
+## 13. Dokumentasi Penjualan (README + 2 Panduan) ✅
+
+Lengkap untuk menawarkan produk ke sekolah:
+
+- `dokumentasi/PANDUAN_SETUP_SEKOLAH.md` — untuk admin sekolah (pembeli):
+  setup identitas, kelola data, akun & login, cek cepat. Tanpa koding.
+- `dokumentasi/PANDUAN_PENYESUAIAN_KONTEN.md` — untuk tim teknis: peta file
+  konten per halaman publik, jenjang, tema, deploy (GH Pages/Netlify/Vercel),
+  mode Standar vs Cloud, checklist serah terima.
+- `README.md` — judul jadi "Template Portal Sekolah (SD/SMP/SMA/SMK)" +
+  tabel dokumentasi & fitur template universal.
+- (Sebelumnya) `PANDUAN_PERSIAPAN_SEKOLAH.md` — formulir data calon pembeli.
+
 *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
