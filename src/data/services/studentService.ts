@@ -11,7 +11,7 @@ import {
   addStudentStatusMutation,
   setStudentStatus,
   generateStudentNis,
-} from '../store/core';
+} from '../store/core/students';
 import type { AuthUser, Student } from '../../types';
 
 export {

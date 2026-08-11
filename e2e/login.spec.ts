@@ -4,7 +4,7 @@ import { resetApp, loginAs, openLoginPanel, SEED } from './helpers';
 test.describe('Login Flow — Semua Role', () => {
   test.beforeEach(async ({ page }) => {
     await resetApp(page);
-    // Ensure we're on the login page
+    await openLoginPanel(page);
     await page.waitForSelector('input[type="password"]', { timeout: 10000 });
   });
 

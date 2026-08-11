@@ -4,7 +4,7 @@
  * lewat Panel Setup Sekolah (via store version).
  */
 import { useSyncExternalStore } from 'react';
-import { store } from '../data/store/core/db';
+import { store } from '../data/store/core/storeEvents';
 import { getSchoolIdentity, type SchoolIdentity } from '../config/school';
 
 export function useSchoolIdentity(): SchoolIdentity {

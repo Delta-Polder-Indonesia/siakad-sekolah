@@ -2,15 +2,17 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import {
   getTeachers,
-  getStudents,
   getTeacherByUser,
+  getLocalTeacherId,
+} from '../data/services/teacherService';
+import {
+  getStudents,
   getStudentByUser,
   getParentStudent,
-  getLocalTeacherId,
-  hashPassword,
-  addLoginLog,
-  setClassTeacherId,
-} from '../data/services';
+} from '../data/services/studentService';
+import { hashPassword } from '../data/services/coreService';
+import { addLoginLog } from '../data/services/loginHistoryService';
+import { setClassTeacherId } from '../data/services/classService';
 import {
   loginPortal,
   loginAdmin,

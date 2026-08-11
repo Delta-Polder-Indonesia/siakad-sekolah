@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, lazy, Suspense, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import { logger } from '../../utils/logger';
-import { ToastProvider } from '../../components/ui';
+import { ToastProvider } from '../../components/ui/Toast';
 import { useSchoolIdentity } from '../../hooks/useSchoolIdentity';
-import { FeedbackButton } from '../halaman/feedback';
-
-const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
-
 import {
   BACKGROUND_IMAGES,
   MAIN_NAV,
@@ -16,16 +12,17 @@ import {
   SLIDESHOW_INTERVAL_MS,
   MAX_LOGIN_ATTEMPTS,
   LOCKOUT_DURATION_MS,
-  validateLoginInput,
-  BackgroundSlideshow,
-  LoginPanel,
-  LoginIllustration,
-  PpdbModal,
-  PerpustakaanModal,
-  PpdbView,
-  ValidRole,
-} from './DataLogingPage';
+} from './DataLogingPage/constants';
+import { validateLoginInput } from './DataLogingPage/utils';
+import type { PpdbView, ValidRole } from './DataLogingPage/types';
+import BackgroundSlideshow from './DataLogingPage/BackgroundSlideshow';
 
+const FeedbackButton = lazy(() => import('../halaman/feedback/components/FeedbackButton'));
+const FeedbackPage = lazy(() => import('../halaman/feedback/FeedbackPage'));
+const LoginPanel = lazy(() => import('./DataLogingPage/LoginPanel'));
+const LoginIllustration = lazy(() => import('./DataLogingPage/LoginIllustration'));
+const PpdbModal = lazy(() => import('./DataLogingPage/PpdbModal'));
+const PerpustakaanModal = lazy(() => import('./DataLogingPage/PerpustakaanModal'));
 const AdminMasterPanel = lazy(() => import('../admin/PanelAdminModal'));
 const TutorialModal = lazy(() => import('./TutorialModal'));
 const ExpectationModal = lazy(() => import('../halaman/ExpectationModal'));
@@ -64,6 +61,10 @@ export default function LoginPage() {
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
 
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  useLayoutEffect(() => {
+    document.getElementById('lcp-shell')?.setAttribute('data-hydrated', '');
+  }, []);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -266,7 +267,7 @@ export default function LoginPage() {
 
   return (
     <ToastProvider>
-      <div className="relative h-screen w-full overflow-hidden bg-slate-900 font-sans antialiased">
+      <div className="relative h-screen w-full overflow-hidden bg-transparent font-sans antialiased">
         <BackgroundSlideshow images={BACKGROUND_IMAGES} currentSlide={currentSlide} />
 
         <header className="absolute inset-x-0 top-0 z-20">
@@ -305,6 +306,10 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={handleOpenLogin}
+                  onMouseEnter={() => {
+                    void import('./DataLogingPage/LoginPanel');
+                    void import('./DataLogingPage/LoginIllustration');
+                  }}
                   className="rounded-full border-2 border-white/70 px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:border-[#00008B] hover:bg-transparent hover:text-white"
                 >
                   Masuk
@@ -361,28 +366,31 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <LoginIllustration isOpen={isLoginOpen} />
-        <LoginPanel
-          isOpen={isLoginOpen}
-          onClose={handleCloseLogin}
-          role={role}
-          id={id}
-          password={password}
-          showPassword={showPassword}
-          isLoading={isLoading}
-          hasError={!!error}
-          errorMessage={error}
-          onRoleChange={handleRoleChange}
-          onIdChange={handleIdChange}
-          onPasswordChange={handlePasswordChange}
-          onTogglePassword={handleTogglePassword}
-          onSubmit={handleSubmit}
-          onHelpClick={handleShowTutorial}
-          onGoogleLogin={handleGoogleLogin}
-          disabled={!!lockoutUntil}
-        />
-
         <Suspense fallback={null}>
+          {isLoginOpen && (
+            <>
+              <LoginIllustration isOpen={isLoginOpen} />
+              <LoginPanel
+                isOpen={isLoginOpen}
+                onClose={handleCloseLogin}
+                role={role}
+                id={id}
+                password={password}
+                showPassword={showPassword}
+                isLoading={isLoading}
+                hasError={!!error}
+                errorMessage={error}
+                onRoleChange={handleRoleChange}
+                onIdChange={handleIdChange}
+                onPasswordChange={handlePasswordChange}
+                onTogglePassword={handleTogglePassword}
+                onSubmit={handleSubmit}
+                onHelpClick={handleShowTutorial}
+                onGoogleLogin={handleGoogleLogin}
+                disabled={!!lockoutUntil}
+              />
+            </>
+          )}
           {showTutorial && <TutorialModal open={showTutorial} onClose={handleCloseTutorial} />}
           {showExpectation && (
             <ExpectationModal
@@ -409,10 +417,8 @@ export default function LoginPage() {
               scope={adminScope}
             />
           )}
+          <FeedbackButton onNavigate={() => setShowFeedbackPage(true)} />
         </Suspense>
-
-        {/* Feedback Button */}
-        <FeedbackButton onNavigate={() => setShowFeedbackPage(true)} />
       </div>
     </ToastProvider>
   );

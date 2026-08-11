@@ -67,7 +67,7 @@ export function exportToCsv(rows: (string | number)[][], headers: string[], file
 // ─── PDF PAGE SETUP ───────────────────────────────────────────────────────
 
 export async function createPdfDoc() {
-  const { jsPDF } = await import('jspdf');
+  const jsPDF = await import('./loadJsPdf').then((m) => m.loadJsPdf());
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
