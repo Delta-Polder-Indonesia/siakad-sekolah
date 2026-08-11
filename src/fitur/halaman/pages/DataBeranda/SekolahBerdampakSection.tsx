@@ -21,7 +21,7 @@ export default function KampusBerdampakSection({
   tags = DEFAULT_TAGS,
   buttonText = 'Sekolah Berdampak',
   buttonLink = 'sekolah-berdampak',
-  imageSrc = 'images/HalamanKami/Beranda/smknu_pkl-2024.png',
+  imageSrc = 'images/HalamanKami/Beranda/smknu_pkl-2024.webp',
 }: KampusBerdampakSectionProps) {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     if (onNavigate) {

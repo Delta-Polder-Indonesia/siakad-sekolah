@@ -64,7 +64,7 @@ export default function SiakadSection({
         {/* ─── KONTAINER GAMBAR ─── */}
         <div className="flex w-full shrink-0 items-center justify-center lg:w-[360px]">
           <img
-            src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/siakad-app.png`}
+            src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/siakad-app.webp`}
             alt={imageAlt}
             className="h-auto max-h-[450px] w-full object-contain drop-shadow-xl transition-transform duration-300"  loading="lazy" decoding="async" />
         </div>

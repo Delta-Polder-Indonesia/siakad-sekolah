@@ -72,7 +72,7 @@ export default function RisetInfrastrukturPage() {
               loading="eager"
               decoding="sync"
               className="absolute top-0 right-0 z-[1] h-full w-1/2 object-cover object-center"
-              src={`${import.meta.env.BASE_URL}images/Dashboard/logo-profile.png`}
+              src={`${import.meta.env.BASE_URL}images/Dashboard/logo-profile.webp`}
               onError={() => setImageError(true)}
             />
           ) : (

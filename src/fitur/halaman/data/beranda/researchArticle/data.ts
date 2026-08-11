@@ -21,7 +21,7 @@ export const DEFAULT_ARTICLES: ResearchArticle[] = [
     date: '18 Juni 2026',
     category: 'Artikel Penelitian',
     link: 'riset-air-bersih',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
+    bgImageSrc: 'images/Dashboard/logo-profile.webp',
   },
   {
     id: '2',
@@ -29,7 +29,7 @@ export const DEFAULT_ARTICLES: ResearchArticle[] = [
     date: '18 Juni 2026',
     category: 'Artikel Penelitian',
     link: 'riset-infrastruktur',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
+    bgImageSrc: 'images/Dashboard/logo-profile.webp',
   },
   {
     id: '3',
@@ -37,7 +37,7 @@ export const DEFAULT_ARTICLES: ResearchArticle[] = [
     date: '18 Juni 2026',
     category: 'Artikel Penelitian',
     link: 'riset-digitalisasi',
-    bgImageSrc: 'images/Dashboard/logo-profile.png',
+    bgImageSrc: 'images/Dashboard/logo-profile.webp',
   },
 ];
 

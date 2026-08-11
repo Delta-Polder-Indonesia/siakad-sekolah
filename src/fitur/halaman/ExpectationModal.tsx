@@ -142,44 +142,44 @@ const HERO_CONFIG: Record<string, { title: string; description: string; image: s
   Profil: {
     title: 'Profil Sekolah',
     description: `Mengenal lebih jauh sejarah, visi, misi, dan nilai-nilai yang menjadi fondasi ${namaSekolahUppercase}.`,
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   'Program Sekolah': {
     title: 'Program Sekolah',
     description:
       'Berbagai program unggulan yang dirancang untuk mendukung perkembangan akademik dan karakter siswa.',
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   'Program Keahlian': {
     title: 'Program Keahlian',
     description: 'Program keahlian yang mempersiapkan siswa menghadapi tantangan di era modern.',
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   'Sarana Prasarana': {
     title: 'Sarana Prasarana',
     description:
       'Fasilitas lengkap dan modern untuk mendukung proses belajar mengajar yang efektif.',
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   'Kegiatan Sekolah': {
     title: 'Kegiatan Sekolah',
     description: `Dokumentasi berbagai kegiatan akademik dan non-akademik di ${namaSekolahUppercase}.`,
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   Berita: {
     title: 'Berita Terkini',
     description: `Informasi dan berita terkini seputar ${namaSekolahUppercase}.`,
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   Galeri: {
     title: 'Galeri',
     description: `Galeri foto kegiatan dan momen berharga di ${namaSekolahUppercase}.`,
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   Kontak: {
     title: 'Kontak Kami',
     description: `Hubungi kami untuk informasi lebih lanjut mengenai ${namaSekolahUppercase}.`,
-    image: 'images/Dashboard/logo-profile.png',
+    image: 'images/Dashboard/logo-profile.webp',
   },
   Agenda: {
     title: 'Kalender Akademik',

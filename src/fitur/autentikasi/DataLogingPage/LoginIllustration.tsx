@@ -31,8 +31,12 @@ const LoginIllustration = memo<LoginIllustrationProps>(({ isOpen }) => {
         {!hasError ? (
           <img
             src={LOGIN_ILLUSTRATION}
-            alt=""
+            alt="Ilustrasi keamanan portal akademik"
             className="h-full w-full object-cover transition-opacity duration-300"
+            loading="eager"
+            decoding="async"
+            width={960}
+            height={720}
             onError={() => setHasError(true)}
           />
         ) : (

@@ -1,0 +1,22 @@
+{
+  "name": "Portal SIAKAD — SMA Negeri 1 Medan",
+  "short_name": "SIAKAD",
+  "description": "Sistem Informasi Akademik SMA Negeri 1 Medan — kelola absensi, nilai, tugas, PPDB, dan perpustakaan digital.",
+  "start_url": "/siakad-sekolah/",
+  "scope": "/siakad-sekolah/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b2f9f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/logo/logo-sekolah.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "id",
+  "dir": "ltr"
+}

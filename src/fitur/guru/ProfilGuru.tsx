@@ -149,7 +149,7 @@ export default function TeacherProfilePage() {
         <div
           className="relative h-32 md:h-40"
           style={{
-            backgroundImage: `url(${import.meta.env.BASE_URL}images/Dashboard/logo-profile.png)`,
+            backgroundImage: `url(${import.meta.env.BASE_URL}images/Dashboard/logo-profile.webp)`,
             backgroundSize: 'cover',
             backgroundPosition: 'center 25%',
             backgroundRepeat: 'no-repeat',

@@ -49,7 +49,7 @@ export default function SekolahBerdampakPage() {
         </div>
         {!imageError ? (
           <img
-            src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/smknu_pkl-2024.png`}
+            src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/smknu_pkl-2024.webp`}
             alt={`${namaSekolah} Berdampak`}
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}

@@ -5,6 +5,9 @@ export const LOGO_SMP = `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg
 // ── ✨ BARU: Ilustrasi keamanan di samping panel login ──
 export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/cyber-security-1923446_960_720.png`;
 
+ // Fallback WebP tersedia untuk ilustrasi (36KB vs 29KB PNG — gunakan PNG sebagai fallback, WebP sebagai modern)
+export const LOGIN_ILLUSTRATION_WEBP = `${import.meta.env.BASE_URL}images/Dashboard/cyber-security-1923446_960_720.webp`;
+
 // ── ✨ BARU: Pesan keamanan yang ditampilkan bersama ilustrasi ──
 export const SECURITY_MESSAGE = {
   line1: 'Harap Jaga Password Anda.',
@@ -29,33 +32,45 @@ export const Z_INDEX = {
   perpustakaanModal: 200,
 } as const;
 
+// Gunakan format optimal per gambar: WebP bila lebih kecil (Konoha-1,2), JPEG bila lebih kecil (3,5,6)
+// Semua gambar telah dioptimasi dengan ImageMagick (strip + quality 80) untuk PSI performance
 export const BACKGROUND_IMAGES = [
   {
-    src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.jpg`,
+    // Konoha-1: WebP 96KB vs JPG 114KB (optimized) — WebP wins 16% smaller
+    src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.webp`,
+    fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-1.jpg`,
     caption: 'Fasilitas Pembelajaran Modern',
     description:
       'Ruang kelas berteknologi tinggi yang mendukung proses belajar mengajar untuk mencetak generasi unggul.',
   },
   {
-    src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.jpg`,
+    // Konoha-2: WebP 89KB vs JPG 135KB — WebP wins 34% smaller
+    src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.webp`,
+    fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-2.jpg`,
     caption: 'Kegiatan Ekstrakurikuler',
     description:
       'Beragam kegiatan pengembangan diri untuk menggali potensi, bakat, dan minat setiap siswa.',
   },
   {
+    // Konoha-3: JPG 24KB vs WebP 62KB — JPG wins 61% smaller
     src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-3.jpg`,
+    fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-3.jpg`,
     caption: 'Prestasi Siswa Berprestasi',
     description:
       'Meraih prestasi gemilang di tingkat regional, nasional, hingga internasional setiap tahunnya.',
   },
   {
+    // Konoha-5: JPG 62KB vs WebP 83KB — JPG wins 25% smaller
     src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-5.jpg`,
+    fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-5.jpg`,
     caption: 'Lingkungan Belajar Nyaman',
     description:
       'Kampus hijau yang asri dan kondusif untuk mendukung kegiatan akademik yang berkualitas.',
   },
   {
+    // Konoha-6: JPG 40KB vs WebP 120KB — JPG wins 66% smaller
     src: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-6.jpg`,
+    fallback: `${import.meta.env.BASE_URL}images/Dashboard/Konoha-6.jpg`,
     caption: 'Alumni Tahun Ajaran 2024/2025',
     description:
       'Generasi unggul dan berkarakter yang siap berkontribusi untuk kemajuan bangsa Indonesia.',

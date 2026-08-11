@@ -1,22 +1,30 @@
-# Cache headers untuk GitHub Pages
-# Static assets - cache 1 tahun
-/assets/*/*
+# Cache headers — Cloudflare Pages / Netlify compatible
+# Catatan: GitHub Pages mengabaikan file ini (selalu 10m cache). Untuk cache optimal,
+# deploy ke Cloudflare Pages / Netlify / Vercel yang menghormati header ini.
+
+# Vite hashed assets - cache 1 tahun immutable (safe karena nama file berisi hash)
+/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-/images/*/*
+# Gambar statis - cache 1 tahun immutable (berkas diganti => nama berubah di code)
+/images/*
   Cache-Control: public, max-age=31536000, immutable
 
-# HTML files - cache 1 jam tapi revalidate
+# HTML - revalidate setiap request (agar deploy baru langsung terlihat)
 /*.html
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, max-age=0, must-revalidate
 
-# Index HTML - cache singkat
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
-# Security headers
+# Fallback: HTML other paths
+/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Security headers — semua path
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
