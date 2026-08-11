@@ -36,6 +36,6 @@ coverage/
 # Build
 *.tsbuildinfo
 
-# Backups
+# Backups (jangan pakai pola *.sql global — itu ikut meng-ignore migration Prisma!)
 backups/
-*.sql
+backups/*.sql
