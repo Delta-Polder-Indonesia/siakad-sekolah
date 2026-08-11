@@ -13,6 +13,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 dev-server.log
+vite.log
+*.log
 
 # OS / Editor
 .DS_Store
@@ -20,20 +22,21 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Env files
+# Env files (jangan commit .env asli; env.example boleh di-track sebagai template)
 .env
 .env.*
-.env.example
+!.env.example
 
 # Playwright E2E test artifacts
 test-results/
 playwright-report/
 
-# md yang di sembunyikan
+# md lokal yang sengaja tidak di-commit (berisi info internal/rahasia)
+# CATATAN: jangan ignore seluruh folder (mis. "dokumentasi/") —
+# gunakan daftar nama file eksplisit di atas agar file lain tetap ter-track.
 PANDUAN_LOGIN.md
 SESSION_HISTORY.md
 STRUKTUR_PROYEK.md
 perencanaan.md
 catatan_eror.md
 AUDIT_REPORT.md
-dokumentasi
