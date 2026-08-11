@@ -1,4 +1,8 @@
-# Portal Siswa — SMA NEGERI 1 MEDAN
+# Portal SIAKAD — Template Portal Sekolah (SD / SMP / SMA / SMK)
+
+> **Template universal**: siap di-branding ulang & dijual ke sekolah mana pun.
+> Identitas sekolah (nama, logo, kontak, jenjang, tahun ajaran) bisa diubah
+> dari panel admin **tanpa menyentuh kode** — lihat Panduan Setup Sekolah.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB)](https://react.dev/)
@@ -7,6 +11,25 @@
 [![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-222)](https://pages.github.com/)
 
 Aplikasi web portal sekolah berbasis React, Vite, dan Tailwind CSS untuk manajemen operasional guru, siswa, orang tua, dan admin. Menyediakan alur kerja terpisah untuk setiap peran dengan tampilan korporat modern.
+
+---
+
+## 📚 Dokumentasi Template
+
+| Dokumen | Untuk siapa | Isi |
+|---|---|---|
+| [`dokumentasi/PANDUAN_SETUP_SEKOLAH.md`](dokumentasi/PANDUAN_SETUP_SEKOLAH.md) | Admin sekolah (pembeli) | Setup identitas, data, login — tanpa koding |
+| [`dokumentasi/PANDUAN_PENYESUAIAN_KONTEN.md`](dokumentasi/PANDUAN_PENYESUAIAN_KONTEN.md) | Tim teknis | Penyesuaian konten, jenjang, tema, deploy |
+| [`dokumentasi/PANDUAN_PERSIAPAN_SEKOLAH.md`](dokumentasi/PANDUAN_PERSIAPAN_SEKOLAH.md) | Calon pembeli | Formulir data yang perlu disiapkan sekolah |
+| [`REVIEW_KODE.md`](REVIEW_KODE.md) | Developer | Catatan review, refactor & audit performa |
+
+### ✨ Fitur Template Universal
+
+- **Setup Sekolah tanpa koding** — Admin → Sistem → Setup Sekolah: ubah nama,
+  logo, kontak, jenjang, tahun ajaran; berlaku langsung di seluruh aplikasi.
+- **Data Sekolah** — Admin → Sistem → Data Sekolah: ekspor/impor data master
+  (guru, siswa, kelas, roster) & reset/kosongkan data untuk instalasi baru.
+- Dukungan jenjang **SD / SMP / SMA / SMK** dengan label yang menyesuaikan.
 
 ---
 
