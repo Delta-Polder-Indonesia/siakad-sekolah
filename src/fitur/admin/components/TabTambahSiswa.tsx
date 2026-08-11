@@ -131,7 +131,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
         </div>
 
         <div className="flex w-full justify-end border-t-2 border-black/10 pt-3">
-          <button
+          <button type="button"
             onClick={handleAddStudent}
             className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
           >

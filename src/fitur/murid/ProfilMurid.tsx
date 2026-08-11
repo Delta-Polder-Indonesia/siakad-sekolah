@@ -294,7 +294,7 @@ export default function ProfilePage() {
             )}
             <p className="text-xs font-bold text-black">{message.text}</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setMessage(null)}
             className="rounded-md p-1 text-black transition-colors hover:text-blue-600"
           >

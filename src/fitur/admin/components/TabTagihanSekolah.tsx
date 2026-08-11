@@ -172,13 +172,13 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
                 </p>
               </div>
               <div className="flex justify-end gap-1.5 text-[10px]">
-                <button
+                <button type="button"
                   onClick={() => setShowConfirm(false)}
                   className="rounded-md border-2 border-black bg-white px-2.5 py-1 font-bold text-black transition-colors hover:bg-neutral-100"
                 >
                   Batal
                 </button>
-                <button
+                <button type="button"
                   onClick={handleExecuteTerapkan}
                   className="rounded-md border-2 border-black bg-black px-2.5 py-1 font-bold text-white transition-colors hover:bg-neutral-900"
                 >
@@ -189,7 +189,7 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
           )}
 
           {/* TOMBOL UTAMA */}
-          <button
+          <button type="button"
             onClick={preCheckValidation}
             className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black px-4 py-2 text-xs font-bold transition-colors sm:w-auto ${
               showConfirm

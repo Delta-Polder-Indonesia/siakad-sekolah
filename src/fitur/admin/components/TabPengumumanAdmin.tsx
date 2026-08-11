@@ -300,13 +300,13 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                     </p>
                   </div>
                   <div className="flex justify-end gap-1.5 text-[10px]">
-                    <button
+                    <button type="button"
                       onClick={() => setShowConfirm(false)}
                       className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                     >
                       Batal
                     </button>
-                    <button
+                    <button type="button"
                       onClick={handleExecuteSimpan}
                       className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                     >
@@ -317,7 +317,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
               )}
 
               {/* TOMBOL UTAMA */}
-              <button
+              <button type="button"
                 onClick={preCheckValidation}
                 className={`inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-black bg-white px-5 py-2 text-xs font-bold text-black transition-colors sm:w-auto ${
                   showConfirm
@@ -356,7 +356,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                       {new Date(item.createdAt).toLocaleString('id-ID')}
                     </p>
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       if (window.confirm('Hapus pengumuman ini?')) {
                         deletePengumumanAdmin(item.id);

@@ -11,3 +11,4 @@ export { default as DonutChart, MiniDonut } from './DonutChart';
 export { default as BarChart, HorizontalBarChart } from './BarChart';
 export { default as QuickActions } from './QuickActions';
 export { lazyPage, PageSkeleton } from './LazyLoad';
+export { default as StatCard } from './StatCard';

@@ -144,7 +144,7 @@ const ActionCell: React.FC<{
 }> = ({ loan, bookTitle, onReturn }) => {
   if (loan.status === 'dipinjam') {
     return (
-      <button
+      <button type="button"
         onClick={() => onReturn(loan.id, bookTitle)}
         aria-label={`Kembalikan buku "${bookTitle}"`}
         className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-2.5 py-1.5 text-xs font-medium text-neutral-700 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"

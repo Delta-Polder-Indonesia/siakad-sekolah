@@ -51,7 +51,7 @@ const EmptyState: React.FC<{ hasQuery: boolean; onReset: () => void }> = ({
       </p>
     </div>
     {hasQuery && (
-      <button
+      <button type="button"
         onClick={onReset}
         className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
       >
@@ -164,7 +164,7 @@ export default function KatalogPage({
         {categories.map((cat) => {
           const isActive = selectedCategory === cat;
           return (
-            <button
+            <button type="button"
               key={cat}
               onClick={() => onCategoryChange(cat)}
               aria-pressed={isActive}
@@ -251,7 +251,7 @@ export default function KatalogPage({
             className="w-full rounded-lg border border-neutral-300 bg-white py-2 pr-9 pl-9 text-xs transition outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
           />
           {searchQuery && (
-            <button
+            <button type="button"
               onClick={() => onSearchChange('')}
               aria-label="Hapus pencarian"
               className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-neutral-400 transition hover:text-neutral-700 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"

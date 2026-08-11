@@ -363,7 +363,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
         </div>
 
         <div className="flex flex-wrap items-center gap-3 p-4">
-          <button
+          <button type="button"
             onClick={handleOpenAdd}
             className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-3 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
           >
@@ -454,14 +454,14 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                   </td>
                   <td className="px-3 py-2.5">
                     <div className="flex gap-1">
-                      <button
+                      <button type="button"
                         onClick={() => handleEdit(book)}
                         className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                         title="Edit"
                       >
                         <Edit className="h-3 w-3" />
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(book.id)}
                         className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                         title="Hapus"

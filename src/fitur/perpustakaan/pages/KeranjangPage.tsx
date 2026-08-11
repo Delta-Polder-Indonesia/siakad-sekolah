@@ -26,7 +26,7 @@ const EmptyState: React.FC<{ onOpenKatalog: () => void }> = ({ onOpenKatalog }) 
         Gunakan ikon keranjang pada Katalog Literatur untuk menandai buku.
       </p>
     </div>
-    <button
+    <button type="button"
       onClick={onOpenKatalog}
       className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-xs font-semibold text-neutral-800 transition hover:border-neutral-500 hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
     >
@@ -55,13 +55,13 @@ const ConfirmBanner: React.FC<{
       </p>
     </div>
     <div className="flex shrink-0 gap-2">
-      <button
+      <button type="button"
         onClick={onCancel}
         className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:outline-none"
       >
         Batal
       </button>
-      <button
+      <button type="button"
         onClick={onConfirm}
         className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
       >
@@ -219,7 +219,7 @@ export default function KeranjangPage({
 
                     {/* Hapus */}
                     <td className="px-4 py-3 text-right">
-                      <button
+                      <button type="button"
                         onClick={() => onRemoveFromCart(book.id)}
                         aria-label={`Hapus "${book.title}" dari keranjang`}
                         className="rounded-lg p-1.5 text-red-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
@@ -242,7 +242,7 @@ export default function KeranjangPage({
               <span className="ml-2 text-amber-700">({outOfStockCount} tidak tersedia)</span>
             )}
           </div>
-          <button
+          <button type="button"
             onClick={() => setShowConfirm(true)}
             disabled={cartBooks.length === 0 || cartBooks.length === outOfStockCount}
             aria-label="Ajukan semua pinjaman dalam keranjang"

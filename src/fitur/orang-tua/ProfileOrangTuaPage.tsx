@@ -396,7 +396,7 @@ export default function ProfileOrangTuaPage({
             </div>
             <p className="text-xs font-bold">{message.text}</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setMessage(null)}
             className="rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:bg-neutral-100"
             aria-label="Tutup notifikasi"
@@ -642,7 +642,7 @@ export default function ProfileOrangTuaPage({
                 </p>
               </div>
             </div>
-            <button
+            <button type="button"
               onClick={() => onNavigate?.('personal-messages')}
               className="mt-3 w-full rounded-md border-2 border-black bg-black py-2 text-[10px] font-bold tracking-wider text-white uppercase transition-colors hover:bg-neutral-900"
             >

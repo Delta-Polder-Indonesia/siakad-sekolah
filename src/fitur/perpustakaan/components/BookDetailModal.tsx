@@ -145,7 +145,7 @@ export default function BookDetailModal({
           <h2 id={titleId} className="text-sm font-bold text-neutral-900">
             Detail Buku
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
             aria-label="Tutup detail buku"
             className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:outline-none"
@@ -225,7 +225,7 @@ export default function BookDetailModal({
               {/* ── Aksi ── */}
               <div className="mt-auto flex gap-2 border-t border-neutral-100 pt-4">
                 {/* Keranjang */}
-                <button
+                <button type="button"
                   onClick={() => onToggleCart(book.id)}
                   disabled={isUnavailable}
                   aria-label={
@@ -251,7 +251,7 @@ export default function BookDetailModal({
                 </button>
 
                 {/* Pinjam */}
-                <button
+                <button type="button"
                   onClick={() => onBorrow(book.id, book.title)}
                   disabled={isUnavailable || isBorrowed}
                   aria-label={

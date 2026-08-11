@@ -482,4 +482,78 @@ Lengkap untuk menawarkan produk ke sekolah:
   tabel dokumentasi & fitur template universal.
 - (Sebelumnya) `PANDUAN_PERSIAPAN_SEKOLAH.md` — formulir data calon pembeli.
 
+---
+
+## 14. Review Folder `fitur/halaman` (168 file) — Sistem vs Konten ✅
+
+> Konten halaman yang sengaja kosong (stub template: SdgsDetail, SilaAsa/Asa,
+> ResearchDetail, dll.) TIDAK dinilai — sesuai permintaan. Yang direview:
+> sistem/fungsionalitas.
+
+### ✅ Sistem yang SUDAH BAGUS (pertahankan)
+1. **Navigasi** — `NavigationContext` rapi (goBack/navigateTo + hook
+   `useBackNavigation`/`useSectionNavigate`); `navItems` adaptif jenjang
+   (`isSmk`); switch-case lengkap di ExpectationModal; sistem `detailNav`
+   (resolveRiset/Sdgs/Sila/Asa/Ebook/Reg/Berita) **dengan test**.
+2. **Kalender Akademik** — `dateUtils.ts` satu pintu (parse tanggal Indonesia,
+   rentang, regex lookbehind) + test; data agenda 4 tahun (2023–2027); libur
+   nasional 2025–2027; DasborKalender sudah terstruktur (TypeTable,
+   SemesterSection, AgendaDetailView).
+3. **Carousel manual** — auto-play + pause + swipe touch + kontrol; lengkap
+   tanpa dependency eksternal.
+4. **Kebersihan kode** — 0 `any`, 0 `console.log`, 0 TODO di seluruh folder.
+5. **Integrasi identitas** — `useSchoolIdentity` dipakai di GtkSiswaPage,
+   FeedbackForm, SiakadSection.
+
+### 🔧 DIPERBAIKI (commit #22)
+1. **FloatingNav hardcode URL API** — sebelumnya
+   `import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api'` ditulis
+   manual (duplikasi config) dan tetap fetch walau mode lokal → kini pakai
+   `API_BASE` & `hasApi` dari `services/apiConfig` (konsisten dengan sistem
+   lain; mode lokal tidak fetch sia-sia).
+2. **embla-carousel-react & embla-carousel-auto-scroll DIHAPUS** — keduanya
+   ada di dependencies tapi **0 pemakaian** di seluruh repo (carousel buatan
+   sendiri). Menghemat install & ukuran bundle.
+
+### 📝 Rekomendasi (belum dikerjakan — butuh waktu)
+1. **God component**: `ExpectationModal` (824), `AgendaPage` (889),
+   `DasborKalenderAkademik` (921) — sudah terstruktur, tapi bisa dipecah lagi
+   dengan pola hook (seperti AdminPanel/DiskusiTugas).
+2. **Duplikasi carousel**: `TestimoniCarousel` & `LayananCarousel` ~90% identik
+   → ekstrak satu hook `useCarousel`.
+3. **Stub konten** (Sdgs/SilaAsa/Research): pastikan terhubung via detailNav —
+   sudah ada resolver + test ✅; isi konten menyusul per sekolah.
+4. **Libur nasional 2027** baru 6 entri — lengkapi mendekati tahun berjalan.
+
+---
+
+## 15. Perbaikan Markup Menu Utama (nilai 54 → target 65+) ✅
+
+Audit markup 10 folder role (~110 file) menghasilkan skor 54/100. Perbaikan
+yang dikerjakan (tanpa emoji / efek mengambang — hanya icon):
+
+### ✅ Dikerjakan
+1. **`type="button"` pada 108 tombol** (40 file) — tombol ber-`onClick` kini
+   eksplisit `type="button"`, menghilangkan risiko submit tak sengaja saat
+   berada di dalam `<form>` (sebelumnya default `type="submit"`). Tombol
+   submit (tanpa onClick, di form) sengaja dibiarkan.
+2. **Audit `alt` gambar** — hasil pengecekan tag penuh (multi-line): SEMUA
+   70 `<img>` sudah punya `alt` (hitungan 62 sebelumnya false positive grep
+   per-baris). Tidak ada yang perlu diperbaiki.
+3. **Komponen `StatCard`** (baru, `components/ui`) — gaya hitam-putih
+   konsisten, props `label/value/icon/alert/loading`, TANPA animasi/emoji.
+   Dipakai di **DasborGuru** menggantikan 2 blok markup duplikat (loading &
+   data, 6 kartu) — visual identik, kode jauh lebih pendek. +4 unit test.
+   Ini contoh awal "design system mulai dipakai" — komponen UI lama
+   (Button/Card/Input) bergaya slate/blue TIDAK dipakai karena tidak cocok
+   dengan design system hitam-putih aplikasi (rekomendasi: samakan gayanya
+   dulu, lalu pakai bertahap).
+
+### 📋 Rekomendasi lanjutan (urutan dampak)
+1. Samakan gaya komponen `Button/Input/Card` ke hitam-putih → pakai di
+   form guru/murid (menghapus markup duplikat terbesar).
+2. Ekstrak `SectionHeader` (pola border-b + uppercase) — muncul 40×.
+3. Terapkan `StatCard` ke dasbor lain setelah polanya disamakan.
+4. Hapus 350 tombol tanpa onClick yang dibiarkan? (itu submit button — aman).
+
 *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*

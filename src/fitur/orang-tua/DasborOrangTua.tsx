@@ -429,7 +429,7 @@ export default function DasborOrangTua({ onNavigate }: { onNavigate?: (page: str
                   <p className="font-mono text-[10px] font-bold text-black">
                     {waliKelas?.phone || '+62 --- ---- ----'}
                   </p>
-                  <button
+                  <button type="button"
                     onClick={() => onNavigate?.('personal-messages')}
                     className="cursor-pointer rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
                   >

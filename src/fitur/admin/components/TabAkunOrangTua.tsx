@@ -85,7 +85,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
           </div>
           <div className="sm:mt-0">
             {!isEditingGuest ? (
-              <button
+              <button type="button"
                 onClick={() => setIsEditingGuest(true)}
                 className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
               >
@@ -93,13 +93,13 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
               </button>
             ) : (
               <div className="flex gap-2">
-                <button
+                <button type="button"
                   onClick={handleSaveGuest}
                   className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                 >
                   <Save className="h-3 w-3" /> Simpan
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setIsEditingGuest(false)}
                   className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                 >
@@ -137,7 +137,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
               </p>
             </div>
 
-            <button
+            <button type="button"
               disabled={!isEditingGuest}
               onClick={() =>
                 setGuestConfig({ ...guestConfig, allowEmailLogin: !guestConfig.allowEmailLogin })
@@ -193,7 +193,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
                 <th className="w-1/4 border-r border-black px-4 py-2.5">
                   <div className="flex items-center gap-1.5">
                     <span>Kata Sandi</span>
-                    <button
+                    <button type="button"
                       onClick={() => setShowPasswords(!showPasswords)}
                       className="rounded-md border-2 border-black bg-white p-1 font-bold text-black transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                       title={showPasswords ? 'Sembunyikan' : 'Tampilkan'}
@@ -259,14 +259,14 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
                   <td className="px-4 py-3 text-right">
                     {editingId === s.id ? (
                       <div className="flex justify-end gap-1">
-                        <button
+                        <button type="button"
                           onClick={() => handleSave(s.id)}
                           className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                           title="Simpan"
                         >
                           <Save className="h-3 w-3" />
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => setEditingId(null)}
                           className="rounded-md border-2 border-black bg-white p-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                           title="Batal"
@@ -275,7 +275,7 @@ export default function TabAkunOrangTua({ setNotice }: { setNotice: (msg: string
                         </button>
                       </div>
                     ) : (
-                      <button
+                      <button type="button"
                         onClick={() => handleEdit(s)}
                         className="ml-auto inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/50"
                       >

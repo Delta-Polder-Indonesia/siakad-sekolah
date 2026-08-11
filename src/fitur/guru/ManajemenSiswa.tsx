@@ -122,7 +122,7 @@ export default function StudentManagement() {
             Kelola data profil, nomor induk, beserta akun akses siswa per kelas binaan Anda.
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={openAddModal}
           className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-800 sm:self-end"
         >
@@ -244,7 +244,7 @@ export default function StudentManagement() {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <button
+                      <button type="button"
                         onClick={() => openEditModal(student)}
                         className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
                         title="Ubah Data"
@@ -254,13 +254,13 @@ export default function StudentManagement() {
 
                       {deleteConfirm === student.id ? (
                         <div className="flex items-center gap-1.5">
-                          <button
+                          <button type="button"
                             onClick={() => handleDelete(student.id)}
                             className="rounded-md border-2 border-rose-600 bg-rose-600 px-2 py-1 text-[10px] font-bold text-white transition hover:bg-rose-700"
                           >
                             Ya
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => setDeleteConfirm(null)}
                             className="rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition hover:bg-neutral-100"
                           >
@@ -268,7 +268,7 @@ export default function StudentManagement() {
                           </button>
                         </div>
                       ) : (
-                        <button
+                        <button type="button"
                           onClick={() => setDeleteConfirm(student.id)}
                           className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-rose-600 hover:bg-rose-50 hover:text-rose-600"
                           title="Hapus Data"
@@ -317,7 +317,7 @@ export default function StudentManagement() {
                 )}
                 {editingStudent ? 'Sunting Berkas Siswa' : 'Registrasi Siswa Baru'}
               </h2>
-              <button
+              <button type="button"
                 onClick={() => setShowModal(false)}
                 className="rounded-md border-2 border-black bg-white p-1.5 text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
               >
@@ -401,13 +401,13 @@ export default function StudentManagement() {
 
             {/* Footer Aksi Modal */}
             <div className="flex justify-end gap-2.5 border-t-2 border-black bg-white p-4">
-              <button
+              <button type="button"
                 onClick={() => setShowModal(false)}
                 className="rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
               >
                 Batal
               </button>
-              <button
+              <button type="button"
                 onClick={handleSave}
                 className="rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition hover:bg-neutral-800"
               >

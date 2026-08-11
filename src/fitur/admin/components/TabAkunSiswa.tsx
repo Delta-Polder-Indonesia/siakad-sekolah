@@ -601,13 +601,13 @@ export default function TabAkunSiswa() {
                     </td>
                     <td className="p-2.5 text-center">
                       <div className="flex items-center justify-center gap-1.5">
-                        <button
+                        <button type="button"
                           onClick={() => handleSaveStudent(student.id)}
                           className="rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
                         >
                           Simpan
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => openStatusModal(student)}
                           title="Ubah status mutasi siswa"
                           className="inline-flex items-center gap-1 rounded-md border-2 border-blue-600 bg-white px-2.5 py-1 text-[10px] font-bold text-blue-600 transition-colors hover:bg-neutral-100"
@@ -615,14 +615,14 @@ export default function TabAkunSiswa() {
                           <UserCog className="h-3 w-3" />
                           Mutasi
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => setHistoryStudentId(student.id)}
                           className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                         >
                           <History className="h-3 w-3" />
                           Log
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => handleDeleteStudent(student.id)}
                           className="inline-flex items-center gap-1 rounded-md border-2 border-rose-600 bg-white px-2.5 py-1 text-[10px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
                         >
@@ -661,13 +661,13 @@ export default function TabAkunSiswa() {
             <div className="flex flex-wrap items-center gap-1.5">
               {mutationRows.length > 0 ? (
                 <>
-                  <button
+                  <button type="button"
                     onClick={handleExportMutationsCsv}
                     className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                   >
                     <Download className="h-3.5 w-3.5" /> CSV
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleExportMutationsPdf}
                     className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                   >
@@ -677,7 +677,7 @@ export default function TabAkunSiswa() {
               ) : null}
               {selectedHistoryStudent.status === 'pindah' ||
               selectedHistoryStudent.status === 'keluar' ? (
-                <button
+                <button type="button"
                   onClick={handleExportSuratMutasi}
                   className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-600 bg-white px-2.5 py-1 text-[10px] font-bold text-emerald-600 transition-colors hover:bg-neutral-100"
                 >
@@ -829,13 +829,13 @@ export default function TabAkunSiswa() {
               </label>
             </div>
             <div className="flex justify-end gap-2 border-t-2 border-black/10 bg-neutral-50 p-3">
-              <button
+              <button type="button"
                 onClick={() => setStatusModal(null)}
                 className="rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
               >
                 Batal
               </button>
-              <button
+              <button type="button"
                 onClick={handleSetStatus}
                 className="rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
               >

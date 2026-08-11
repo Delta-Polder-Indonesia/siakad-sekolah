@@ -55,13 +55,13 @@ export function PendingLoansTable({ loans, books, onApprove, onReject }: Pending
                 <td className="px-3 py-2.5 font-mono text-[10px] text-black/70">{tx.borrowDate}</td>
                 <td className="px-3 py-2.5 text-right">
                   <div className="flex justify-end gap-2">
-                    <button
+                    <button type="button"
                       onClick={() => onApprove(tx.id)}
                       className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
                     >
                       <Check className="h-3.5 w-3.5" /> SETUJUI
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => onReject(tx.id)}
                       className="flex items-center gap-1.5 rounded-md border-2 border-rose-600 bg-white px-3 py-1 text-[10px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
                     >

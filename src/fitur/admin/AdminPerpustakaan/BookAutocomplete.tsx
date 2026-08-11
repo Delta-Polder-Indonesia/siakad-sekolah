@@ -169,7 +169,7 @@ export function BookAutocomplete({
           </div>
         )}
       </div>
-      <button
+      <button type="button"
         onClick={onAdd}
         disabled={!selectedId}
         className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900 disabled:cursor-not-allowed disabled:border-black disabled:bg-neutral-100 disabled:text-black/40"

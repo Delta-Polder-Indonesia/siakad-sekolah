@@ -68,7 +68,7 @@ export default function Berita() {
           />
         </div>
         <div className="flex gap-2">
-          <button
+          <button type="button"
             onClick={() => setFilterKategori('')}
             className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
               !filterKategori
@@ -79,7 +79,7 @@ export default function Berita() {
             Semua
           </button>
           {kategoris.map((k) => (
-            <button
+            <button type="button"
               key={k}
               onClick={() => setFilterKategori(k)}
               className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${

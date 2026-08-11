@@ -424,13 +424,13 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                         </p>
                       </div>
                       <div className="flex justify-end gap-1.5">
-                        <button
+                        <button type="button"
                           onClick={() => setShowConfirm(false)}
                           className="rounded-md border-2 border-black bg-white px-2.5 py-1 text-[10px] font-bold text-black transition-colors hover:bg-neutral-100"
                         >
                           Batal
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => handleExecuteSave(selectedTeacher.id)}
                           className="rounded-md border-2 border-black bg-black px-2.5 py-1 text-[10px] font-bold text-white transition-colors hover:bg-neutral-900"
                         >
@@ -440,7 +440,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                     </div>
                   )}
 
-                  <button
+                  <button type="button"
                     onClick={() => preCheckValidation(selectedTeacher.id)}
                     disabled={showConfirm}
                     className={`inline-flex items-center gap-1.5 rounded-md border-2 px-4 py-2 text-xs font-bold transition-colors ${

@@ -46,7 +46,7 @@ export default function MasterAnggota() {
       </div>
 
       <div className="p-4">
-        <button
+        <button type="button"
           onClick={() => {
             setShowForm(true);
             setEditingId(null);
@@ -114,7 +114,7 @@ export default function MasterAnggota() {
                   </td>
                   <td className="px-3 py-2.5">
                     <div className="flex gap-1">
-                      <button
+                      <button type="button"
                         onClick={() => {
                           setShowForm(true);
                           setEditingId(item.id);
@@ -123,7 +123,7 @@ export default function MasterAnggota() {
                       >
                         <Pencil className="h-3 w-3" /> Edit
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(item.id)}
                         className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                       >

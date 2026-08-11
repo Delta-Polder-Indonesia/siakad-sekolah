@@ -234,13 +234,13 @@ export function FormPeminjaman({
           </div>
 
           <div className="flex justify-end gap-2 border-t-2 border-black/10 pt-4">
-            <button
+            <button type="button"
               onClick={handleReset}
               className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
             >
               <X className="h-3.5 w-3.5" /> Reset
             </button>
-            <button
+            <button type="button"
               onClick={handleProcess}
               className="flex items-center gap-2 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
             >
@@ -274,13 +274,13 @@ export function FormPeminjaman({
               className="w-full resize-none rounded-md border-2 border-black bg-white px-2.5 py-2 text-xs font-bold text-black transition-colors outline-none placeholder:text-black/40 hover:border-blue-600 focus:border-blue-600"
             />
             <div className="mt-4 flex justify-end gap-2">
-              <button
+              <button type="button"
                 onClick={() => setRejectTargetId(null)}
                 className="rounded-md border-2 border-black bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
               >
                 Batal
               </button>
-              <button
+              <button type="button"
                 onClick={handleConfirmReject}
                 className="rounded-md border-2 border-rose-600 bg-rose-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-700"
               >

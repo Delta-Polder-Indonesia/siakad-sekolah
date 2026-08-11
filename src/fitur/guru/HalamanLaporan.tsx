@@ -345,7 +345,7 @@ export default function ReportPage() {
           {(reportData.length > 0 || (reportMode === 'monthly' && kelasRekap.length > 0)) && (
             <div className="flex items-center gap-2">
               {reportMode === 'monthly' && kelasRekap.length > 0 && (
-                <button
+                <button type="button"
                   onClick={handleExportKelasCSV}
                   className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-black transition-colors hover:border-blue-600 hover:text-blue-600"
                 >
@@ -354,13 +354,13 @@ export default function ReportPage() {
               )}
               {reportData.length > 0 && (
                 <>
-                  <button
+                  <button type="button"
                     onClick={handleExportCSV}
                     className="flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 font-mono text-xs font-bold tracking-wide text-white transition-colors hover:bg-neutral-800"
                   >
                     <Download className="h-3.5 w-3.5" /> CSV
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const className = classes.find((c) => c.id === selectedClass)?.name || '';
                       exportAbsensiPdf(

@@ -70,7 +70,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
     return (
       <div className="rounded-md border-2 border-dashed border-black bg-white p-8 text-center">
         <p className="text-xs font-bold text-black">Buku tidak ditemukan</p>
-        <button
+        <button type="button"
           onClick={onBack}
           className="mt-4 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
         >
@@ -142,7 +142,7 @@ export default function PerpusDetailBuku({ bookId, onBack }: PerpusDetailBukuPro
           </div>
 
           {/* Back Button */}
-          <button
+          <button type="button"
             onClick={onBack}
             className="mt-5 flex items-center gap-2 rounded-md border-2 border-black bg-black px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
           >

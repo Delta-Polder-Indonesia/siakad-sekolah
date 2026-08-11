@@ -18,7 +18,7 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
           {/* Banner / Judul Utama */}
           <div className="relative mb-6 border-b-4 border-double border-gray-900 pt-14 pb-5 text-center md:pt-10">
             <div className="absolute top-14 right-0 z-10 md:top-10">
-              <button
+              <button type="button"
                 onClick={onClose}
                 className="mr-0 cursor-pointer text-sm font-medium text-slate-700 transition hover:text-slate-900"
               >

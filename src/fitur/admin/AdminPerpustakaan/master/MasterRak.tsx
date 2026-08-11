@@ -88,7 +88,7 @@ export default function MasterRak() {
                         <button className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100">
                           <Pencil className="h-3 w-3" /> Edit
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => handleDelete(item.kode)}
                           className="flex items-center gap-1 rounded-md border-2 border-black bg-white px-2 py-1 text-[10px] font-bold text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                         >

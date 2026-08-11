@@ -693,7 +693,7 @@ export default function InputRapotGuru() {
                         MATA PELAJARAN
                       </span>
                       <span className="text-black">|</span>
-                      <button
+                      <button type="button"
                         onClick={() =>
                           exportRapotPdf(
                             nilaiSiswa,
@@ -708,7 +708,7 @@ export default function InputRapotGuru() {
                       >
                         <Download className="h-3 w-3" /> PDF
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() =>
                           exportRapotCsv(
                             nilaiSiswa,

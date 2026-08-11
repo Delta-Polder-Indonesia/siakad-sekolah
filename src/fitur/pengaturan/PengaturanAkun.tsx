@@ -387,7 +387,7 @@ export default function PengaturanAkun() {
         {error && <p className="text-sm text-red-600">{error}</p>}
         {message && <p className="text-sm text-emerald-600">{message}</p>}
 
-        <button
+        <button type="button"
           onClick={user.role === 'teacher' ? handleSaveTeacher : handleSaveStudent}
           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
         >

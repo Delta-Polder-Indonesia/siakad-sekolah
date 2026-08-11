@@ -44,7 +44,7 @@ export function SelectedBooksTable({ books, onRemove }: SelectedBooksTableProps)
                 {book.qty}
               </td>
               <td className="px-3 py-2 text-center">
-                <button
+                <button type="button"
                   onClick={() => onRemove(book.id)}
                   className="rounded-md border-2 border-rose-600 bg-white p-1 text-rose-600 transition-colors hover:bg-rose-50"
                   title="Hapus buku"

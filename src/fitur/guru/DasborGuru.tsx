@@ -26,7 +26,7 @@ import {
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import HalamanRpsGuru from './HalamanRpsGuru';
 import { PageProps } from '../../types';
-import { Skeleton, TableSkeleton, DonutChart, BarChart, QuickActions } from '../../components/ui';
+import { Skeleton, TableSkeleton, DonutChart, BarChart, QuickActions, StatCard } from '../../components/ui';
 
 type JadwalHariIni = {
   no: number;
@@ -167,18 +167,7 @@ export default function DasborGuru({ onNavigate }: PageProps) {
               'Alpa',
               'Belum Presensi',
             ].map((label) => (
-              <div
-                key={label}
-                className="flex min-h-[74px] flex-col justify-between rounded-md border-2 border-black bg-white p-2.5"
-              >
-                <div className="flex items-center justify-between border-b-2 border-black/10 pb-1">
-                  <Skeleton className="h-3 w-24" />
-                  <Skeleton className="h-3.5 w-3.5 rounded" />
-                </div>
-                <div className="mt-1 flex justify-center">
-                  <Skeleton className="h-6 w-12" />
-                </div>
-              </div>
+              <StatCard key={label} label={label} loading />
             ))}
           </>
         ) : (
@@ -201,28 +190,13 @@ export default function DasborGuru({ onNavigate }: PageProps) {
                 alert: stats.todayBelum > 0,
               },
             ].map((card) => (
-              <div
+              <StatCard
                 key={card.label}
-                className="flex min-h-[74px] flex-col justify-between rounded-md border-2 border-black bg-white p-2.5"
-              >
-                <div className="flex items-center justify-between border-b-2 border-black/10 pb-1">
-                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
-                    {card.label}
-                  </span>
-                  <card.icon
-                    className={`h-3.5 w-3.5 ${card.alert ? 'text-rose-600' : 'text-black'}`}
-                  />
-                </div>
-                <div className="mt-1 text-center">
-                  <p
-                    className={`text-xl leading-tight font-bold text-black ${
-                      card.alert ? 'text-rose-700' : ''
-                    }`}
-                  >
-                    {card.value}
-                  </p>
-                </div>
-              </div>
+                label={card.label}
+                value={card.value}
+                icon={card.icon}
+                alert={card.alert}
+              />
             ))}{' '}
           </>
         )}

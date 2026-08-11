@@ -172,7 +172,7 @@ export default function KotakSuratGuru() {
             <span className="text-[10px] font-bold tracking-wider text-black uppercase">
               Arsip Kalender
             </span>
-            <button
+            <button type="button"
               onClick={() => setShowCalendar((prev) => !prev)}
               className="mt-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-black bg-white px-2 py-1 font-mono text-xs font-bold text-black uppercase transition-colors outline-none hover:border-blue-600 hover:bg-neutral-100 hover:text-blue-600"
             >
@@ -190,7 +190,7 @@ export default function KotakSuratGuru() {
                   Arsip Bulanan
                 </h2>
                 <div className="flex items-center gap-1">
-                  <button
+                  <button type="button"
                     onClick={() => navigateMonth(-1)}
                     className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                   >
@@ -199,7 +199,7 @@ export default function KotakSuratGuru() {
                   <span className="min-w-[100px] text-center text-[10px] font-bold text-black uppercase">
                     {monthLabel}
                   </span>
-                  <button
+                  <button type="button"
                     onClick={() => navigateMonth(1)}
                     className="cursor-pointer rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:border-blue-600 hover:bg-neutral-100"
                   >
@@ -225,7 +225,7 @@ export default function KotakSuratGuru() {
                 {calendarData.weeks.map((week, wIdx) => (
                   <div key={`${selectedMonth}_${wIdx}`} className="grid grid-cols-7 gap-1">
                     {week.map((day, dIdx) => (
-                      <button
+                      <button type="button"
                         key={`${day.date}_${dIdx}`}
                         disabled={day.day === 0}
                         onClick={() => {
@@ -262,7 +262,7 @@ export default function KotakSuratGuru() {
               </div>
 
               {selectedDate && (
-                <button
+                <button type="button"
                   onClick={() => {
                     setSelectedDate(null);
                     setSelectedLetterId('');
@@ -285,7 +285,7 @@ export default function KotakSuratGuru() {
             Filter Status:
           </span>
 
-          <button
+          <button type="button"
             onClick={() => {
               setSelectedStatus('semua');
               setSelectedLetterId('');
@@ -300,7 +300,7 @@ export default function KotakSuratGuru() {
           </button>
 
           {(['menunggu', 'disetujui', 'ditolak'] as const).map((status) => (
-            <button
+            <button type="button"
               key={status}
               onClick={() => {
                 setSelectedStatus(status);

@@ -138,7 +138,7 @@ export default function TeacherProfilePage() {
             )}
             <p className="text-xs font-bold">{message.text}</p>
           </div>
-          <button onClick={() => setMessage(null)} className="transition-opacity hover:opacity-70">
+          <button type="button" onClick={() => setMessage(null)} className="transition-opacity hover:opacity-70">
             <X className="h-4 w-4" />
           </button>
         </div>

@@ -187,7 +187,7 @@ export default function PesanMasuk() {
             </div>
           ) : (
             filteredUsers.map((u) => (
-              <button
+              <button type="button"
                 key={u.id}
                 onClick={() => {
                   setActiveChatId(u.id);

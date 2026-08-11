@@ -47,7 +47,7 @@ export default function ConfirmModal({
         aria-labelledby="confirm-modal-title"
         className="relative z-10 mx-4 w-full max-w-sm rounded-md border-2 border-black bg-white p-5"
       >
-        <button
+        <button type="button"
           onClick={onCancel}
           className="absolute top-3 right-3 rounded-md border-2 border-black bg-white p-1 text-black transition-colors hover:bg-neutral-100"
           aria-label="Tutup"
@@ -76,13 +76,13 @@ export default function ConfirmModal({
         <p className="mb-5 text-xs leading-relaxed font-bold text-black">{message}</p>
 
         <div className="flex justify-end gap-2">
-          <button
+          <button type="button"
             onClick={onCancel}
             className="rounded-md border-2 border-black bg-white px-4 py-1.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
           >
             {cancelLabel}
           </button>
-          <button
+          <button type="button"
             onClick={onConfirm}
             className={`rounded-md border-2 px-4 py-1.5 text-xs font-bold transition-colors ${
               variant === 'danger'

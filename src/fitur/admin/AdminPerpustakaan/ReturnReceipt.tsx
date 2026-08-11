@@ -31,7 +31,7 @@ export function ReturnReceipt({ struk }: ReturnReceiptProps) {
   };
 
   return (
-    <button
+    <button type="button"
       onClick={handlePrint}
       className="flex items-center gap-1.5 rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-neutral-900"
     >

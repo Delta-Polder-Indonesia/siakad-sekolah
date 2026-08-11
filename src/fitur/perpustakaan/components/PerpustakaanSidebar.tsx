@@ -60,7 +60,7 @@ const NavItem: React.FC<{
   badge?: number;
   onClick: () => void;
 }> = ({ item, isActive, badge, onClick }) => (
-  <button
+  <button type="button"
     onClick={onClick}
     aria-current={isActive ? 'page' : undefined}
     className={[
@@ -181,7 +181,7 @@ export default function PerpustakaanSidebar({
             <span className="mb-2 block px-1 text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
               Penanda Buku
             </span>
-            <button
+            <button type="button"
               onClick={() => onChangeTab('keranjang')}
               aria-current={activeTab === 'keranjang' ? 'page' : undefined}
               className={[
@@ -232,7 +232,7 @@ export default function PerpustakaanSidebar({
             item.key === 'pinjaman' ? pendingCount : item.key === 'keranjang' ? cartCount : 0;
 
           return (
-            <button
+            <button type="button"
               key={item.key}
               onClick={() => onChangeTab(item.key)}
               aria-current={isActive ? 'page' : undefined}

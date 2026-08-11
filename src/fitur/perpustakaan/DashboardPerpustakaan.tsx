@@ -303,7 +303,7 @@ export default function DashboardPerpustakaan({
             </div>
 
             <div className="flex items-center gap-1 border-l border-neutral-200 pl-3">
-              <button
+              <button type="button"
                 onClick={onBackToPortal}
                 aria-label="Kembali ke Portal Akademik"
                 className="flex items-center gap-1.5 rounded px-2 py-1.5 text-xs font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
@@ -311,7 +311,7 @@ export default function DashboardPerpustakaan({
                 <LayoutDashboard className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="hidden sm:inline">Portal</span>
               </button>
-              <button
+              <button type="button"
                 onClick={onLogout}
                 aria-label="Keluar dari Perpustakaan"
                 className="flex items-center gap-1.5 rounded px-2 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:text-red-800"

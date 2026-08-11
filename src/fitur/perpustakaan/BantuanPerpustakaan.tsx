@@ -301,7 +301,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
           {/* FIX #14 — Hapus px-24 kaku, ganti dengan text-center murni */}
           <div className="relative mb-6 border-b-4 border-double border-gray-900 pt-12 pb-5 text-center sm:pt-10">
             {/* FIX #6 — aria-label deskriptif */}
-            <button
+            <button type="button"
               onClick={onClose}
               aria-label="Tutup halaman bantuan perpustakaan"
               className="absolute top-3 right-0 flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-gray-900 bg-white px-3 py-2 text-xs font-bold tracking-wider text-gray-900 uppercase transition hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:outline-none"
@@ -347,7 +347,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
             {TAB_CONFIG.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
-                <button
+                <button type="button"
                   key={tab.id}
                   role="tab"
                   aria-selected={isActive}
@@ -398,7 +398,7 @@ export default function BantuanPerpustakaan({ onClose }: BantuanPerpustakaanProp
                    */
                   <div key={faq.id} className="rounded-xl border border-gray-200 bg-gray-50">
                     <dt>
-                      <button
+                      <button type="button"
                         id={triggerId}
                         onClick={() => toggleFaq(faq.id)}
                         aria-expanded={isOpen}

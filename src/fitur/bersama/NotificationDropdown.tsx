@@ -71,7 +71,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
     >
       <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
         <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase">Notifikasi</h3>
-        <button
+        <button type="button"
           onClick={handleMarkAllRead}
           className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800"
         >
@@ -89,7 +89,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
             const Icon = TYPE_ICONS[item.type];
             const isNew = newKeys.includes(item.itemKey);
             return (
-              <button
+              <button type="button"
                 key={item.id}
                 onClick={() => handleClickItem(item)}
                 className={`flex w-full items-start gap-3 border-b border-slate-100 px-4 py-2.5 text-left transition-colors hover:bg-slate-50 ${
@@ -112,7 +112,7 @@ export default function NotificationDropdown({ onNavigate, onClose }: Notificati
       </div>
 
       <div className="border-t border-slate-200 px-4 py-2 text-center">
-        <button
+        <button type="button"
           onClick={() => {
             onNavigate('school-announcements');
             onClose();
