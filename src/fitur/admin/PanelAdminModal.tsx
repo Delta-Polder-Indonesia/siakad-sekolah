@@ -35,6 +35,7 @@ import TabPengumumanAdmin from './components/TabPengumumanAdmin';
 import TabAkunSiswa from './components/TabAkunSiswa';
 import TabAkunOrangTua from './components/TabAkunOrangTua';
 import TabSetupSekolah from './components/TabSetupSekolah';
+import TabDataSekolah from './components/TabDataSekolah';
 import TabKelolaRoster from './components/TabKelolaRoster';
 import TabRiwayatLogin from './components/TabRiwayatLogin';
 import TabMasterAkademik from './components/TabMasterAkademik';
@@ -57,6 +58,7 @@ type TeacherAdminTab =
   | 'akun-siswa'
   | 'akun-orang-tua'
   | 'setup-sekolah'
+  | 'data-sekolah'
   | 'kelola-roster'
   | 'riwayat-login'
   | 'ppdb-admin'
@@ -130,7 +132,10 @@ const MENU_MASTER_GROUPS = [
   },
   {
     title: 'Sistem',
-    items: [{ id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings }],
+    items: [
+      { id: 'setup-sekolah', label: 'Setup Sekolah', icon: Settings },
+      { id: 'data-sekolah', label: 'Data Sekolah', icon: Database },
+    ],
   },
 ] as const;
 
@@ -385,6 +390,7 @@ export default function AdminMasterPanel({ scope, open, onClose }: AdminGuruPane
               )}
               {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
               {activeTab === 'setup-sekolah' && <TabSetupSekolah setNotice={handleNotice} />}
+              {activeTab === 'data-sekolah' && <TabDataSekolah setNotice={handleNotice} />}
 
               {/* Menu Perpustakaan */}
               <Suspense

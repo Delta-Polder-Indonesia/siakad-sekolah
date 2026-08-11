@@ -434,4 +434,37 @@ Prioritas bergeser dari "sambungkan backend" → **"gampang di-branding & disetu
 - Perubahan jenjang penuh yang mengubah struktur konten (SD→SMK) tetap butuh build
   ulang (ubah `jenjang` di `dataSekolah.ts`); setelan jenjang di panel untuk identitas.
 
+---
+
+## 12. Template Universal — Data Sekolah: Ekspor / Impor / Reset ✅
+
+**Tujuan:** "pindah sekolah" dalam hitungan menit — sekolah pembeli tinggal
+impor data lama, tanpa input manual.
+
+### Fitur baru (menu admin → Sistem → Data Sekolah)
+1. **Ekspor Data Master** → unduh JSON berisi guru, siswa, kelas, roster
+   (`data-master-sekolah-YYYY-MM-DD.json`). Bisa untuk cadangan atau pindah instalasi.
+2. **Impor Data Master** → unggah file hasil ekspor; validasi struktur & field
+   wajib (id/name/nip/nis/classId); password polos otomatis di-hash (yang sudah
+   hash 64-hex dipertahankan); koleksi master DIGANTI total; ringkasan hasil
+   (jumlah guru/siswa/kelas/roster) ditampilkan.
+3. **Reset / Kosongkan Data**:
+   - `Reset ke Data Demo` → factory reset (seed contoh bawaan lagi)
+   - `Kosongkan Semua Data` → database kosong, siap diisi sekolah pembeli
+   - Keduanya menjaga **identitas sekolah** (config/school) tetap utuh.
+
+### Catatan teknis
+- Logika murni di `src/data/store/core/dataTools.ts` (bisa diuji unit).
+- Semua key localStorage aplikasi dibersihkan saat reset (`APP_STORAGE_KEYS`).
+- Setelah reset, aplikasi reload otomatis agar semua komponen konsisten.
+
+### Test baru (+9)
+- `dataTools.test.ts` (8): ekspor valid, impor+ganti+hashing, hash dipertahankan,
+  tolak file bukan SIAKAD, tolak data tak lengkap, reset empty, reset demo,
+  collectMasterData.
+- `TabDataSekolah.test.tsx` (1 render): 3 section tampil.
+
+### Verifikasi
+- FE: 288 test (27 file) ✅ · lint 0 error ✅ · build ✅
+
 *Laporan dibuat otomatis dari hasil analisis & perbaikan langsung di workspace. Semua perubahan ada di folder `siakad-sekolah/` (belum di-commit — silakan review lalu commit sendiri).*
