@@ -46,17 +46,6 @@ export default defineConfig(({ command }) => ({
   preview: {
     host: true,
     allowedHosts: true,
-    configurePreviewServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (req.url === '/' || req.url === '') {
-          res.statusCode = 302;
-          res.setHeader('Location', '/siakad-sekolah/');
-          res.end();
-          return;
-        }
-        next();
-      });
-    },
   },
 
   server: {
