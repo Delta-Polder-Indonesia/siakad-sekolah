@@ -39,8 +39,7 @@ export default function HeroBanner({
           src={`${import.meta.env.BASE_URL}${imageSrc}`}
           alt={imageAlt}
           className="h-full w-full object-cover"
-          onError={handleImageError}
-        />
+          onError={handleImageError}  loading="lazy" decoding="async" />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-slate-50 text-sm font-bold tracking-wider text-slate-400 uppercase">
           Dokumentasi

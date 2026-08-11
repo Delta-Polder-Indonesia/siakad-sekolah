@@ -190,8 +190,7 @@ export default function Fasilitas() {
                   <img
                     src={item.foto}
                     alt={item.nama}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"  loading="lazy" decoding="async" />
                   <div className="absolute inset-0 bg-slate-950/20" />
                   <span className="absolute top-3 left-3 border border-slate-900 bg-slate-950 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase">
                     {item.kategori}

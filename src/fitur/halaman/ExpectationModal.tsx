@@ -680,8 +680,7 @@ export default function ExpectationModal({
                           <img
                             src={`${import.meta.env.BASE_URL}images/logo/gambar-2.svg`}
                             alt={`Logo ${namaSekolahUppercase}`}
-                            className="h-full w-full object-cover"
-                          />
+                            className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                         </div>
                         <div>
                           <h1
@@ -765,8 +764,7 @@ export default function ExpectationModal({
                       alt={hero.title}
                       className="absolute inset-0 h-full w-full object-cover object-center"
                       draggable="false"
-                      decoding="async"
-                    />
+                      decoding="async" loading="lazy" />
 
                     <div
                       className="absolute inset-0 z-[1]"

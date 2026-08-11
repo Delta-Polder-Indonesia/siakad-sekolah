@@ -89,8 +89,7 @@ export default function Facility05Page({ onNavigate }: PageProps) {
             <img
               src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
               alt={`Logo Resmi ${namaSekolah}`}
-              className="h-full w-full object-cover"
-            />
+              className="h-full w-full object-cover"  loading="lazy" decoding="async" />
           </div>
         </div>
       </header>

@@ -91,8 +91,7 @@ export default function MuseumPerkebunan({ onBack, onOpenWisata }: Props) {
         <img
           src="https://konten.usu.ac.id/storage/satker/0/statis/fasilitas/mpi_1.webp?w=16&q=75"
           alt="Banner Museum Perkebunan Indonesia"
-          className="absolute top-0 right-0 h-full w-full object-cover object-center md:w-1/2"
-        />
+          className="absolute top-0 right-0 h-full w-full object-cover object-center md:w-1/2"  loading="lazy" decoding="async" />
 
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#006535] via-[#2DB24A] via-50% to-transparent" />
 
@@ -206,8 +205,7 @@ export default function MuseumPerkebunan({ onBack, onOpenWisata }: Props) {
               <img
                 src="https://konten.usu.ac.id/storage/satker/0/icons/flower-sec2.svg"
                 alt="Icon Bunga"
-                className="h-6 w-6"
-              />
+                className="h-6 w-6"  loading="lazy" decoding="async" />
             </div>
             <h2 className="py-2 text-lg font-semibold text-white">Informasi Lainnya</h2>
           </div>
@@ -272,8 +270,7 @@ export default function MuseumPerkebunan({ onBack, onOpenWisata }: Props) {
                 <img
                   src="https://konten.usu.ac.id/storage/satker/0/icons/flower-sec2.svg"
                   alt="Icon Bunga"
-                  className="h-6 w-6"
-                />
+                  className="h-6 w-6"  loading="lazy" decoding="async" />
               </div>
               <h2 className="py-2 text-lg font-semibold text-white">Wisata Lainnya</h2>
             </div>
@@ -306,8 +303,7 @@ export default function MuseumPerkebunan({ onBack, onOpenWisata }: Props) {
                   <img
                     src={item.img}
                     alt={item.name}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"  loading="lazy" decoding="async" />
                 </div>
                 <div className="flex flex-1 flex-col gap-2 p-4 transition-colors duration-300 group-hover:bg-[#008244]">
                   <p className="text-sm font-semibold text-slate-800 group-hover:text-white">

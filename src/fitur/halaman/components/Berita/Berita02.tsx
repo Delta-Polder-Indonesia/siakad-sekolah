@@ -43,8 +43,7 @@ export default function Berita02Page({ onNavigate }: PageProps) {
               <img
                 src={`${import.meta.env.BASE_URL}images/logo/gambar-2.svg`}
                 alt={`Logo ${namaSekolahUppercase}`}
-                className="h-full w-full object-cover"
-              />
+                className="h-full w-full object-cover"  loading="lazy" decoding="async" />
             </div>
             <div>
               <h1 className="text-sm leading-tight font-bold tracking-tight text-white drop-shadow-md md:text-base lg:text-lg">

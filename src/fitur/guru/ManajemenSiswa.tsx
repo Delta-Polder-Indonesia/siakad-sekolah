@@ -210,8 +210,7 @@ export default function StudentManagement() {
                         <img
                           src={student.avatar}
                           alt={`Foto ${student.name}`}
-                          className="h-8 w-8 rounded-md border-2 border-black object-cover"
-                        />
+                          className="h-8 w-8 rounded-md border-2 border-black object-cover"  loading="lazy" decoding="async" />
                       ) : (
                         <div
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-2 border-black text-xs font-bold text-white ${

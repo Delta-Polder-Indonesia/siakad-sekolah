@@ -161,7 +161,7 @@ export default function TeacherProfilePage() {
             {/* Avatar Upload */}
             <div className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-md border-4 border-black bg-white md:h-28 md:w-28">
               {avatarPreview ? (
-                <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
+                <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover"  loading="lazy" decoding="async" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-black text-2xl font-bold text-white">
                   {(teacher?.name || '?').charAt(0).toUpperCase()}

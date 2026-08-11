@@ -84,8 +84,7 @@ export default function EkstrakurikulerSection({ onOpenEkskul }: Ekstrakurikuler
       <img
         src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/IconSiswaBaru/ukm-climbing.png`}
         alt="Aktivitas Ekstrakurikuler"
-        className="pointer-events-none absolute top-0 right-0 h-full object-cover opacity-10 max-lg:w-[320px] md:opacity-100"
-      />
+        className="pointer-events-none absolute top-0 right-0 h-full object-cover opacity-10 max-lg:w-[320px] md:opacity-100"  loading="lazy" decoding="async" />
 
       <div className="relative z-10 grid gap-8 lg:grid-cols-2 2xl:gap-16">
         {/* Kolom Kiri */}

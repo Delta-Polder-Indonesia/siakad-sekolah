@@ -57,7 +57,7 @@ const riwayatItems: RiwayatItem[] = [
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
   <div className="flex w-fit items-stretch">
     <div className="flex items-center bg-[#42ac35] p-1">
-      <img src={FLOWER_SEC2} alt="" width={32} height={32} className="h-8 w-8" />
+      <img src={FLOWER_SEC2} alt="" width={32} height={32} className="h-8 w-8"  loading="lazy" decoding="async" />
     </div>
     <h2 className="flex-1 bg-[#006633] px-4 py-2 text-xl leading-7 font-semibold text-white">
       {children}
@@ -176,7 +176,7 @@ export default function ProfileKepsek() {
                   aria-hidden
                   className="pointer-events-none absolute right-0 bottom-0 z-[2] h-1/2 w-1/2 opacity-50"
                 >
-                  <img src={FLOWER_BG} alt="" className="h-full w-full object-cover" />
+                  <img src={FLOWER_BG} alt="" className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                 </div>
                 <div className="relative z-10 flex flex-col items-center gap-1 md:items-start">
                   <p className="text-lg leading-[1.875rem] font-semibold text-[#006535] xl:text-xl">

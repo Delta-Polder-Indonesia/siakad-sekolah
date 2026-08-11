@@ -134,8 +134,7 @@ export default function PengumumanSekolah() {
               <img
                 src={previewImage.src}
                 alt={previewImage.title}
-                className="h-auto max-h-[75vh] w-auto rounded object-contain"
-              />
+                className="h-auto max-h-[75vh] w-auto rounded object-contain"  loading="lazy" decoding="async" />
             </div>
           </div>
         </div>

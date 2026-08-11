@@ -256,8 +256,7 @@ export default function RapotSiswa() {
                 <img
                   src={student.avatar}
                   alt=""
-                  className="h-7 w-7 shrink-0 rounded-md border border-white bg-white object-cover"
-                />
+                  className="h-7 w-7 shrink-0 rounded-md border border-white bg-white object-cover"  loading="lazy" decoding="async" />
               ) : (
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white bg-white text-black">
                   <User className="h-4 w-4" />

@@ -61,8 +61,7 @@ export default function BeasiswaSection({ onOpenBeasiswa }: BeasiswaSectionProps
               alt="Ornamen Beasiswa"
               width={32}
               height={32}
-              className="h-8 w-8"
-            />
+              className="h-8 w-8"  loading="lazy" decoding="async" />
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Beasiswa</h2>
           </div>
 

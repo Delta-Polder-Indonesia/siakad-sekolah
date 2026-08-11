@@ -84,8 +84,7 @@ export default function KatamsoLand({ onBack, onOpenWisata }: Props) {
         <img
           src="https://konten.usu.ac.id/storage/satker/0/statis/fasilitas/katamsoland_1.webp"
           alt="Katamso Land"
-          className="absolute top-0 right-0 h-full w-full object-cover object-right md:w-3/5"
-        />
+          className="absolute top-0 right-0 h-full w-full object-cover object-right md:w-3/5"  loading="lazy" decoding="async" />
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#006535] via-[#2DB24A] via-50% to-transparent" />
         <div className="relative z-20 flex h-full items-center px-4 md:px-14">
           <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
@@ -286,8 +285,7 @@ export default function KatamsoLand({ onBack, onOpenWisata }: Props) {
                   <img
                     src={item.img}
                     alt={item.name}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"  loading="lazy" decoding="async" />
                 </div>
                 <div className="flex flex-1 flex-col gap-2 p-4 transition-colors duration-300 group-hover:bg-[#008244]">
                   <p className="text-sm font-semibold text-slate-800 group-hover:text-white">

@@ -529,8 +529,7 @@ export default function AgendaPage({ onNavigate, isActive }: PageProps & { isAct
             <img
               src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
               alt="Logo"
-              className="h-full w-full object-cover"
-            />
+              className="h-full w-full object-cover"  loading="lazy" decoding="async" />
           </div>
         </div>
       </header>

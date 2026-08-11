@@ -247,8 +247,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
               <img
                 src={fotoPengumumanDataUrl}
                 alt={fotoPengumumanNama || 'Preview foto pengumuman'}
-                className="max-h-44 w-full rounded-md border-2 border-black/10 object-cover"
-              />
+                className="max-h-44 w-full rounded-md border-2 border-black/10 object-cover"  loading="lazy" decoding="async" />
               <div className="mt-2 flex items-center justify-between gap-2">
                 <p className="truncate font-mono text-[10px] font-bold text-black">
                   {fotoPengumumanNama || 'Foto terpilih'}
@@ -398,8 +397,7 @@ export default function TabPengumumanAdmin({ scope }: TabPengumumanAdminProps) {
                   <img
                     src={item.imageDataUrl}
                     alt={item.imageName || item.title}
-                    className="mt-2.5 h-auto max-h-32 w-full rounded-md border-2 border-black object-contain"
-                  />
+                    className="mt-2.5 h-auto max-h-32 w-full rounded-md border-2 border-black object-contain"  loading="lazy" decoding="async" />
                 )}
               </article>
             ))}

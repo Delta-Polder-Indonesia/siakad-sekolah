@@ -150,8 +150,7 @@ export default function FasilitasSection({ onOpenFasilitas }: FasilitasSectionPr
                       <img
                         src={`${baseUrl}${item.imageSrc}`}
                         alt={item.name}
-                        className="h-full w-full object-cover grayscale transition duration-300 group-hover:grayscale-0"
-                      />
+                        className="h-full w-full object-cover grayscale transition duration-300 group-hover:grayscale-0"  loading="lazy" decoding="async" />
                     </div>
 
                     {/* Overlay default putih */}
@@ -215,8 +214,7 @@ export default function FasilitasSection({ onOpenFasilitas }: FasilitasSectionPr
               alt="Ornamen Fasilitas Kampus"
               width={32}
               height={32}
-              className="h-8 w-8"
-            />
+              className="h-8 w-8"  loading="lazy" decoding="async" />
             <h2 className="text-2xl font-bold text-slate-900">Fasilitas Kampus</h2>
           </div>
 

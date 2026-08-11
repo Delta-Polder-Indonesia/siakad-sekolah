@@ -763,8 +763,7 @@ export default function ProfileOrangTuaPage({
                     <img
                       src={parentAvatarPreview}
                       alt="Parent Avatar"
-                      className="h-full w-full object-cover"
-                    />
+                      className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-neutral-200">
                       <User className="h-6 w-6 text-black" />

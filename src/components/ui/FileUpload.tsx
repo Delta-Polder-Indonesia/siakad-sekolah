@@ -47,8 +47,7 @@ function getFileIcon(file: FileUploadFile) {
       <img
         src={file.preview}
         alt={file.file.name}
-        className="h-10 w-10 rounded border border-slate-200 object-cover"
-      />
+        className="h-10 w-10 rounded border border-slate-200 object-cover"  loading="lazy" decoding="async" />
     );
   }
   if (file.file.type.startsWith('image/')) {

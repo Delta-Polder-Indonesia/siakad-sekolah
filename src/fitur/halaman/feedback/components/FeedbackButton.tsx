@@ -16,8 +16,7 @@ export default function FeedbackButton({ onNavigate }: FeedbackButtonProps) {
         <img
           src={`${import.meta.env.BASE_URL}images/Dashboard/hubungikami.png`}
           alt=""
-          className="h-14 w-14 object-contain sm:h-16 sm:w-16"
-        />
+          className="h-14 w-14 object-contain sm:h-16 sm:w-16"  loading="lazy" decoding="async" />
       </button>
     </div>
   );

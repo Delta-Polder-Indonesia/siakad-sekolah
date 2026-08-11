@@ -116,7 +116,7 @@ export function BookAutocomplete({
                   >
                     <div className="flex h-12 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-black bg-white">
                       {book.coverImage ? (
-                        <img src={book.coverImage} alt="" className="h-full w-full object-cover" />
+                        <img src={book.coverImage} alt="" className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                       ) : (
                         <BookOpen className="h-4 w-4 text-black/40" />
                       )}

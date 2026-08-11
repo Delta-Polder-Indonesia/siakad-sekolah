@@ -164,8 +164,7 @@ export default function BookDetailModal({
                   <img
                     src={book.coverImage}
                     alt={`Sampul buku "${book.title}" karya ${book.author}`}
-                    className="h-full w-full object-cover"
-                  />
+                    className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                 ) : (
                   <div
                     className="flex h-full w-full flex-col items-center justify-center text-neutral-300"

@@ -65,8 +65,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
             <img
               src={`${import.meta.env.BASE_URL}images/Dashboard/gambar-3.png`}
               alt="Tut Wuri Handayani"
-              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"
-            />
+              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"  loading="lazy" decoding="async" />
           </a>
 
           <a
@@ -78,8 +77,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
             <img
               src={`${import.meta.env.BASE_URL}images/Dashboard/logo-rumah-pendidikan.png`}
               alt="Rumah Pendidikan"
-              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"
-            />
+              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"  loading="lazy" decoding="async" />
           </a>
 
           <a
@@ -91,8 +89,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
             <img
               src={`${import.meta.env.BASE_URL}images/Dashboard/logo-sekolah-kita-white.svg`}
               alt="Sekolah Kita"
-              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"
-            />
+              className="h-12 w-auto cursor-pointer object-contain transition-opacity hover:opacity-80"  loading="lazy" decoding="async" />
           </a>
         </div>
 
@@ -117,8 +114,7 @@ export default function ProgramFooter({ onNavigate }: FooterProps) {
                   <img
                     src={`${import.meta.env.BASE_URL}images/SosialMedia/${icon}`}
                     alt={label}
-                    className="h-4 w-4 object-contain"
-                  />
+                    className="h-4 w-4 object-contain"  loading="lazy" decoding="async" />
                   <span>{label}</span>
                 </a>
               </li>

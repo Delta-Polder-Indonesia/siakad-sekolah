@@ -95,8 +95,7 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
             <img
               src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
               alt="Logo Instansi"
-              className="h-full w-full object-cover"
-            />
+              className="h-full w-full object-cover"  loading="lazy" decoding="async" />
           </div>
         </div>
       </header>

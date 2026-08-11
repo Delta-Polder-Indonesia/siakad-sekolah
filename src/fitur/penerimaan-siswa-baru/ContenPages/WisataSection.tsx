@@ -204,8 +204,7 @@ export default function WisataSection({ onOpenWisata }: WisataSectionProps) {
                 <img
                   src={item.imgSrc}
                   alt={item.title}
-                  className="h-full w-full object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"
-                />
+                  className="h-full w-full object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0"  loading="lazy" decoding="async" />
 
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/90 via-white/30 to-transparent transition-all duration-300 group-hover:from-[#008244]/90 group-hover:via-[#008244]/30" />
 

@@ -36,8 +36,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
         <img
           src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/smknu_pkl-2024.png`}
           alt="Banner Kegiatan"
-          className="absolute top-0 right-0 z-[1] h-full w-full object-cover object-center md:w-1/2"
-        />
+          className="absolute top-0 right-0 z-[1] h-full w-full object-cover object-center md:w-1/2"  loading="lazy" decoding="async" />
 
         {/* Layer Gradient Overlay */}
         <div className="absolute inset-0 z-[2] bg-gradient-to-r from-emerald-900 via-emerald-800/90 to-transparent"></div>
@@ -105,8 +104,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                       <img
                         src={`${import.meta.env.BASE_URL}${featuredItem.image}`}
                         alt={featuredItem.title}
-                        className="h-full w-full object-cover"
-                      />
+                        className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                       <div className="absolute top-3 left-3">
                         <span className="inline-flex items-center gap-2 rounded-lg bg-emerald-800/90 px-3 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm backdrop-blur-md">
                           {featuredItem.category}
@@ -156,8 +154,7 @@ export default function RelatedArticlesSection({ onNavigate }: RelatedArticlesSe
                           <img
                             src={`${import.meta.env.BASE_URL}${art.image}`}
                             alt={art.title}
-                            className="h-full w-full object-cover"
-                          />
+                            className="h-full w-full object-cover"  loading="lazy" decoding="async" />
                         </div>
 
                         <div className="flex flex-col gap-2 p-4 transition-all duration-300">

@@ -88,8 +88,7 @@ export default function Berita01Page({ onNavigate }: PageProps) {
             <img
               src={`${import.meta.env.BASE_URL}images/HalamanKami/profil/gedung-utama.jpg`}
               alt="Dokumentasi Kegiatan Siswa"
-              className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
-            />
+              className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"  loading="lazy" decoding="async" />
           </div>
           <p className="border-l border-slate-300 pl-3 text-left text-xs tracking-wide text-slate-500">
             <span className="font-semibold text-slate-700">Dokumentasi internal:</span> Proses

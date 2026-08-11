@@ -35,8 +35,7 @@ export default function SekolahBerdampakPage() {
               <img
                 src={`${import.meta.env.BASE_URL}images/logo/gambar-2.svg`}
                 alt={`Logo ${namaSekolahUppercase}`}
-                className="h-full w-full object-cover"
-              />
+                className="h-full w-full object-cover"  loading="lazy" decoding="async" />
             </div>
             <div>
               <p className="text-sm leading-tight font-bold tracking-tight text-white drop-shadow-md">

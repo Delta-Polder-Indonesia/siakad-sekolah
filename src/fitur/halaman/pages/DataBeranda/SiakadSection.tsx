@@ -27,8 +27,7 @@ export default function SiakadSection({
             <img
               src="images/HalamanKami/Beranda/IconConten/flower-ora.svg"
               alt="Icon Flower"
-              className="flex h-8 w-8 items-center justify-center"
-            />
+              className="flex h-8 w-8 items-center justify-center"  loading="lazy" decoding="async" />
             <h2 className="sec-title tracking-tight text-slate-900">
               Sistem Informasi Akademik (SIAKAD)
             </h2>
@@ -65,8 +64,7 @@ export default function SiakadSection({
           <img
             src={`${import.meta.env.BASE_URL}images/HalamanKami/Beranda/siakad-app.png`}
             alt={imageAlt}
-            className="h-auto max-h-[450px] w-full object-contain drop-shadow-xl transition-transform duration-300"
-          />
+            className="h-auto max-h-[450px] w-full object-contain drop-shadow-xl transition-transform duration-300"  loading="lazy" decoding="async" />
         </div>
       </div>
     </section>

@@ -253,8 +253,7 @@ export default function AttendancePage() {
                           <img
                             src={student.avatar}
                             alt={student.name}
-                            className="h-7 w-7 rounded-md border-2 border-black object-cover p-0.5"
-                          />
+                            className="h-7 w-7 rounded-md border-2 border-black object-cover p-0.5"  loading="lazy" decoding="async" />
                         ) : (
                           <div className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-white text-[10px] font-bold text-black">
                             {student.gender.toUpperCase()}

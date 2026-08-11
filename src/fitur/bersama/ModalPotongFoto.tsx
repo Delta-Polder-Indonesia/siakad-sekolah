@@ -140,8 +140,7 @@ export default function ModalPotongFoto({
                   height: `${perhitungan.height}px`,
                   left: `${perhitungan.left}px`,
                   top: `${perhitungan.top}px`,
-                }}
-              />
+                }}  loading="lazy" decoding="async" />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm text-gray-500">
                 Memuat foto...

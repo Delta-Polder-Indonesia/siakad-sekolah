@@ -164,8 +164,7 @@ export default function Prestasi() {
               <img
                 src={featuredItem.foto}
                 alt={featuredItem.judul}
-                className="h-full w-full object-cover"
-              />
+                className="h-full w-full object-cover"  loading="lazy" decoding="async" />
               <div className="absolute inset-0 bg-slate-950/20" />
               <span className="absolute top-4 left-4 border border-slate-900 bg-amber-400 px-3 py-1 text-xs font-extrabold tracking-wider text-slate-950 uppercase">
                 Pencapaian Tertinggi

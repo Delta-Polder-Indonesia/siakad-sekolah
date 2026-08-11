@@ -80,8 +80,7 @@ export default function DaftarNamaGuru() {
                     <img
                       src={guru.avatar}
                       alt={guru.name}
-                      className="h-8 w-8 rounded-full border border-black object-cover"
-                    />
+                      className="h-8 w-8 rounded-full border border-black object-cover"  loading="lazy" decoding="async" />
                   ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border border-black bg-white text-xs font-bold text-black">
                       {guru.name.charAt(0).toUpperCase()}

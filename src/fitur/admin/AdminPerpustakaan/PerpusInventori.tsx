@@ -284,8 +284,7 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
                       <img
                         src={coverPreview}
                         alt="Preview cover"
-                        className="h-32 w-24 rounded-md border-2 border-black object-cover"
-                      />
+                        className="h-32 w-24 rounded-md border-2 border-black object-cover"  loading="lazy" decoding="async" />
                       <button
                         type="button"
                         onClick={handleRemoveCover}
