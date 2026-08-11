@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { addSuratIzin, getClasses, getStudentByUser, getSuratIzinByStudent } from '../../data/services';
+import { getClasses, getStudentByUser, getSuratIzinByStudent } from '../../data/services';
+import { submitSurat } from '../../services/suratIzinService';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Send, Loader2, FileText, Calendar } from 'lucide-react';
 import { FileUpload } from '../../components/ui';
@@ -55,7 +56,7 @@ export default function KirimSuratMurid() {
     setFeedback('');
     try {
       const attachmentDataUrl = attachment ? await readFileAsDataUrl(attachment) : undefined;
-      addSuratIzin({
+      await submitSurat({
         id: `ltr_${Date.now()}`,
         studentId: student.id,
         classId: student.classId,

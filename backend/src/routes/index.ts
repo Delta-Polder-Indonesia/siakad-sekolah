@@ -15,6 +15,7 @@ import { rapotRouter } from '../modules/rapot/rapot.route.js';
 import { billingRouter } from '../modules/billing/billing.route.js';
 import { libraryRouter } from '../modules/library/library.route.js';
 import { assignmentRouter } from '../modules/assignment/assignment.route.js';
+import { suratIzinRouter } from '../modules/surat-izin/suratIzin.route.js';
 
 export const apiRouter = Router();
 
@@ -34,3 +35,4 @@ apiRouter.use('/rapot',         rapotRouter);
 apiRouter.use('/billing',       billingRouter);
 apiRouter.use('/library',       libraryRouter);
 apiRouter.use('/assignments',   assignmentRouter);
+apiRouter.use('/surat-izin',    suratIzinRouter);
