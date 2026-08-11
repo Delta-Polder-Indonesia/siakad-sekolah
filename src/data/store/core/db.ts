@@ -145,6 +145,14 @@ export const STUDENT_STATUS_MUTATION_KEY = 'portal-siswa-status-mutations';
 export const PPDB_AUDIT_KEY = 'portal-siswa-ppdb-audit';
 export const PPDB_ADMIN_SESSION_KEY = 'portal-siswa-ppdb-admin-session';
 export const PPDB_ADMIN_LOCK_KEY = 'portal-siswa-ppdb-admin-lock';
+// State EPHEMERAL (presence, typing, chat read state) dipisah dari DB utama.
+// State ini berubah SANGAT sering (tiap keystroke saat mengetik, tiap 10 dtk
+// heartbeat presence). Kalau ikut di key utama, setiap perubahan men-serialize
+// SELURUH database (bisa ratusan KB-MB karena lampiran base64) — boros CPU,
+// localStorage, dan memicu re-render global. Key kecil terpisah = jauh lebih cepat.
+export const PRESENCE_KEY = 'siakad-presence-v1';
+export const TYPING_KEY = 'siakad-typing-v1';
+export const CHAT_READ_KEY = 'siakad-chat-read-v1';
 const STORE_UPDATED_EVENT = 'absensi_store_updated';
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
 
@@ -270,9 +278,25 @@ export async function hashPassword(plain: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Coalescing notifikasi: beberapa writeDB dalam satu frame (mis. keystroke
+// typing) cukup memicu SATU event → komponen (50+) re-render maks 1x per frame.
+// `storeVersion` tetap naik sinkron agar getSnapshot selalu akurat; event
+// (pemicu React untuk membandingkan snapshot) dijadwalkan per frame.
+let notifyScheduled = false;
+function dispatchStoreEvent() {
+  notifyScheduled = false;
+  window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
+}
+
 export function notifyStoreUpdated() {
   storeVersion += 1;
-  window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
+  if (notifyScheduled) return;
+  notifyScheduled = true;
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(dispatchStoreEvent);
+  } else {
+    queueMicrotask(dispatchStoreEvent); // fallback environment non-browser
+  }
 }
 
 export function subscribeStore(listener: () => void) {
@@ -367,8 +391,33 @@ export function readDB(): Database {
 }
 
 export function writeDB(data: Database) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const raw = JSON.stringify(data);
+  if (localStorage.getItem(STORAGE_KEY) === raw) return; // tidak ada perubahan nyata → skip
+  localStorage.setItem(STORAGE_KEY, raw);
   notifyStoreUpdated();
+}
+
+// ==================== EPHEMERAL STATE HELPERS ====================
+// Baca/tulis state kecil (presence, typing, chat-read) di key terpisah.
+// Fallback otomatis ke nilai legacy di DB utama → migrasi sekali tanpa kode khusus.
+
+export function readEphemeral<T>(key: string, fallback: T): T {
+  const raw = localStorage.getItem(key);
+  if (raw !== null) {
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      // data rusak → fallback
+    }
+  }
+  return fallback;
+}
+
+export function writeEphemeral<T>(key: string, value: T, notify = true): void {
+  const raw = JSON.stringify(value);
+  if (localStorage.getItem(key) === raw) return; // skip identik
+  localStorage.setItem(key, raw);
+  if (notify) notifyStoreUpdated();
 }
 
 export function readLocalKey<T>(key: string, fallback: T): T {
@@ -489,7 +538,7 @@ export async function initializeData() {
         // Version 1 had plain text passwords. Re-hash them.
         if (existing.teachers && Array.isArray(existing.teachers)) {
           existing.teachers = await Promise.all(
-            existing.teachers.map(async (t: any) => ({
+            existing.teachers.map(async (t) => ({
               ...t,
               password: await hashPassword(t.password),
             }))
@@ -497,7 +546,7 @@ export async function initializeData() {
         }
         if (existing.students && Array.isArray(existing.students)) {
           existing.students = await Promise.all(
-            existing.students.map(async (s: any) => ({
+            existing.students.map(async (s) => ({
               ...s,
               password: await hashPassword(s.password),
               parentPassword: s.parentPassword ? await hashPassword(s.parentPassword) : undefined,

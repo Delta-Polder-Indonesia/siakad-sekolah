@@ -1,4 +1,12 @@
-import { readDB, writeDB, notifyStoreUpdated, STORAGE_KEY } from './db';
+import {
+  readDB,
+  writeDB,
+  readEphemeral,
+  writeEphemeral,
+  PRESENCE_KEY,
+  TYPING_KEY,
+  CHAT_READ_KEY,
+} from './db';
 import type { ChatGroup, GroupChatMessage, PrivateMessage } from '../../../types';
 // ==================== CHAT GROUPS & FORUM PRESENCE ====================
 
@@ -105,7 +113,9 @@ export function deletePrivateMessage(id: string) {
 /** Hitung jumlah pesan privat belum dibaca dari user lain. */
 export function getUnreadPrivateCount(userId: string, otherId: string): number {
   if (!userId) return 0;
-  const lastRead = readDB().chatReadState[`private:${userId}|${otherId}`]?.[userId] ?? 0;
+  const lastRead = readChatReadState()[`private:${userId}|${otherId}`]?.[userId] ?? 0;
+  // Baca database SEKALI (sebelumnya 2x parse penuh — mahal saat dipanggil
+  // dalam loop untuk semua siswa).
   return readDB().privateMessages.filter(
     (item) => item.senderId === otherId && item.receiverId === userId && item.createdAt > lastRead
   ).length;
@@ -113,37 +123,50 @@ export function getUnreadPrivateCount(userId: string, otherId: string): number {
 
 const PRESENCE_ONLINE_WINDOW = 2 * 60 * 1000;
 
+// State presence dipisah ke key kecil (PRESENCE_KEY) — tidak lagi men-serialize
+// seluruh DB setiap heartbeat.
+
+function readPresenceState(): Record<string, number> {
+  // Fallback migrasi: jika key baru belum ada, ambil dari DB utama (legacy).
+  return readEphemeral<Record<string, number>>(PRESENCE_KEY, readDB().studentPresence ?? {});
+}
+
 export function touchPresence(studentId: string) {
-  const db = readDB();
-  db.studentPresence = { ...db.studentPresence, [studentId]: Date.now() };
-  writeDB(db);
+  const next = { ...readPresenceState(), [studentId]: Date.now() };
+  writeEphemeral(PRESENCE_KEY, next);
 }
 
 /** Heartbeat senyap — menulis tanpa memicu event store (untuk interval berkala). */
 export function touchPresenceSilent(studentId: string) {
-  const db = readDB();
-  db.studentPresence = { ...db.studentPresence, [studentId]: Date.now() };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  const next = { ...readPresenceState(), [studentId]: Date.now() };
+  writeEphemeral(PRESENCE_KEY, next, false);
 }
 
 export function isStudentOnline(studentId: string): boolean {
-  const last = readDB().studentPresence[studentId];
+  const last = readPresenceState()[studentId];
   if (!last) return false;
   return Date.now() - last < PRESENCE_ONLINE_WINDOW;
 }
 
 // ==================== CHAT READ STATE (unread badge) ====================
 
+// State read (badge belum dibaca) dipisah ke key kecil (CHAT_READ_KEY).
+
+type ChatReadState = Record<string, Record<string, number>>;
+
+function readChatReadState(): ChatReadState {
+  return readEphemeral<ChatReadState>(CHAT_READ_KEY, readDB().chatReadState ?? {});
+}
+
 /** Tandai suatu scope (forum/grup) sudah dibaca oleh user pada waktu sekarang. */
 export function markScopeRead(scopeKey: string, userId: string) {
   if (!userId) return;
-  const db = readDB();
-  const map = db.chatReadState[scopeKey] ?? {};
-  db.chatReadState = {
-    ...db.chatReadState,
+  const state = readChatReadState();
+  const map = state[scopeKey] ?? {};
+  writeEphemeral(CHAT_READ_KEY, {
+    ...state,
     [scopeKey]: { ...map, [userId]: Date.now() },
-  };
-  writeDB(db);
+  });
 }
 
 /** Hitung jumlah pesan belum dibaca (di luar pesan user sendiri). */
@@ -153,14 +176,14 @@ export function getUnreadCountForScope(
   messages: Array<{ authorId: string; createdAt: number }>
 ): number {
   if (!userId) return 0;
-  const lastRead = readDB().chatReadState[scopeKey]?.[userId] ?? 0;
+  const lastRead = readChatReadState()[scopeKey]?.[userId] ?? 0;
   return messages.filter((msg) => msg.authorId !== userId && msg.createdAt > lastRead).length;
 }
 
 /** Waktu terakhir suatu scope (forum/grup) dibaca oleh user (0 jika belum pernah). */
 export function getScopeLastRead(scopeKey: string, userId: string): number {
   if (!userId) return 0;
-  return readDB().chatReadState[scopeKey]?.[userId] ?? 0;
+  return readChatReadState()[scopeKey]?.[userId] ?? 0;
 }
 
 // ==================== TYPING INDICATOR (C15) ====================
@@ -168,30 +191,40 @@ export function getScopeLastRead(scopeKey: string, userId: string): number {
 /** Jendela waktu suatu status ketikan dianggap masih aktif. */
 export const TYPING_WINDOW = 4 * 1000;
 
+// State typing dipisah ke key kecil (TYPING_KEY) — setTyping dipanggil pada
+// SETIAP keystroke; sebelumnya men-serialize seluruh DB per tombol.
+
+type TypingState = Record<
+  string,
+  Record<string, { ts: number; name: string; role: string }>
+>;
+
+function readTypingState(): TypingState {
+  return readEphemeral<TypingState>(TYPING_KEY, readDB().typingState ?? {});
+}
+
 /** Tandai user sedang mengetik di suatu scope (forum/grup/private). */
 export function setTyping(scopeKey: string, userId: string, name: string, role: string) {
   if (!userId || !scopeKey) return;
-  const db = readDB();
-  db.typingState = {
-    ...db.typingState,
+  const state = readTypingState();
+  writeEphemeral(TYPING_KEY, {
+    ...state,
     [scopeKey]: {
-      ...(db.typingState[scopeKey] ?? {}),
+      ...(state[scopeKey] ?? {}),
       [userId]: { ts: Date.now(), name, role },
     },
-  };
-  writeDB(db);
+  });
 }
 
 /** Hentikan status ketikan untuk user di suatu scope. */
 export function clearTyping(scopeKey: string, userId: string) {
   if (!scopeKey) return;
-  const db = readDB();
-  const scope = db.typingState[scopeKey];
+  const state = readTypingState();
+  const scope = state[scopeKey];
   if (!scope || !scope[userId]) return;
   const next = { ...scope };
   delete next[userId];
-  db.typingState = { ...db.typingState, [scopeKey]: next };
-  writeDB(db);
+  writeEphemeral(TYPING_KEY, { ...state, [scopeKey]: next });
 }
 
 /** Daftar user yang sedang mengetik di suatu scope (di luar user itu sendiri). */
@@ -200,7 +233,7 @@ export function getTypingUsers(
   excludeUserId: string
 ): Array<{ userId: string; name: string; role: string }> {
   if (!scopeKey) return [];
-  const scope = readDB().typingState[scopeKey] ?? {};
+  const scope = readTypingState()[scopeKey] ?? {};
   const now = Date.now();
   return Object.entries(scope)
     .filter(([userId, entry]) => userId !== excludeUserId && now - entry.ts < TYPING_WINDOW)

@@ -1243,10 +1243,13 @@ describe('storage summary and subscriptions', () => {
     expect(summary.usedPercent).toBeGreaterThanOrEqual(0);
   });
 
-  it('notifies subscribers when the store changes', () => {
+  it('notifies subscribers when the store changes', async () => {
     const listener = vi.fn();
     const unsubscribe = store.subscribeStore(listener);
     store.addTask('T', 'S', '2026-01-01');
+    // Sejak refactor performa, notifikasi di-coalesce per frame (rAF) —
+    // beberapa writeDB cepat → satu event. Tunggu satu frame.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     expect(listener).toHaveBeenCalled();
     unsubscribe();
 
