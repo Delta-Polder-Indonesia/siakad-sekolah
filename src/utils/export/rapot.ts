@@ -3,14 +3,14 @@ import { isTuntas, KONFIGURASI_PENILAIAN } from '../penilaian';
 import { createPdfDoc, exportToCsv } from './helpers';
 // ─── RAPOT PDF ────────────────────────────────────────────────────────────
 
-export function exportRapotPdf(
+export async function exportRapotPdf(
   nilaiList: NilaiRapot[],
   studentName: string,
   className: string,
   tahunAjaran: string,
   semester: string
 ) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader('LAPORAN HASIL BELAJAR (RAPOT)', `${studentName} - Kelas ${className}`);
 
   // Info

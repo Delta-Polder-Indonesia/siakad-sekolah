@@ -61,6 +61,13 @@ export default defineConfig(({ command }) => ({
     minify: true,
     cssMinify: true,
 
+    // JANGAN preload semua chunk di index.html. Sebelumnya `pdf-vendor` (jspdf
+    // ±377KB) ikut di-modulepreload padahal hanya dipakai saat ekspor PDF —
+    // browser mengunduhnya di first load. Dengan dynamic import jspdf di
+    // utils/export/helpers.ts dkk + opsi ini, jspdf hanya diunduh saat
+    // pengguna benar-benar mencetak.
+    modulePreload: false,
+
     rollupOptions: {
       output: {
         manualChunks(id) {

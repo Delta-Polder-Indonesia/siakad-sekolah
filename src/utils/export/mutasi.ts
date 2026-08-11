@@ -32,8 +32,8 @@ export function exportMutationsCsv(rows: MutasiSiswaRow[], studentName: string) 
   );
 }
 
-export function exportMutationsPdf(rows: MutasiSiswaRow[], studentName: string) {
-  const p = createPdfDoc();
+export async function exportMutationsPdf(rows: MutasiSiswaRow[], studentName: string) {
+  const p = await createPdfDoc();
   p.addHeader('REKAP RIWAYAT MUTASI SISWA', studentName);
 
   p.doc.setFontSize(9);
@@ -111,12 +111,12 @@ export interface SuratMutasiKeluarParams {
   movedAt?: string;
 }
 
-export function exportSuratMutasiPdf(params: SuratMutasiKeluarParams) {
+export async function exportSuratMutasiPdf(params: SuratMutasiKeluarParams) {
   const judul =
     params.jenis === 'pindah' ? 'SURAT KETERANGAN PINDAH SEKOLAH' : 'SURAT KETERANGAN KELUAR';
   const alasan = params.jenis === 'pindah' ? 'pindah sekolah' : 'mengundurkan diri / keluar';
 
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader(judul, `${namaSekolahUppercase}`);
 
   // Kop alamat sekolah

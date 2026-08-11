@@ -1,4 +1,3 @@
-import { jsPDF } from 'jspdf';
 import { namaSekolahUppercase } from '../../fitur/halaman/components/Profile/dataSekolah';
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 
@@ -67,7 +66,8 @@ export function exportToCsv(rows: (string | number)[][], headers: string[], file
 
 // ─── PDF PAGE SETUP ───────────────────────────────────────────────────────
 
-export function createPdfDoc() {
+export async function createPdfDoc() {
+  const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();

@@ -2,13 +2,13 @@ import type { TagihanSekolah } from '../../types';
 import { createPdfDoc, formatDateShort, formatRupiah } from './helpers';
 // ─── TAGIHAN PDF ──────────────────────────────────────────────────────────
 
-export function exportTagihanPdf(
+export async function exportTagihanPdf(
   tagihanList: TagihanSekolah[],
   studentName: string,
   tahun: number,
   monthNames: string[]
 ) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader('LAPORAN TAGIHAN SEKOLAH', studentName);
 
   p.doc.setFontSize(9);

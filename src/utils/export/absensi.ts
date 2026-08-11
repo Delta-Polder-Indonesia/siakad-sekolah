@@ -2,7 +2,7 @@ import type { Student } from '../../types';
 import { createPdfDoc, formatDateShort, exportToCsv } from './helpers';
 // ─── ABSENSI PDF ──────────────────────────────────────────────────────────
 
-export function exportAbsensiPdf(
+export async function exportAbsensiPdf(
   students: (Student & {
     hadir: number;
     izin: number;
@@ -23,7 +23,7 @@ export function exportAbsensiPdf(
     percentage: number;
   }
 ) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader('LAPORAN ABSENSI SISWA', `Kelas ${className}`);
 
   p.doc.setFontSize(9);

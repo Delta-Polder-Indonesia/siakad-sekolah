@@ -2,13 +2,13 @@ import type { TeacherLessonNote } from '../../types';
 import { createPdfDoc, exportToCsv } from './helpers';
 // ─── JURNAL MENGAJAR PDF ─────────────────────────────────────────────────
 
-export function exportJurnalPdf(
+export async function exportJurnalPdf(
   notes: TeacherLessonNote[],
   teacherName: string,
   className: string,
   subject: string
 ) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader('JURNAL MENGAJAR GURU', `${subject} - Kelas ${className}`);
 
   p.doc.setFontSize(9);

@@ -12,12 +12,12 @@ export interface KalenderAkademikPdfParams {
 
 const truncate = (s: string, max: number) => (s.length > max ? s.slice(0, max - 1) + '…' : s);
 
-export function exportKalenderAkademikPdf({
+export async function exportKalenderAkademikPdf({
   tahunAjaran,
   ganjil,
   genap,
 }: KalenderAkademikPdfParams) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader(`KALENDER AKADEMIK ${namaSekolahUppercase}`, `Tahun Ajaran ${tahunAjaran}`);
 
   const colWidths = [8, 34, 14, 52, 34, 38];

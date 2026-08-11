@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { CreditCard, Landmark, Wallet, CircleDollarSign, Download } from 'lucide-react';
-import { jsPDF } from 'jspdf';
 import { exportTagihanPdf } from '../../utils/export';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -123,7 +122,8 @@ export default function TagihanSekolahPage() {
     setSelectedBillIds([]);
   };
 
-  const handleUnduhBuktiPdf = (bill: TagihanSekolah) => {
+  const handleUnduhBuktiPdf = async (bill: TagihanSekolah) => {
+    const { jsPDF } = await import('jspdf');
     const paymentLabel = getPaymentMethodLabel(bill.paymentMethod);
     const nomorTransaksi = `TRX-${bill.year}${String(bill.month).padStart(2, '0')}-${bill.studentId.toUpperCase()}`;
     const tanggalCetak = new Intl.DateTimeFormat('id-ID', {
@@ -198,9 +198,10 @@ export default function TagihanSekolahPage() {
     doc.save(namaFile);
   };
 
-  const handleUnduhDaftarTahunanPdf = () => {
+  const handleUnduhDaftarTahunanPdf = async () => {
     if (!user) return;
 
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const marginX = 48;
     let cursorY = 60;

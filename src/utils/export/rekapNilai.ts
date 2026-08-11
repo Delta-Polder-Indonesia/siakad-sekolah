@@ -13,14 +13,14 @@ export interface RekapNilaiRow {
   tuntas: boolean;
 }
 
-export function exportRekapNilaiPdf(
+export async function exportRekapNilaiPdf(
   rows: RekapNilaiRow[],
   className: string,
   subject: string,
   tahunAjaran: string,
   semester: string
 ) {
-  const p = createPdfDoc();
+  const p = await createPdfDoc();
   p.addHeader('REKAP NILAI SISWA', `${subject} - Kelas ${className}`);
 
   p.doc.setFontSize(9);
