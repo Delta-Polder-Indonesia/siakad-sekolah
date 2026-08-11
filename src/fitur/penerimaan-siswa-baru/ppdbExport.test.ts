@@ -4,6 +4,40 @@ import { exportPpdbCsv, downloadJsonFile, printDetailPdf, printRecap } from './p
 import { statusText, formatDate } from './AdminPanel.types';
 import type { AdminPanelStats } from './AdminPanel.types';
 
+// Mock jspdf agar test tidak menulis file PDF nyata ke disk (sebelumnya
+// muncul artefak `detail-REG-001.pdf` di folder repo setelah `npm test`).
+vi.mock('jspdf', () => {
+  class MockJsPDF {
+    internal = { pageSize: { getWidth: () => 210, getHeight: () => 297 } };
+    constructor(_opts?: unknown) {}
+    setFont(_font?: unknown, _style?: unknown) {
+      return this;
+    }
+    setFontSize(_size?: unknown) {
+      return this;
+    }
+    setTextColor(_r?: unknown, _g?: unknown, _b?: unknown) {
+      return this;
+    }
+    setDrawColor(_c?: unknown) {
+      return this;
+    }
+    setLineWidth(_w?: unknown) {
+      return this;
+    }
+    line() {
+      return this;
+    }
+    text() {
+      return this;
+    }
+    save(_filename?: unknown) {
+      return this;
+    }
+  }
+  return { jsPDF: MockJsPDF };
+});
+
 const DUMMY_APP: PPDBApplication = {
   id: 'a1',
   registrationNo: 'REG-001',

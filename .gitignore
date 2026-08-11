@@ -31,6 +31,9 @@ Thumbs.db
 test-results/
 playwright-report/
 
+# Artefak test di folder root (mis. PDF hasil jsPDF saat vitest jalan)
+/*.pdf
+
 # md lokal yang sengaja tidak di-commit (berisi info internal/rahasia)
 # CATATAN: jangan ignore seluruh folder (mis. "dokumentasi/") —
 # gunakan daftar nama file eksplisit di atas agar file lain tetap ter-track.
