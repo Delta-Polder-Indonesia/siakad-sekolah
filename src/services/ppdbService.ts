@@ -22,7 +22,24 @@ import {
   type PPDBApplication,
   type PPDBAuditLog,
 } from '../data/services';
-import { API_BASE, hasApi } from './apiConfig';
+import { API_BASE } from './apiConfig';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATATAN ARSITEKTUR (BUG-02 / Phase 1)
+// -----------------------------------------------------------------------------
+// Backend BELUM memiliki modul route `/ppdb/*`. Sedangkan tipe data PPDB di
+// frontend (src/types.ts → PPDBApplication) memakai model kaya ~60 field
+// berbahasa Indonesia (namaLengkap, jenisKelamin, …), sementara model Prisma
+// `PPDBApplication` di backend memakai ~25 field berbahasa Inggris (fullName,
+// gender, …). Keduanya TIDAK kompatibel secara langsung.
+//
+// Agar fitur PPDB TIDAK memanggil endpoint yang tidak tersedia (yang akan
+// menghasilkan 404 saat VITE_API_BASE_URL diisi), fitur PPDB untuk sementara
+// SELALU memakai mode lokal (storage) yang sudah berfungsi penuh.
+//
+// TODO(Phase 3): setelah modul backend `/ppdb` dibangun & kontrak data
+// disamakan (migrasi schema), ubah `usePpdbApi` menjadi `hasApi`.
+const usePpdbApi = false;
 
 type JsonMap = Record<string, unknown>;
 type AuthTokens = { accessToken: string; refreshToken: string };
@@ -67,7 +84,7 @@ const buildHeaders = (init?: RequestInit, useJson = true): HeadersInit => {
 
 const tryRefreshToken = async (): Promise<boolean> => {
   const refreshToken = getRefreshToken();
-  if (!refreshToken || !hasApi) return false;
+  if (!refreshToken || !usePpdbApi) return false;
 
   try {
     const response = await fetch(`${API_BASE}/auth/admin/refresh`, {
@@ -136,7 +153,7 @@ export const ppdbService = {
   async submitApplication(
     data: Omit<PPDBApplication, 'id' | 'registrationNo' | 'submittedAt' | 'status'>
   ) {
-    if (hasApi) {
+    if (usePpdbApi) {
       return request<PPDBApplication>('/ppdb/applications', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -146,22 +163,22 @@ export const ppdbService = {
   },
 
   async getApplications() {
-    if (hasApi) return request<PPDBApplication[]>('/ppdb/applications');
+    if (usePpdbApi) return request<PPDBApplication[]>('/ppdb/applications');
     return getPPDBApplications();
   },
 
   async getStatistics() {
-    if (hasApi) return request<PPDBStatistics>('/ppdb/statistics');
+    if (usePpdbApi) return request<PPDBStatistics>('/ppdb/statistics');
     return getPPDBStatistics();
   },
 
   async getApplicationById(id: string) {
-    if (hasApi) return request<PPDBApplication>(`/ppdb/applications/${id}`);
+    if (usePpdbApi) return request<PPDBApplication>(`/ppdb/applications/${id}`);
     return getPPDBApplicationById(id);
   },
 
   async getApplicationByRegNo(regNo: string) {
-    if (hasApi)
+    if (usePpdbApi)
       return request<PPDBApplication | null>(
         `/ppdb/applications/registration/${encodeURIComponent(regNo)}`
       );
@@ -174,7 +191,7 @@ export const ppdbService = {
     adminNotes?: string,
     verifiedBy?: string
   ) {
-    if (hasApi) {
+    if (usePpdbApi) {
       return request<PPDBApplication>(`/ppdb/applications/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status, adminNotes, verifiedBy }),
@@ -188,7 +205,7 @@ export const ppdbService = {
     documentKey: string,
     status: 'PENDING' | 'VALID' | 'INVALID'
   ) {
-    if (hasApi) {
+    if (usePpdbApi) {
       return request<PPDBApplication>(
         `/ppdb/applications/${id}/documents/${encodeURIComponent(documentKey)}`,
         {
@@ -201,7 +218,7 @@ export const ppdbService = {
   },
 
   async deleteApplication(id: string) {
-    if (hasApi) {
+    if (usePpdbApi) {
       await request<JsonMap>(`/ppdb/applications/${id}`, { method: 'DELETE' });
       return true;
     }
@@ -209,12 +226,12 @@ export const ppdbService = {
   },
 
   async getAuditLogs() {
-    if (hasApi) return request<PPDBAuditLog[]>('/ppdb/audit-logs');
+    if (usePpdbApi) return request<PPDBAuditLog[]>('/ppdb/audit-logs');
     return getPPDBAuditLogs();
   },
 
   async exportBackupJson() {
-    if (hasApi) {
+    if (usePpdbApi) {
       const data = await request<JsonMap>('/ppdb/backup/export');
       return JSON.stringify(data, null, 2);
     }
@@ -222,7 +239,7 @@ export const ppdbService = {
   },
 
   async importBackupJson(rawJson: string) {
-    if (hasApi) {
+    if (usePpdbApi) {
       return request<{ ok: boolean; message: string }>('/ppdb/backup/import', {
         method: 'POST',
         body: JSON.stringify({ payload: rawJson }),
@@ -233,7 +250,7 @@ export const ppdbService = {
 
   async getApiHealth(): Promise<ApiHealth> {
     const checkedAt = new Date().toISOString();
-    if (!hasApi) {
+    if (!usePpdbApi) {
       return {
         mode: 'local',
         online: navigator.onLine,
@@ -274,14 +291,14 @@ export const ppdbService = {
   },
 
   adminLogin: (username: string, pin: string) => {
-    if (hasApi) {
+    if (usePpdbApi) {
       return apiLogin(username, pin);
     }
     return Promise.resolve(adminLogin(username, pin));
   },
 
   adminLogout: () => {
-    if (hasApi) {
+    if (usePpdbApi) {
       clearTokens();
       return Promise.resolve();
     }
@@ -290,12 +307,12 @@ export const ppdbService = {
   },
 
   isAdminAuthenticated: () => {
-    if (hasApi) return Boolean(getAccessToken());
+    if (usePpdbApi) return Boolean(getAccessToken());
     return isAdminAuthenticated();
   },
 
   getAdminProfileName: () => {
-    if (hasApi) return localStorage.getItem(ADMIN_NAME_KEY) || 'Admin API';
+    if (usePpdbApi) return localStorage.getItem(ADMIN_NAME_KEY) || 'Admin API';
     return getAdminProfileName();
   },
 

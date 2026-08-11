@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Save, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
+import { getPengaturanTagihan } from '../../../data/services';
 import {
-  getPengaturanTagihan,
-  terapkanTagihanTahunanUntukSemuaSiswa,
-} from '../../../data/services';
+  terapkanTagihanTahunan,
+  simpanPengaturanTagihan,
+} from '../../../services/billingService';
 
 interface TabTagihanSekolahProps {
   scope: 'teacher' | 'student';
@@ -46,10 +47,18 @@ export default function TabTagihanSekolah({ scope }: TabTagihanSekolahProps) {
   };
 
   // Eksekusi final saat admin menekan tombol "Yakin"
-  const handleExecuteTerapkan = () => {
+  const handleExecuteTerapkan = async () => {
     const day = Math.max(1, Math.min(28, tanggalJatuhTempo));
 
-    terapkanTagihanTahunanUntukSemuaSiswa(tahunTagihan, nominalTagihan, day, scope);
+    // Simpan konfigurasi (nominal & jatuh tempo) ke backend bila aktif,
+    // lalu terapkan tagihan tahunan ke semua siswa.
+    await simpanPengaturanTagihan({
+      monthlyAmount: nominalTagihan,
+      dueDay: day,
+      updatedAt: Date.now(),
+      updatedBy: scope,
+    });
+    await terapkanTagihanTahunan(tahunTagihan, nominalTagihan, day, scope);
 
     setLocalNotice({
       message: `✅ Pengaturan tagihan tahun ${tahunTagihan} berhasil diterapkan untuk semua siswa.`,

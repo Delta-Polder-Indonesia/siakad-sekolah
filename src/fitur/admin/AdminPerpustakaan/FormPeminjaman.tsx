@@ -40,9 +40,9 @@ interface FormPeminjamanProps {
     memberName: string,
     borrowDate: string,
     dueDate: string
-  ) => { ok: boolean; message?: string };
-  onApprove: (txId: string) => { ok: boolean; message?: string };
-  onReject: (txId: string, note?: string) => void;
+  ) => { ok: boolean; message?: string } | Promise<{ ok: boolean; message?: string }>;
+  onApprove: (txId: string) => { ok: boolean; message?: string } | Promise<{ ok: boolean; message?: string }>;
+  onReject: (txId: string, note?: string) => void | Promise<void>;
 }
 
 export function FormPeminjaman({
@@ -92,7 +92,10 @@ export function FormPeminjaman({
   const handleRemoveBook = (id: string) =>
     setSelectedBooks(selectedBooks.filter((b) => b.id !== id));
 
-  const handleProcess = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleProcess = async () => {
+    if (isSubmitting) return;
     if (!selectedMemberId) {
       showToast('error', '⚠️ Pilih anggota terlebih dahulu.');
       return;
@@ -106,10 +109,15 @@ export function FormPeminjaman({
     const studentName = student ? student.name : 'Unknown';
     let successCount = 0;
 
-    selectedBooks.forEach((b) => {
-      const res = onBorrow(b.id, selectedMemberId, studentName, tglPinjam, tglKembali);
-      if (res.ok) successCount++;
-    });
+    setIsSubmitting(true);
+    try {
+      for (const b of selectedBooks) {
+        const res = await onBorrow(b.id, selectedMemberId, studentName, tglPinjam, tglKembali);
+        if (res.ok) successCount++;
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
 
     showToast('success', `✅ ${successCount} buku berhasil diajukan pinjamannya.`);
     handleReset();
@@ -126,8 +134,8 @@ export function FormPeminjaman({
     setTglKembali(d.toISOString().slice(0, 10));
   };
 
-  const handleApprove = (txId: string) => {
-    const res = onApprove(txId);
+  const handleApprove = async (txId: string) => {
+    const res = await onApprove(txId);
     if (!res.ok) showToast('error', res.message || 'Gagal menyetujui peminjaman.');
   };
 
@@ -136,9 +144,9 @@ export function FormPeminjaman({
     setRejectNote('');
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!rejectTargetId) return;
-    onReject(rejectTargetId, rejectNote.trim() || 'Ditolak oleh admin');
+    await onReject(rejectTargetId, rejectNote.trim() || 'Ditolak oleh admin');
     setRejectTargetId(null);
     setRejectNote('');
     showToast('success', '✅ Permohonan peminjaman ditolak.');

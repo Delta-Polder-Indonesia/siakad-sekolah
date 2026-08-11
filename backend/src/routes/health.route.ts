@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { logger, checkLogAggregationHealth } from '../config/logger.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 export const healthRouter = Router();
 
@@ -34,8 +35,8 @@ healthRouter.get('/', async (_req, res) => {
   }
 });
 
-// Detailed health check
-healthRouter.get('/detailed', async (_req, res) => {
+// Detailed health check — dibatasi admin (membocorkan info sistem/DB).
+healthRouter.get('/detailed', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const dbCheck = await checkDatabase();
     const memoryInfo = getMemoryInfo();
@@ -73,8 +74,8 @@ healthRouter.get('/detailed', async (_req, res) => {
   }
 });
 
-// Database health check
-healthRouter.get('/database', async (_req, res) => {
+// Database health check — dibatasi admin (menampilkan statistik DB).
+healthRouter.get('/database', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const dbCheck = await checkDatabase();
     res.json(dbCheck);
@@ -88,8 +89,8 @@ healthRouter.get('/database', async (_req, res) => {
   }
 });
 
-// Memory health check
-healthRouter.get('/memory', (_req, res) => {
+// Memory health check — dibatasi admin (info memori proses).
+healthRouter.get('/memory', requireAuth, requireAdmin, (_req, res) => {
   try {
     const memoryInfo = getMemoryInfo();
     res.json(memoryInfo);
@@ -102,8 +103,8 @@ healthRouter.get('/memory', (_req, res) => {
   }
 });
 
-// Log aggregation health check
-healthRouter.get('/log-aggregation', async (_req, res) => {
+// Log aggregation health check — dibatasi admin.
+healthRouter.get('/log-aggregation', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const logAggHealth = await checkLogAggregationHealth();
     res.json(logAggHealth);

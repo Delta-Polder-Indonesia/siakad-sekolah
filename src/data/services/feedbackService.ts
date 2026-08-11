@@ -138,10 +138,9 @@ export async function sendFeedbackToEmail(
       templateId === 'default_template' ||
       publicKey === 'default_public_key'
     ) {
-      console.log('EmailJS credentials belum diset, menggunakan mode simulasi');
-      console.log('Feedback data yang akan dikirim:', templateParams);
-
-      // Mode simulasi - return success tapi log data
+      // Mode simulasi - kredensial EmailJS belum diset, email tidak dikirim.
+      // (Sengaja TIDAK mencetak `templateParams` ke konsol untuk menghindari
+      // kebocoran data pribadi/pesan pengguna di DevTools.)
       return {
         success: true,
         message: 'Feedback berhasil disimpan (mode simulasi - email tidak dikirim)',
