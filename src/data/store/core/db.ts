@@ -2,6 +2,7 @@ import { initialData } from './seedData';
 import { initialCatatanBK } from './seedData';
 import { initialEkskul, initialEkskulMember, initialEkskulKehadiran } from './seedData';
 import { notifyStoreUpdated } from './storeEvents';
+import { hasApi } from '../../../services/apiConfig';
 
 export { notifyStoreUpdated, subscribeStore, store } from './storeEvents';
 // ==================== TYPES ====================
@@ -267,12 +268,29 @@ export function isStorageHydrated(): boolean {
 // ==================== UTILS ====================
 
 /**
- * Simulasi hashing password sederhana untuk demo/local storage.
- * Dalam produksi sesungguhnya, gunakan bcrypt/argon2 di server.
+ * Simulasi hashing password sederhana — HANYA UNTUK MODE DEMO LOKAL.
+ *
+ * PERINGATAN KEAMANAN:
+ * - Memakai SHA-256 dengan salt statis global 'sekolah_salt' (sama untuk semua user).
+ *   Rentan rainbow table, tidak ada per-user salt, dan bukan pengganti bcrypt/argon2.
+ * - HANYA boleh dipakai ketika `hasApi === false` (mode demo tanpa backend).
+ * - Ketika backend aktif (`hasApi === true`), autentikasi WAJIB lewat backend
+ *   (bcrypt di server) dan TIDAK BOLEH memakai perbandingan hash lokal ini.
+ * - Guard di bawah akan memperingatkan jika dipanggil saat backend aktif.
+ * - Jangan seed password statis untuk produksi — lihat `seedData.ts` (password
+ *   demo hanya untuk lokal).
  */
 export async function hashPassword(plain: string): Promise<string> {
+  if (hasApi) {
+    // Guard: cegah penggunaan hash lemah saat backend aktif.
+    // Di mode produksi, password harus diverifikasi di server (bcrypt/argon2).
+    console.warn(
+      '[hashPassword] DIPANGGIL saat hasApi=true — hash lemah ini HANYA untuk mode demo lokal. ' +
+        'Gunakan endpoint backend /api/auth/login untuk verifikasi kredensial.'
+    );
+  }
   const encoder = new TextEncoder();
-  const data = encoder.encode(plain + 'sekolah_salt'); // Simple salt
+  const data = encoder.encode(plain + 'sekolah_salt'); // Simple salt — demo only
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');

@@ -106,8 +106,8 @@ export const ROLE_CONFIG = {
   },
   parent: {
     label: 'Orang Tua',
-    idLabel: 'Nama Orang Tua (Wali)',
-    idPlaceholder: 'Masukkan nama lengkap',
+    idLabel: 'NIS Anak (Nomor Induk Siswa)',
+    idPlaceholder: 'Masukkan NIS anak, mis. 2024001',
     passwordLabel: 'Kata Sandi',
     passwordPlaceholder: 'Masukkan kata sandi',
     inputType: 'text',

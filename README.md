@@ -247,7 +247,7 @@ Setelah menjalankan dev server, gunakan kredensial berikut:
 |------|----|----------|
 | **Guru** | `198501012010011001` | `guru123` |
 | **Siswa** | `2024001` | `siswa123` |
-| **Orang Tua** | `Siti Aminah` | `ortu123` |
+| **Orang Tua** | `2024001` (NIS anak) | `ortu123` |
 | **Admin** | (via env var) | (via env var) |
 | **Tamu** | `Tamu Pengunjung` | `TAMU2026` |
 
@@ -339,6 +339,34 @@ Hasil build ada di folder `dist/`. Upload ke:
 - **Hosting statis** — upload folder `dist/`
 
 > **Catatan:** Data saat ini disimpan di **localStorage** browser. Data tidak sinkron antar perangkat. Untuk skala sekolah penuh, perlu backend dan database terpusat (sudah ada starter di `backend/`).
+
+### Aset Besar & Git LFS
+
+Repo ini mengandung PDF & gambar besar di `public/` (±18 MB):
+- `public/download/STRATEGIS-01/*.pdf` — 4 dokumen pemerintah (±0.8 MB) yang **dipakai UI** (`Program-1.tsx` meng-link via `BASE_URL + download/...`).
+- `public/images/Dashboard/Konoha-*.jpg/.webp` — 6 gambar slideshow/dashboard yang **dipakai** (`constants.ts` & `TonggakSejarah.tsx`) — sudah dikompres & dioptimasi WebP/JPEG.
+
+**Aturan repo:**
+- **Jangan hapus** aset yang masih direferensikan di `src/` (grep dulu: `grep -r "Konoha" src` / `grep -r "STRATEGIS" src`).
+- **Artefak generate** (hasildari `jsPDF` saat test/ekspor) seperti `detail-REG-001.pdf`, `detail-*.pdf`, `rekap-ppdb-*.pdf` **jangan di-commit** — sudah di-ignore via `.gitignore` (`/*.pdf`, `detail-REG-*.pdf`, dll.).
+- Untuk PDF/gambar besar yang memang perlu di-track, **gunakan Git LFS** agar clone tetap ringan:
+
+```bash
+# sekali per clone
+git lfs install
+
+# track pola (sudah ada di .gitattributes)
+git lfs track "public/download/**/*.pdf"
+git lfs track "public/images/Dashboard/*.png"
+git lfs track "public/images/Dashboard/*.jpg"
+git lfs track "public/images/Dashboard/*.webp"
+
+# verifikasi
+cat .gitattributes
+git lfs ls-files
+```
+
+Tanpa LFS, `.git` akan membengkak (>80 MB) dan clone lambat — dengan LFS hanya pointer yang di-clone, file besar diunduh on-demand.
 
 ---
 

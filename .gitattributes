@@ -1,0 +1,11 @@
+# Git LFS — untuk aset besar (PDF & gambar) agar repo tetap ringan.
+# Aktifkan dengan: git lfs install && git lfs track "public/download/**/*.pdf"
+# Verifikasi: cat .gitattributes && git lfs ls-files
+#
+# Pola saat ini: PDF dokumen pemerintah & gambar Dashboard besar
+public/download/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+public/images/Dashboard/*.png filter=lfs diff=lfs merge=lfs -text
+public/images/Dashboard/*.jpg filter=lfs diff=lfs merge=lfs -text
+public/images/Dashboard/*.webp filter=lfs diff=lfs merge=lfs -text
+# Artefak generate (tidak di-commit, ada di .gitignore)
+# detail-*.pdf  — hasil jsPDF saat test/ekspor, di-ignore

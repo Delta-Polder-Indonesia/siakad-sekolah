@@ -1,11 +1,26 @@
 // Layer autentikasi portal ke backend (/api/auth).
 // Dipakai AuthContext saat backend aktif (hasApi). Kalau backend tidak
 // tersedia, AuthContext otomatis fallback ke store lokal.
-import { API_BASE } from './apiConfig';
+//
+// KEAMANAN TOKEN:
+// - Ideal (hasApi=true): token disimpan di httpOnly cookie oleh backend
+//   (Set-Cookie: accessToken, refreshToken, httpOnly, SameSite=Strict/Lax,
+//   Secure di production). Frontend TIDAK menyimpan token di localStorage
+//   (rentan XSS) — hanya mengandalkan cookie yang dikirim otomatis via
+//   `credentials: 'include'`.
+// - Minimal/fallback: bila cookie belum diadopsi penuh, simpan token di
+//   memory (variabel modul) — tidak persisten di localStorage, hilang saat
+//   reload, sehingga mengurangi risiko pencurian persisten. localStorage
+//   hanya dipakai saat hasApi=false (mode demo lokal).
+import { API_BASE, hasApi } from './apiConfig';
 import type { UserRole } from '../types';
 
 const ACCESS_TOKEN_KEY = 'portal_access_token';
 const REFRESH_TOKEN_KEY = 'portal_refresh_token';
+
+// Memory storage untuk mode backend (hasApi=true) — tidak persisten di localStorage
+let memoryAccessToken: string | null = null;
+let memoryRefreshToken: string | null = null;
 
 // Backend memakai nama role huruf besar.
 const ROLE_MAP: Partial<Record<UserRole, 'GURU' | 'MURID' | 'WALIS' | 'TAMU'>> = {
@@ -44,21 +59,36 @@ export type PortalAdminLoginResult =
   | { status: 'unreachable' };
 
 export function savePortalTokens(accessToken: string, refreshToken: string | null) {
+  if (hasApi) {
+    // Mode backend: simpan di memory, JANGAN di localStorage (hindari XSS).
+    // Backend juga menyetel httpOnly cookie (Set-Cookie) — cookie adalah
+    // sumber kebenaran untuk request berikutnya (credentials: include).
+    memoryAccessToken = accessToken;
+    memoryRefreshToken = refreshToken;
+    // Bersihkan legacy localStorage jika ada (migrasi)
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    return;
+  }
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   else localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export function clearPortalTokens() {
+  memoryAccessToken = null;
+  memoryRefreshToken = null;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export function getPortalAccessToken() {
+  if (hasApi) return memoryAccessToken || '';
   return localStorage.getItem(ACCESS_TOKEN_KEY) || '';
 }
 
 export function getPortalRefreshToken() {
+  if (hasApi) return memoryRefreshToken || '';
   return localStorage.getItem(REFRESH_TOKEN_KEY) || '';
 }
 
@@ -68,15 +98,16 @@ export function getPortalRefreshToken() {
 export async function logoutPortal(): Promise<void> {
   const accessToken = getPortalAccessToken();
   const refreshToken = getPortalRefreshToken();
-  if (!accessToken) return;
-
+  // Jika token hanya di httpOnly cookie, accessToken memory mungkin kosong
+  // setelah reload — tetap coba logout via cookie (credentials: include).
   try {
     await fetch(`${API_BASE}/auth/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       },
+      credentials: 'include',
       body: JSON.stringify({ refreshToken: refreshToken || null }),
     });
   } catch {
@@ -94,7 +125,10 @@ export async function changePortalPassword(opts: {
   newPassword: string;
 }): Promise<{ ok: boolean; message?: string; authFailed?: boolean }> {
   const token = getPortalAccessToken();
-  if (!token) {
+  // Saat hasApi=true dan token di httpOnly cookie, memory token mungkin kosong
+  // setelah reload — biarkan request tetap dikirim via cookie (credentials: include).
+  // Untuk mode backend tanpa cookie, token tetap diperlukan.
+  if (!token && !hasApi) {
     return { ok: false, message: 'Tidak ada sesi backend yang aktif.' };
   }
 
@@ -105,12 +139,12 @@ export async function changePortalPassword(opts: {
       : { studentId: opts.userId, oldPassword: opts.oldPassword, newPassword: opts.newPassword };
 
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
     const res = await fetch(`${API_BASE}/auth/${path}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers,
+      credentials: 'include',
       body: JSON.stringify(body),
     });
 
@@ -150,6 +184,7 @@ export async function loginPortal(
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ role: backendRole, id, password }),
     });
 
@@ -187,6 +222,7 @@ export async function loginAdmin(username: string, pin: string): Promise<PortalA
     const res = await fetch(`${API_BASE}/auth/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ username, pin }),
     });
 

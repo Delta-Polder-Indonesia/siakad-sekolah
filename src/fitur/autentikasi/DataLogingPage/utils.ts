@@ -59,7 +59,8 @@ export function validateLoginInput(role: ValidRole, id: string, password: string
       break;
     }
     case 'parent':
-      if (trimmedId.length < 3) return 'Nama minimal 3 karakter.';
+      // Wali login pakai NIS anak (unik), bukan nama (rentan duplikat)
+      if (!/^\d{4,}$/.test(trimmedId)) return 'NIS anak minimal 4 digit angka.';
       break;
   }
 

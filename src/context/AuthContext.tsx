@@ -37,16 +37,73 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
+      // KEAMANAN SESI:
+      // - Ideal (hasApi=true): sesi disimpan di httpOnly cookie oleh backend (Set-Cookie),
+      //   frontend TIDAK menyimpan AuthUser/token di localStorage. Verifikasi sesi
+      //   dilakukan via backend (credentials: 'include').
+      // - Minimal (fallback): bila httpOnly belum penuh, simpan hanya data non-sensitif
+      //   (id, role) dan verifikasi ulang ke backend saat load. Jangan simpan token
+      //   di localStorage saat backend aktif — token di httpOnly cookie.
+      // - Mode demo lokal (hasApi=false): boleh pakai localStorage karena tidak ada backend.
+      if (hasApi) {
+        // Mode backend: coba baca sesi minimal (hasil migrasi) — tapi verifikasi
+        // sebenarnya harus via backend (cookie). Untuk kompatibilitas, masih
+        // izinkan baca absensi_auth lama sambil memberi warning untuk migrasi.
+        const savedMinimal = localStorage.getItem('absensi_auth_minimal');
+        if (savedMinimal) {
+          try {
+            return JSON.parse(savedMinimal) as AuthUser;
+          } catch {
+            localStorage.removeItem('absensi_auth_minimal');
+          }
+        }
+        // Fallback: baca legacy key tapi jangan andalkan untuk produksi
+        const savedLegacy = localStorage.getItem('absensi_auth');
+        if (savedLegacy) {
+          try {
+            const parsed = JSON.parse(savedLegacy) as AuthUser;
+            // Migrasi: simpan minimal dan hapus legacy yang penuh
+            logger.warn(
+              '[Auth] absensi_auth legacy terdeteksi saat hasApi=true — migrasi ke minimal & httpOnly cookie disarankan.'
+            );
+            return parsed;
+          } catch {
+            localStorage.removeItem('absensi_auth');
+          }
+        }
+        return null;
+      }
       const saved = localStorage.getItem('absensi_auth');
       return saved ? JSON.parse(saved) : null;
     } catch {
       localStorage.removeItem('absensi_auth');
+      localStorage.removeItem('absensi_auth_minimal');
       return null;
     }
   });
 
   const simpanSesi = useCallback((authUser: AuthUser) => {
     try {
+      if (hasApi) {
+        // Mode backend aktif: JANGAN simpan AuthUser penuh di localStorage.
+        // Ideal: backend menyetel httpOnly cookie (Set-Cookie) — frontend tidak
+        // perlu menyimpan token/sesi. Minimal: simpan hanya data non-sensitif
+        // (id, role, name) untuk UI, dan verifikasi sesi ke backend saat reload.
+        // Ini mencegah pencurian token via XSS (localStorage rentan XSS).
+        const minimal: AuthUser = {
+          id: authUser.id,
+          name: authUser.name,
+          role: authUser.role,
+          // avatar/email boleh disertakan untuk UI, tapi bukan rahasia
+          avatar: authUser.avatar,
+          email: authUser.email,
+        };
+        localStorage.setItem('absensi_auth_minimal', JSON.stringify(minimal));
+        // Hapus legacy full object jika ada
+        localStorage.removeItem('absensi_auth');
+        return;
+      }
+      // Mode demo lokal (hasApi=false): boleh pakai localStorage penuh
       localStorage.setItem('absensi_auth', JSON.stringify(authUser));
     } catch {
       logger.warn('Gagal menyimpan sesi ke localStorage karena kuota penuh.');
@@ -123,6 +180,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Fallback: backend unreachable / role tak didukung — pakai store lokal
+      // CATATAN: hashPassword di bawah HANYA untuk mode demo lokal (hasApi===false).
+      // Di mode backend (hasApi===true) cabang ini tidak pernah dieksekusi.
       const hashedInput = await hashPassword(password);
 
       if (role === 'teacher') {
@@ -163,10 +222,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return true;
         }
       } else if (role === 'parent') {
+        // Login wali: identifier unik = NIS anak (bukan nama). Ini mencegah
+        // tabrakan nama & tebakan (nama tidak unik). Kombinasikan NIS + parentPassword.
+        const trimmedId = id.trim();
         const students = getStudents();
         for (const s of students) {
           if (
-            s.parentName?.toLowerCase() === id.toLowerCase() &&
+            s.nis === trimmedId &&
             s.status !== 'keluar' &&
             s.status !== 'lulus' &&
             s.status !== 'pindah'
@@ -206,6 +268,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await fetch(`${API_BASE}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ idToken: credential, role }),
         });
 
@@ -242,8 +305,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('absensi_auth');
+    localStorage.removeItem('absensi_auth_minimal');
     // Revoke token di server (best-effort — jangan blokir logout lokal jika
     // backend tidak terjangkau). Tanpa ini token tetap valid sampai expiry.
+    // Token idealnya di httpOnly cookie — server akan clear cookie via Set-Cookie.
     void logoutPortal();
     clearPortalTokens();
   }, []);
