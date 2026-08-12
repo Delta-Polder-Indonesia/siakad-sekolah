@@ -63,7 +63,7 @@ Proyek ini adalah aplikasi **Portal SIAKAD Sekolah** berbasis **React 19 + Vite 
 | BUG-05 | Admin PPDB client-side (P1) | ✅ **DIPERBAIKI** | Autentikasi admin PPDB dipindah ke SERVER saat backend aktif: `adminLogin` via `POST /api/auth/admin/login` (JWT role ADMIN), `isAdminAuthenticated` berbasis server-issued token; konfigurasi PPDB authoritative di server (`/api/ppdb/config`, requireAuth+requireAdmin). PIN client hanya fallback mode demo. |
 | BUG-06 | Backend tsc gagal (P2) | ⏳ **UNVERIFIED** | Sandbox tak bisa unduh engine Prisma; perlu `prisma generate` dgn network |
 | BUG-07 | Dua shell paralel (P2) | ✅ **SEBAGIAN** | `AppShell.tsx` (dead, ber-bug) dihapus; satu shell tersisa (`AuthenticatedApp`) |
-| BUG-08 | Deep-link/refresh hilang halaman (P2) | ⏳ Terdefer | Butuh migrasi navigasi ke URL-as-source-of-truth; berisiko, tidak dilakukan di sesi ini |
+| BUG-08 | Deep-link/refresh hilang halaman (P2) | ✅ **DIPERBAIKI** | URL jadi sumber kebenaran: `pathToPage` (inverse `pageToPath`) memulihkan halaman dari `location.pathname` saat mount/refresh/back-forward; URL disinkronkan saat navigasi. + konstanta FEEDBACK per role. (+21 test routes) |
 | BUG-09 | Default credentials seed (P2) | ⏳ Terdefer | Backend sudah blokir password lemah di prod; seed demo dibiarkan (kredensial demo terdokumentasi) |
 | BUG-10 | Service duplikat (P3) | ✅ **DIKOREKSI** | Ternyata **bukan** dead code — `data/services/*` adalah fallback lokal dari `src/services/*` (pola API-wrapper + fallback), konsisten dengan PPDB |
 | BUG-11 | Health publik bocorkan info (P3) | ✅ **DIPERBAIKI** | `/detailed`, `/database`, `/memory`, `/log-aggregation` kini `requireAuth, requireAdmin` |
@@ -538,13 +538,14 @@ PHASE 9 — DOCUMENTATION
 24. **Perbaiki dulu:** PHASE 1 (migrasi + PPDB route), lalu PHASE 2 (keamanan).
 25. **Layak produksi?** **Belum** untuk mode backend. Mode frontend/demo **dapat dipakai sebagai prototype**; untuk produksi riil harus menyelesaikan PHASE 1–4.
 
-> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 03, 04, 05, 07, 11, 12. ⏳ TERDEFER: BUG-08, 09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ UNVERIFIED: BUG-06 (butuh network untuk `prisma generate`).
+> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 03, 04, 05, 07, 08, 11, 12. ⏳ TERDEFER: BUG-09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ UNVERIFIED: BUG-06 (butuh network untuk `prisma generate`).
 
 > **Status penyelesaian bertahap (sesi perbaikan):**
 > - **PHASE 1 (Blockers):** ✅ BUG-01 migrasi, BUG-02 PPDB — **selesai & terverifikasi.**
 > - **PHASE 2 (Security):** ✅ BUG-11 health, BUG-12 feedback log — **selesai.**
 > - **PHASE 3 (Data/API):** ✅ BUG-04 admin-ops 403 — **selesai.** ✅ **BUG-03 tuntas** — blueprint 7 domain akademik disambungkan: **Attendance · Rapot · Billing · Library · Assignment · SuratIzin · Roster**.
 > - **PHASE 3 (Security/Data):** ✅ **BUG-05 selesai** — otorisasi admin PPDB dipindah ke server (login JWT + config authoritative).
+> - **PHASE 4 (Core):** ✅ **BUG-08 selesai** — deep-link & refresh memulihkan halaman dari URL (URL = source of truth).
 > - **PHASE 4 (Core):** ✅ BUG-07 hapus shell duplikat — **selesai.** ⏳ BUG-08 deep-link — terdefer.
 > - **PHASE 5–9:** ⏳ Sebagian besar terdefer (perlu pengembangan backend CRUD per domain, migrasi router, dsb.).
 
