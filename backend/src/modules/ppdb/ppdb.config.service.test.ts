@@ -22,7 +22,7 @@ const fakeConfig = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('getPpdbConfig', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('mengembalikan default saat belum ada konfigurasi', async () => {
     mockFindFirst.mockResolvedValue(null);
@@ -39,7 +39,7 @@ describe('getPpdbConfig', () => {
 });
 
 describe('updatePpdbConfig', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memperbarui config yang ada dengan field yang dikirim', async () => {
     mockFindFirst.mockResolvedValue(fakeConfig());

@@ -42,7 +42,7 @@ const fakeRow = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listAttendance', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memfilter berdasarkan date (rentang UTC start-of-day)', async () => {
     mockFindMany.mockResolvedValue([fakeRow()]);
@@ -87,7 +87,7 @@ describe('listAttendance', () => {
 });
 
 describe('createAttendanceRecords', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menggunakan createMany dengan skipDuplicates & status normal', async () => {
     mockCreateMany.mockResolvedValue({ count: 2 });
@@ -121,7 +121,7 @@ describe('createAttendanceRecords', () => {
 });
 
 describe('deleteAttendance', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menghapus record yang ada dan mengembalikan true', async () => {
     mockFindUnique.mockResolvedValue(fakeRow());

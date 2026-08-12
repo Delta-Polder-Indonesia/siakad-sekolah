@@ -4,8 +4,16 @@
 // AssignmentSubmission). Konten kaya (summary, books, videos, attachments,
 // exercises) disimpan sebagai JSON di kolom `content`.
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
 import { NotFoundError } from '../../utils/errors.js';
+
+// Helper: nilai yang valid untuk kolom JSON nullable Prisma.
+// `null` (SQL NULL) → Prisma.DbNull; objek JSON → nilai aslinya.
+function jsonInput(value: Record<string, unknown> | null | undefined): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  if (value === null || value === undefined) return Prisma.DbNull;
+  return value as Prisma.InputJsonValue;
+}
 
 // ── DTO ─────────────────────────────────────────────────────────────────────
 export interface AssignmentDTO {
@@ -89,7 +97,7 @@ export async function upsertAssignment(
     classId: input.classId,
     title: input.title,
     description: input.description ?? null,
-    content: input.content ?? null,
+    content: jsonInput(input.content),
     dueDate: toUtcStartOfDay(input.dueDate),
     createdBy: input.createdBy,
   };

@@ -38,7 +38,7 @@ const tx = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listTransactions', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it("memetakan status DB 'MENUNGGU' ke UI 'menunggu' & memberName dari relasi", async () => {
     mockTxFindMany.mockResolvedValue([tx()]);
@@ -58,7 +58,7 @@ describe('listTransactions', () => {
 });
 
 describe('borrowBook', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menolak saat stok buku habis', async () => {
     mockBookFindUnique.mockResolvedValue({ id: 'b1', available: 0 });
@@ -78,7 +78,7 @@ describe('borrowBook', () => {
 });
 
 describe('approveLoan', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menolak saat transaksi bukan MENUNGGU', async () => {
     mockTxFindUnique.mockResolvedValue(tx({ status: 'DIPINJAM' }));
@@ -96,7 +96,7 @@ describe('approveLoan', () => {
 });
 
 describe('returnBook', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menolak saat sudah dikembalikan', async () => {
     mockTxFindUnique.mockResolvedValue(tx({ status: 'DIKEMBALIKAN' }));
@@ -116,7 +116,7 @@ describe('returnBook', () => {
 });
 
 describe('rejectLoan', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menandai DITOLAK dengan catatan', async () => {
     mockTxFindUnique.mockResolvedValue(tx());

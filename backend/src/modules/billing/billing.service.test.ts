@@ -57,7 +57,7 @@ const fakeBill = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listBilling', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memfilter status lunas → isPaid=true', async () => {
     mockFindMany.mockResolvedValue([]);
@@ -92,7 +92,7 @@ describe('listBilling', () => {
 });
 
 describe('payBilling', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menandai isPaid=true dengan metode & waktu pembayaran', async () => {
     mockFindUnique.mockResolvedValue(fakeBill());
@@ -114,7 +114,7 @@ describe('payBilling', () => {
 });
 
 describe('pengaturan', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('mengembalikan default saat tidak ada konfigurasi', async () => {
     mockFindFirst.mockResolvedValue(null);
@@ -136,7 +136,7 @@ describe('pengaturan', () => {
 });
 
 describe('generateAnnualBilling', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('membuat 12 tagihan per siswa dengan unique [studentId,year,month]', async () => {
     mockStudentFindMany.mockResolvedValue([{ id: 's1' }, { id: 's2' }]);

@@ -46,7 +46,7 @@ const fakeRow = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listRapot', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memfilter berdasarkan tahunAjaran (academicYear) & semester', async () => {
     mockFindMany.mockResolvedValue([fakeRow()]);
@@ -88,7 +88,7 @@ describe('listRapot', () => {
 });
 
 describe('upsertRapot', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memetakan DTO → field DB pada unique compound key', async () => {
     mockUpsert.mockResolvedValue(fakeRow());
@@ -128,7 +128,7 @@ describe('upsertRapot', () => {
 });
 
 describe('deleteRapot', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menghapus record yang ada dan mengembalikan true', async () => {
     mockFindUnique.mockResolvedValue(fakeRow());

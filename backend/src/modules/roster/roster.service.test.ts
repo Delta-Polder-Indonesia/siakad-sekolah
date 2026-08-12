@@ -25,7 +25,7 @@ const fakeRoster = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listRoster', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memfilter classId & men-serialize DTO', async () => {
     mockFindMany.mockResolvedValue([fakeRoster()]);
@@ -41,7 +41,7 @@ describe('listRoster', () => {
 });
 
 describe('createRoster', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('membuat jadwal roster dengan updatedBy dari caller', async () => {
     mockCreate.mockResolvedValue(fakeRoster());
@@ -55,7 +55,7 @@ describe('createRoster', () => {
 });
 
 describe('deleteRoster', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('menghapus jadwal yang ada', async () => {
     mockFindUnique.mockResolvedValue(fakeRoster());

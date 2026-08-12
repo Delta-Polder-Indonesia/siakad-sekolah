@@ -26,7 +26,7 @@ const fakeSurat = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listSurat', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('memfilter status & men-serialize DTO (status UI huruf kecil, letterDate YYYY-MM-DD)', async () => {
     mockFindMany.mockResolvedValue([fakeSurat()]);
@@ -39,7 +39,7 @@ describe('listSurat', () => {
 });
 
 describe('createSurat', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('membuat surat dengan status awal MENUNGGU & letterDate UTC', async () => {
     mockCreate.mockResolvedValue(fakeSurat());
@@ -56,7 +56,7 @@ describe('createSurat', () => {
 });
 
 describe('updateSuratStatus', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('mengubah status ke DISETUJUI (DB) dan men-serialize ke disetujui', async () => {
     mockFindUnique.mockResolvedValue(fakeSurat());

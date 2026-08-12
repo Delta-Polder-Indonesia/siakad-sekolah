@@ -48,7 +48,7 @@ const fakeSub = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 describe('listAssignments', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
   it('memfilter classId & men-serialize DTO (dueDate YYYY-MM-DD, content dari JSON)', async () => {
     mockAssignFindMany.mockResolvedValue([fakeAssign()]);
     mockAssignCount.mockResolvedValue(1);
@@ -60,7 +60,7 @@ describe('listAssignments', () => {
 });
 
 describe('upsertAssignment', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
   it('membuat tugas baru dengan content JSON & dueDate UTC', async () => {
     mockAssignCreate.mockResolvedValue(fakeAssign());
     const item = await upsertAssignment({
@@ -81,7 +81,7 @@ describe('upsertAssignment', () => {
 });
 
 describe('deleteAssignment', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
   it('menghapus tugas yang ada', async () => {
     mockAssignFindUnique.mockResolvedValue(fakeAssign());
     mockAssignDelete.mockResolvedValue(fakeAssign());
@@ -95,7 +95,7 @@ describe('deleteAssignment', () => {
 });
 
 describe('upsertSubmission', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
   it('membuat submisi baru saat belum ada', async () => {
     mockSubFindUnique.mockResolvedValue(null);
     mockSubCreate.mockResolvedValue(fakeSub());
