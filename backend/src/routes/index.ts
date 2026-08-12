@@ -10,6 +10,14 @@ import { dataRetentionRouter } from './dataRetention.route.js';
 import { queryOptimizationRouter } from './queryOptimization.route.js';
 import { feedbackRouter } from '../modules/feedback/feedback.route.js';
 import { statsRouter } from '../modules/stats/stats.route.js';
+import { attendanceRouter } from '../modules/attendance/attendance.route.js';
+import { rapotRouter } from '../modules/rapot/rapot.route.js';
+import { billingRouter } from '../modules/billing/billing.route.js';
+import { libraryRouter } from '../modules/library/library.route.js';
+import { assignmentRouter } from '../modules/assignment/assignment.route.js';
+import { suratIzinRouter } from '../modules/surat-izin/suratIzin.route.js';
+import { rosterRouter } from '../modules/roster/roster.route.js';
+import { ppdbRouter } from '../modules/ppdb/ppdb.route.js';
 
 export const apiRouter = Router();
 
@@ -24,3 +32,11 @@ apiRouter.use('/data-retention', dataRetentionRouter);
 apiRouter.use('/query-optimization', queryOptimizationRouter);
 apiRouter.use('/feedback',      feedbackRouter);
 apiRouter.use('/stats',         statsRouter);
+apiRouter.use('/attendance',    attendanceRouter);
+apiRouter.use('/rapot',         rapotRouter);
+apiRouter.use('/billing',       billingRouter);
+apiRouter.use('/library',       libraryRouter);
+apiRouter.use('/assignments',   assignmentRouter);
+apiRouter.use('/surat-izin',    suratIzinRouter);
+apiRouter.use('/roster',        rosterRouter);
+apiRouter.use('/ppdb',          ppdbRouter);

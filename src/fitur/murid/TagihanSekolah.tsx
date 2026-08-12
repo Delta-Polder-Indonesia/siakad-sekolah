@@ -3,11 +3,11 @@ import { CreditCard, Landmark, Wallet, CircleDollarSign, Download } from 'lucide
 import { exportTagihanPdf } from '../../utils/export';
 import { useAuth } from '../../context/AuthContext';
 import {
-  bayarTagihanSekolah,
   getTagihanSekolahBySiswa,
   getTahunTagihanSiswa,
   getLocalStudentId,
 } from '../../data/services';
+import { payTagihanSekolah } from '../../services/billingService';
 import type { TagihanSekolah } from '../../types';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
@@ -111,12 +111,12 @@ export default function TagihanSekolahPage() {
     );
   };
 
-  const handleBayarMulti = () => {
+  const handleBayarMulti = async () => {
     if (billsToPay.length === 0) return;
 
-    billsToPay.forEach((bill) => {
-      bayarTagihanSekolah(bill.id, selectedMethod);
-    });
+    await Promise.all(
+      billsToPay.map((bill) => payTagihanSekolah(bill.id, selectedMethod))
+    );
 
     const listBulan = billsToPay.map((b) => MONTH_NAMES[b.month - 1]).join(', ');
     setInfoMessage(

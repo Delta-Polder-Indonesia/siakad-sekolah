@@ -1,13 +1,17 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   getBooks,
   getStudents,
-  borrowBook,
-  returnBook,
   getLibraryTransactions,
-  approveLibraryLoan,
-  rejectLibraryLoan,
 } from '@/data/services';
+import {
+  fetchBooks,
+  fetchTransactions,
+  borrowBookApi,
+  approveLoanApi,
+  rejectLoanApi,
+  returnBookApi,
+} from '@/services/libraryService';
 import { useStoreVersion } from '@/hooks/useStoreVersion'; // Menggunakan alias @/
 import { FormPeminjaman } from './FormPeminjaman';
 import { FormPengembalian } from './FormPengembalian';
@@ -20,6 +24,12 @@ export default function PerpusTransaksi({ activeSubTab }: PerpusTransaksiProps) 
   const storeVersion = useStoreVersion();
   const isPinjam = activeSubTab === 'pinjam';
 
+  // Muat katalog & transaksi dari backend bila aktif (fallback lokal).
+  useEffect(() => {
+    void fetchBooks();
+    void fetchTransactions();
+  }, [storeVersion]);
+
   const allBooks = useMemo(() => getBooks(), [storeVersion]);
   const allStudents = useMemo(() => getStudents(), [storeVersion]);
   const allTx = useMemo(() => getLibraryTransactions(), [storeVersion]);
@@ -31,16 +41,16 @@ export default function PerpusTransaksi({ activeSubTab }: PerpusTransaksiProps) 
           books={allBooks}
           students={allStudents}
           transactions={allTx}
-          onBorrow={borrowBook}
-          onApprove={approveLibraryLoan}
-          onReject={rejectLibraryLoan}
+          onBorrow={borrowBookApi}
+          onApprove={approveLoanApi}
+          onReject={rejectLoanApi}
         />
       ) : (
         <FormPengembalian
           allTx={allTx}
           allBooks={allBooks}
           allStudents={allStudents}
-          onReturn={(txId, returnDate) => returnBook(txId, returnDate)}
+          onReturn={(txId, returnDate) => returnBookApi(txId, returnDate)}
         />
       )}
     </div>

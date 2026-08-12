@@ -1,12 +1,46 @@
 // Seed data awal agar backend punya akun demo yang sama dengan frontend (store.ts).
 // Jalankan: npm run prisma:seed
+//
+// KEAMANAN (BUG-09): password demo hanya boleh dipakai di lingkungan non-produksi.
+// - NODE_ENV=production akan MEMBLOKIR seeding dengan password lemah default
+//   dan mewajibkan SEED_TEACHER_PASSWORD / SEED_STUDENT_PASSWORD (kuat) di env.
+// - Non-produksi memakai default guru123 / siswa123 untuk demo.
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const TEACHER_PASSWORD = 'guru123';
-const STUDENT_PASSWORD = 'siswa123';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Password demo default (non-produksi saja).
+const DEMO_TEACHER_PASSWORD = 'guru123';
+const DEMO_STUDENT_PASSWORD = 'siswa123';
+
+function resolveTeacherPassword(): string {
+  if (isProduction) {
+    const pwd = process.env.SEED_TEACHER_PASSWORD;
+    if (!pwd || pwd.length < 8 || ['guru123', 'password', 'admin', 'password123'].includes(pwd.toLowerCase())) {
+      throw new Error(
+        'SEED di blokir di production: set SEED_TEACHER_PASSWORD (min 8 karakter, kuat) di environment.'
+      );
+    }
+    return pwd;
+  }
+  return DEMO_TEACHER_PASSWORD;
+}
+
+function resolveStudentPassword(): string {
+  if (isProduction) {
+    const pwd = process.env.SEED_STUDENT_PASSWORD;
+    if (!pwd || pwd.length < 8 || ['siswa123', 'password', 'admin', 'password123'].includes(pwd.toLowerCase())) {
+      throw new Error(
+        'SEED di blokir di production: set SEED_STUDENT_PASSWORD (min 8 karakter, kuat) di environment.'
+      );
+    }
+    return pwd;
+  }
+  return DEMO_STUDENT_PASSWORD;
+}
 
 const classes = [
   { code: 'c1', name: 'X IPA 1', grade: 'X' },
@@ -27,8 +61,11 @@ const students = [
 ];
 
 async function main() {
-  const teacherHash = await bcrypt.hash(TEACHER_PASSWORD, 10);
-  const studentHash = await bcrypt.hash(STUDENT_PASSWORD, 10);
+  const teacherPassword = resolveTeacherPassword();
+  const studentPassword = resolveStudentPassword();
+
+  const teacherHash = await bcrypt.hash(teacherPassword, 10);
+  const studentHash = await bcrypt.hash(studentPassword, 10);
 
   // School config (single row)
   const existingConfig = await prisma.schoolConfig.findFirst();

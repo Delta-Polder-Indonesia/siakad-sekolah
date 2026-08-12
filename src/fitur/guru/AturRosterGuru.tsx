@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  addClassRoster,
-  deleteClassRoster,
   getClassRosters,
   getClasses,
   getTeacherByUser,
   getLocalTeacherId,
 } from '../../data/services';
+import { createRosterApi, deleteRosterApi } from '../../services/rosterService';
 import { Trash2, Plus, Calendar, Clock, MapPin } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
@@ -55,9 +54,9 @@ export default function AturRosterGuru() {
     [selectedClassId, storeVersion]
   );
 
-  const handleAddRoster = () => {
+  const handleAddRoster = async () => {
     if (!selectedClassId || !subject.trim() || !startTime || !endTime || !user) return;
-    addClassRoster({
+    await createRosterApi({
       id: `r_${Date.now()}`,
       classId: selectedClassId,
       subject: subject.trim(),
@@ -71,6 +70,10 @@ export default function AturRosterGuru() {
     });
     setSubject('');
     setRoom('');
+  };
+
+  const handleDeleteRoster = async (id: string) => {
+    await deleteRosterApi(id);
   };
 
   return (
@@ -230,7 +233,7 @@ export default function AturRosterGuru() {
                   {/* Button Delete - Minimalis Stark */}
                   <button
                     type="button"
-                    onClick={() => deleteClassRoster(item.id)}
+                    onClick={() => handleDeleteRoster(item.id)}
                     className="shrink-0 cursor-pointer rounded-md border-2 border-black bg-white p-1.5 text-black transition-colors hover:border-rose-600 hover:bg-rose-50 hover:text-rose-600"
                     title="Hapus manifest roster"
                   >

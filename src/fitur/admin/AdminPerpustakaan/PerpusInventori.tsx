@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -11,7 +11,8 @@ import {
   Upload,
   FileText,
 } from 'lucide-react';
-import { getBooks, addOrUpdateBook, saveBooks } from '../../../data/services';
+import { getBooks } from '../../../data/services';
+import { fetchBooks, saveBookApi, deleteBookApi } from '../../../services/libraryService';
 import { useStoreVersion } from '../../../hooks/useStoreVersion';
 import { useToast } from '../../../components/ui';
 import ConfirmModal from '../../bersama/ConfirmModal';
@@ -47,6 +48,11 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
 
   // State untuk preview cover
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  // Muat katalog dari backend bila aktif (fallback lokal).
+  useEffect(() => {
+    void fetchBooks();
+  }, [storeVersion]);
 
   const allBooks = useMemo(() => getBooks(), [storeVersion]);
 
@@ -86,10 +92,9 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
     setDeleteBookId(id);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteBookId) return;
-    const next = allBooks.filter((b) => b.id !== deleteBookId);
-    saveBooks(next);
+    await deleteBookApi(deleteBookId);
     setDeleteBookId(null);
     showToast('success', '✅ Buku berhasil dihapus dari inventori.');
   };
@@ -118,9 +123,9 @@ export default function PerpusInventori({ onViewDetail }: PerpusInventoriProps) 
     setFormData((prev: Partial<Book>) => ({ ...prev, coverImage: '' }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    addOrUpdateBook(formData as Book);
+    await saveBookApi(formData as Book);
     setShowForm(false);
     setCoverPreview(null);
     showToast('success', `✅ ${editingBook ? 'Data buku diperbarui' : 'Buku baru ditambahkan'}.`);

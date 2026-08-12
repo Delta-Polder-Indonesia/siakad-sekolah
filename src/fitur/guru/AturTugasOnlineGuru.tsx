@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  addOnlineAssignment,
-  updateOnlineAssignment,
-  deleteOnlineAssignment,
   getClasses,
   getOnlineAssignmentsByClass,
   getTeacherByUser,
   getLocalTeacherId,
 } from '../../data/services';
+import { saveAssignmentApi } from '../../services/assignmentService';
 import type {
   AssignmentAttachment,
   AssignmentBook,
@@ -212,11 +210,7 @@ export default function AturTugasOnlineGuru() {
             correctIndex: e.correctIndex,
           })),
       };
-      if (editingAssignmentId) {
-        updateOnlineAssignment(payload);
-      } else {
-        addOnlineAssignment(payload);
-      }
+      await saveAssignmentApi(payload);
       resetDraft();
     } catch {
       // Gagal memproses lampiran — form tetap diisi agar user bisa ulangi

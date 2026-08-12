@@ -33,7 +33,10 @@ interface FormPengembalianProps {
   allTx: Transaction[];
   allBooks: Book[];
   allStudents: Student[];
-  onReturn: (txId: string, returnDate: string) => { ok: boolean; message?: string };
+  onReturn: (
+    txId: string,
+    returnDate: string
+  ) => { ok: boolean; message?: string } | Promise<{ ok: boolean; message?: string }>;
 }
 
 export function FormPengembalian({
@@ -99,12 +102,12 @@ export function FormPengembalian({
     return Math.abs(sisa) * dendaPerHari;
   };
 
-  const handleReturn = (txId: string, bookTitle: string) => {
+  const handleReturn = async (txId: string, bookTitle: string) => {
     const returnDate = new Date().toISOString().slice(0, 10);
     const tx = allTx.find((t) => t.id === txId);
     if (!tx) return;
 
-    const res = onReturn(txId, returnDate);
+    const res = await onReturn(txId, returnDate);
     if (res.ok) {
       const sisaHari = getSisaHari(tx.dueDate);
       const denda = getDenda(tx.dueDate);

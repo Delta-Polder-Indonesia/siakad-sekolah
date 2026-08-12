@@ -6,7 +6,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     // Aktifkan mode API agar service yang bergantung pada backend
-    // (ppdbService, authApi) menjalankan cabang fetch saat diuji.
+    // (authApi, feedbackService, attendanceService) menjalankan cabang fetch
+    // saat diuji. Catatan: ppdbService terkunci mode lokal (usePpdbApi=false).
     env: {
       VITE_API_BASE_URL: 'http://localhost:4000/api',
     },

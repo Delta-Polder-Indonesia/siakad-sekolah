@@ -6,12 +6,11 @@ import {
   getTeacherByUser,
   getLocalTeacherId,
   getNilaiRapotByKelas,
-  upsertNilaiRapot,
-  deleteNilaiRapot,
   getMataPelajaran,
   getTahunAjaran,
   getTahunAjaranAktif,
 } from '../../data/services';
+import { submitNilaiRapot, deleteRapotById } from '../../services/rapotService';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Save, Trash2, Plus, BookOpenCheck, Search, Edit2, Download } from 'lucide-react';
 import { exportRapotPdf, exportRapotCsv } from '../../utils/export';
@@ -144,7 +143,7 @@ export default function InputRapotGuru() {
 
   const mapelToSubmit = isManualMode ? manualMapel.trim() : formMapel.trim();
 
-  const handleSimpanNilai = () => {
+  const handleSimpanNilai = async () => {
     if (!user || !selectedStudentId || !selectedClassId || !mapelToSubmit) {
       setNotice('Pilih siswa dan tentukan mata pelajaran terlebih dahulu.');
       return;
@@ -178,7 +177,7 @@ export default function InputRapotGuru() {
       updatedAt: Date.now(),
     };
 
-    upsertNilaiRapot({
+    await submitNilaiRapot({
       ...item,
       nilaiHarian: item.nilaiHarian ?? 0,
       inputBy: item.inputBy || 'SYSTEM_GURU',
@@ -206,9 +205,9 @@ export default function InputRapotGuru() {
     setNotice('');
   };
 
-  const handleHapusNilai = (id: string) => {
+  const handleHapusNilai = async (id: string) => {
     if (!window.confirm('Hapus log nilai mata pelajaran ini?')) return;
-    deleteNilaiRapot(id);
+    await deleteRapotById(id);
     setNotice('LOG_DELETED: Nilai berhasil dihapus.');
   };
 

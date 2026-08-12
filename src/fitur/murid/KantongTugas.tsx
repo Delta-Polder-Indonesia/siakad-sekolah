@@ -4,8 +4,8 @@ import {
   getOnlineAssignmentsByClass,
   getStudentByUser,
   getSubmissionByAssignmentAndStudent,
-  upsertAssignmentSubmission,
 } from '../../data/services';
+import { submitAssignmentApi } from '../../services/assignmentService';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import {
   Send,
@@ -107,7 +107,7 @@ export default function TaskPouchPage() {
         : existingSubmission?.attachmentDataUrl;
       const attachmentName = selectedFile ? selectedFile.name : existingSubmission?.attachmentName;
 
-      upsertAssignmentSubmission({
+      await submitAssignmentApi({
         id: existingSubmission?.id || `sub_${Date.now()}`,
         assignmentId: selectedTask.id,
         studentId: student.id,

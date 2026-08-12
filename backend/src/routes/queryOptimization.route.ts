@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAdmin } from '../middleware/auth.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { QueryOptimizationService } from '../services/queryOptimization.service.js';
 import { logger } from '../config/logger.js';
 
@@ -8,7 +8,7 @@ export const queryOptimizationRouter = Router();
 /**
  * Get query performance analysis (Admin only)
  */
-queryOptimizationRouter.get('/analyze', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.get('/analyze', requireAuth, requireAdmin, async (_req, res) => {
   try {
     logger.info('Query performance analysis requested by admin');
     const analysis = await QueryOptimizationService.analyzeQueryPerformance();
@@ -30,7 +30,7 @@ queryOptimizationRouter.get('/analyze', requireAdmin, async (_req, res) => {
 /**
  * Enable query statistics tracking (Admin only)
  */
-queryOptimizationRouter.post('/enable-statistics', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.post('/enable-statistics', requireAuth, requireAdmin, async (_req, res) => {
   try {
     logger.info('Enabling query statistics tracking');
     const result = await QueryOptimizationService.enableQueryStatistics();
@@ -53,7 +53,7 @@ queryOptimizationRouter.post('/enable-statistics', requireAdmin, async (_req, re
 /**
  * Get execution plan for specific query (Admin only)
  */
-queryOptimizationRouter.post('/explain', requireAdmin, async (req, res) => {
+queryOptimizationRouter.post('/explain', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { query } = req.body;
     
@@ -84,7 +84,7 @@ queryOptimizationRouter.post('/explain', requireAdmin, async (req, res) => {
 /**
  * Get slow queries (Admin only)
  */
-queryOptimizationRouter.get('/slow-queries', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.get('/slow-queries', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const slowQueries = await QueryOptimizationService.identifySlowQueries();
     
@@ -106,7 +106,7 @@ queryOptimizationRouter.get('/slow-queries', requireAdmin, async (_req, res) => 
 /**
  * Get missing indexes recommendations (Admin only)
  */
-queryOptimizationRouter.get('/missing-indexes', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.get('/missing-indexes', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const missingIndexes = await QueryOptimizationService.identifyMissingIndexes();
     
@@ -128,7 +128,7 @@ queryOptimizationRouter.get('/missing-indexes', requireAdmin, async (_req, res) 
 /**
  * Get unused indexes (Admin only)
  */
-queryOptimizationRouter.get('/unused-indexes', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.get('/unused-indexes', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const unusedIndexes = await QueryOptimizationService.identifyUnusedIndexes();
     
@@ -150,7 +150,7 @@ queryOptimizationRouter.get('/unused-indexes', requireAdmin, async (_req, res) =
 /**
  * Get table sizes (Admin only)
  */
-queryOptimizationRouter.get('/table-sizes', requireAdmin, async (_req, res) => {
+queryOptimizationRouter.get('/table-sizes', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const tableSizes = await QueryOptimizationService.analyzeTableSizes();
     

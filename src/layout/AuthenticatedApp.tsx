@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { ComponentType } from 'react';
 import { PageProps } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { pageToPath, pathToPage } from '../routes';
 import Sidebar from './Sidebar';
 import { GuestBookProvider } from '../fitur/tamu/context/GuestBookContext';
 import { NotificationProvider } from '../fitur/bersama/NotificationProvider';
@@ -216,42 +217,48 @@ function getDefaultPage(role?: string): string {
 
 export default function AuthenticatedApp() {
   const { user } = useAuth();
-  const [activePage, setActivePage] = useState(() => getDefaultPage(user?.role));
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [historyInitialized, setHistoryInitialized] = useState(false);
 
   const pages = getPagesByRole(user?.role);
 
-  useEffect(() => {
-    const initialPage = getDefaultPage(user?.role);
-    setActivePage(initialPage);
-  }, [user?.id, user?.role]);
+  // Pulihkan halaman dari URL (deep-link/refresh). Bila path tidak dikenal
+  // untuk role, jatuh ke halaman default.
+  const pageIdFromLocation = useCallback(
+    (role?: string): string => {
+      if (!role) return getDefaultPage(role);
+      const fromUrl = pathToPage(window.location.pathname, role);
+      if (fromUrl && pages[fromUrl]) return fromUrl;
+      return getDefaultPage(role);
+    },
+    [pages]
+  );
 
+  const [activePage, setActivePage] = useState<string>(() => pageIdFromLocation(user?.role));
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Saat user berganti, pulihkan dari URL (atau default).
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      const state = event.state as { page?: string } | null;
-      if (state?.page) {
-        setActivePage(state.page);
-      }
+    setActivePage(pageIdFromLocation(user?.role));
+  }, [user?.id, user?.role, pageIdFromLocation]);
+
+  // Navigasi browser back/forward: baca URL → aktifkan halaman.
+  useEffect(() => {
+    const handlePopState = () => {
+      setActivePage(pageIdFromLocation(user?.role));
     };
-
     window.addEventListener('popstate', handlePopState);
-    if (!historyInitialized) {
-      window.history.replaceState({ page: activePage }, '', window.location.pathname);
-      setHistoryInitialized(true);
-    }
-
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [historyInitialized, activePage]);
+  }, [user?.id, user?.role, pageIdFromLocation]);
 
+  // Saat halaman berubah (navigasi via sidebar), sinkronkan URL.
   useEffect(() => {
-    if (!historyInitialized) return;
-    const currentState = window.history.state as { page?: string } | null;
-    if (!currentState || currentState.page !== activePage) {
-      window.history.pushState({ page: activePage }, '', window.location.pathname);
+    if (!user) return;
+    const target = pageToPath(activePage, user.role);
+    if (window.location.pathname !== target) {
+      window.history.pushState({ page: activePage }, '', target);
     }
-  }, [activePage, historyInitialized]);
+  }, [activePage, user]);
 
+  // Halaman tidak valid utk role → default.
   useEffect(() => {
     if (user && pages && !pages[activePage]) {
       setActivePage(getDefaultPage(user.role));

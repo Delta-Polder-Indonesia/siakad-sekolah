@@ -15,7 +15,8 @@ import {
   getStudents,
 } from '../../../data/services';
 import { useStoreVersion } from '../../../hooks/useStoreVersion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchBooks, fetchTransactions, fetchLibraryMembers } from '../../../services/libraryService';
 
 const MONTHS = [
   'Januari',
@@ -35,6 +36,13 @@ const MONTHS = [
 export default function PerpusDashboard() {
   const storeVersion = useStoreVersion();
   const [selectedMonth, setSelectedMonth] = useState('');
+
+  // Muat data dari backend bila aktif (fallback lokal).
+  useEffect(() => {
+    void fetchBooks();
+    void fetchLibraryMembers();
+    void fetchTransactions();
+  }, [storeVersion]);
 
   const books = useMemo(() => getBooks(), [storeVersion]);
   const members = useMemo(() => getLibraryMembers(), [storeVersion]);

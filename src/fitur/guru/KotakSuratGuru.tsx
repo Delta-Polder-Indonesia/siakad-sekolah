@@ -5,8 +5,8 @@ import {
   getStudents,
   getSuratIzin,
   getTeacherByUser,
-  updateStatusSuratIzin,
 } from '../../data/services';
+import { updateSuratStatusApi } from '../../services/suratIzinService';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Calendar, ChevronLeft, ChevronRight, MailOpen } from 'lucide-react';
 
@@ -121,8 +121,8 @@ export default function KotakSuratGuru() {
     setSelectedDate(null);
   };
 
-  const handleUpdateStatus = (id: string, status: LetterItem['status']) => {
-    updateStatusSuratIzin(id, status);
+  const handleUpdateStatus = async (id: string, status: LetterItem['status']) => {
+    await updateSuratStatusApi(id, status);
   };
 
   const typeLabel: Record<LetterItem['type'], string> = {

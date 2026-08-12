@@ -8,7 +8,7 @@ import {
   handleVerifyBackup,
   handleBackupStats,
 } from './backup.controller.js';
-import { requireAdmin } from '../../middleware/auth.js';
+import { requireAuth, requireAdmin } from '../../middleware/auth.js';
 
 export const backupRouter = Router();
 
@@ -22,9 +22,9 @@ const backupLimiter = rateLimit({
 });
 
 // Backup management endpoints (admin only)
-backupRouter.post('/create', requireAdmin, backupLimiter, handleCreateBackup);
-backupRouter.post('/restore/:filename', requireAdmin, backupLimiter, handleRestoreBackup);
-backupRouter.get('/list', requireAdmin, handleListBackups);
-backupRouter.delete('/cleanup', requireAdmin, handleCleanupBackups);
-backupRouter.get('/verify/:filename', requireAdmin, handleVerifyBackup);
-backupRouter.get('/stats', requireAdmin, handleBackupStats);
+backupRouter.post('/create', requireAuth, requireAdmin, backupLimiter, handleCreateBackup);
+backupRouter.post('/restore/:filename', requireAuth, requireAdmin, backupLimiter, handleRestoreBackup);
+backupRouter.get('/list', requireAuth, requireAdmin, handleListBackups);
+backupRouter.delete('/cleanup', requireAuth, requireAdmin, handleCleanupBackups);
+backupRouter.get('/verify/:filename', requireAuth, requireAdmin, handleVerifyBackup);
+backupRouter.get('/stats', requireAuth, requireAdmin, handleBackupStats);

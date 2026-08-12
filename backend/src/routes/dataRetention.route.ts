@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAdmin } from '../middleware/auth.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { DataRetentionService, runScheduledDataRetention } from '../services/dataRetention.service.js';
 import { logger } from '../config/logger.js';
 
@@ -8,7 +8,7 @@ export const dataRetentionRouter = Router();
 /**
  * Run data retention tasks manually (Admin only)
  */
-dataRetentionRouter.post('/run', requireAdmin, async (_req, res) => {
+dataRetentionRouter.post('/run', requireAuth, requireAdmin, async (_req, res) => {
   try {
     logger.info('Manual data retention triggered by admin');
     const results = await DataRetentionService.runAllRetentionTasks();
@@ -31,7 +31,7 @@ dataRetentionRouter.post('/run', requireAdmin, async (_req, res) => {
 /**
  * Get data retention statistics (Admin only)
  */
-dataRetentionRouter.get('/stats', requireAdmin, async (_req, res) => {
+dataRetentionRouter.get('/stats', requireAuth, requireAdmin, async (_req, res) => {
   try {
     const stats = await DataRetentionService.getRetentionStats();
     
@@ -52,7 +52,7 @@ dataRetentionRouter.get('/stats', requireAdmin, async (_req, res) => {
 /**
  * Get retention configuration (Admin only)
  */
-dataRetentionRouter.get('/config', requireAdmin, async (_req, res) => {
+dataRetentionRouter.get('/config', requireAuth, requireAdmin, async (_req, res) => {
   try {
     res.json({
       ok: true,
@@ -103,7 +103,7 @@ dataRetentionRouter.get('/config', requireAdmin, async (_req, res) => {
 /**
  * Run specific retention task (Admin only)
  */
-dataRetentionRouter.post('/run/:task', requireAdmin, async (req, res) => {
+dataRetentionRouter.post('/run/:task', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { task } = req.params;
     let count = 0;

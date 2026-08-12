@@ -5,9 +5,8 @@ import {
   getLocalTeacherId,
   getClasses,
   getStudentsByClass,
-  getAttendanceByDate,
-  addAttendanceRecords,
 } from '../../data/services';
+import { fetchAttendanceByDate, submitAttendanceRecords } from '../../services/attendanceService';
 import { AttendanceRecord } from '../../types';
 import {
   CheckCircle,
@@ -64,16 +63,22 @@ export default function AttendancePage() {
 
   useEffect(() => {
     if (!selectedClass || !selectedDate) return;
-    const existing = getAttendanceByDate(selectedDate, selectedClass);
-    const map: Record<string, Status> = {};
-    const notes: Record<string, string> = {};
-    existing.forEach((r) => {
-      map[r.studentId] = r.status;
-      if (r.note) notes[r.studentId] = r.note;
+    let cancelled = false;
+    fetchAttendanceByDate(selectedDate, selectedClass).then((existing) => {
+      if (cancelled) return;
+      const map: Record<string, Status> = {};
+      const notes: Record<string, string> = {};
+      existing.forEach((r) => {
+        map[r.studentId] = r.status;
+        if (r.note) notes[r.studentId] = r.note;
+      });
+      setAttendanceMap(map);
+      setNoteMap(notes);
+      setSaved(false);
     });
-    setAttendanceMap(map);
-    setNoteMap(notes);
-    setSaved(false);
+    return () => {
+      cancelled = true;
+    };
   }, [selectedClass, selectedDate, refresh]);
 
   const setStatus = useCallback((studentId: string, status: Status) => {
@@ -93,7 +98,7 @@ export default function AttendancePage() {
     [students]
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!user || !selectedClass) return;
     const records: AttendanceRecord[] = students
       .filter((s) => attendanceMap[s.id])
@@ -108,7 +113,7 @@ export default function AttendancePage() {
         timestamp: Date.now(),
       }));
 
-    addAttendanceRecords(records);
+    await submitAttendanceRecords(records);
     setSaved(true);
     setRefresh((r) => r + 1);
   };
