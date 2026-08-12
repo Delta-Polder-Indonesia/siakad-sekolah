@@ -64,7 +64,7 @@ Proyek ini adalah aplikasi **Portal SIAKAD Sekolah** berbasis **React 19 + Vite 
 | BUG-06 | Backend tsc gagal (P2) | ⏳ **UNVERIFIED** | Sandbox tak bisa unduh engine Prisma; perlu `prisma generate` dgn network |
 | BUG-07 | Dua shell paralel (P2) | ✅ **SEBAGIAN** | `AppShell.tsx` (dead, ber-bug) dihapus; satu shell tersisa (`AuthenticatedApp`) |
 | BUG-08 | Deep-link/refresh hilang halaman (P2) | ✅ **DIPERBAIKI** | URL jadi sumber kebenaran: `pathToPage` (inverse `pageToPath`) memulihkan halaman dari `location.pathname` saat mount/refresh/back-forward; URL disinkronkan saat navigasi. + konstanta FEEDBACK per role. (+21 test routes) |
-| BUG-09 | Default credentials seed (P2) | ⏳ Terdefer | Backend sudah blokir password lemah di prod; seed demo dibiarkan (kredensial demo terdokumentasi) |
+| BUG-09 | Default credentials seed (P2) | 🔶 **SEBAGIAN** | Backend seed diblokir di produksi (wajib `SEED_TEACHER_PASSWORD`/`SEED_STUDENT_PASSWORD` kuat saat `NODE_ENV=production`); non-produksi tetap demo `guru123`/`siswa123`. `env.example` dikoreksi (`ADMIN_PASSWORD_HASH`→`ADMIN_PASSWORD`). Sisanya: wajibkan ganti password pertama login (terdefer). |
 | BUG-10 | Service duplikat (P3) | ✅ **DIKOREKSI** | Ternyata **bukan** dead code — `data/services/*` adalah fallback lokal dari `src/services/*` (pola API-wrapper + fallback), konsisten dengan PPDB |
 | BUG-11 | Health publik bocorkan info (P3) | ✅ **DIPERBAIKI** | `/detailed`, `/database`, `/memory`, `/log-aggregation` kini `requireAuth, requireAdmin` |
 | BUG-12 | `console.log` payload feedback (P3) | ✅ **DIPERBAIKI** | Mode simulasi tidak lagi mencetak `templateParams` (cegah PII leak) |
@@ -538,7 +538,7 @@ PHASE 9 — DOCUMENTATION
 24. **Perbaiki dulu:** PHASE 1 (migrasi + PPDB route), lalu PHASE 2 (keamanan).
 25. **Layak produksi?** **Belum** untuk mode backend. Mode frontend/demo **dapat dipakai sebagai prototype**; untuk produksi riil harus menyelesaikan PHASE 1–4.
 
-> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 03, 04, 05, 07, 08, 11, 12. ⏳ TERDEFER: BUG-09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ UNVERIFIED: BUG-06 (butuh network untuk `prisma generate`).
+> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 03, 04, 05, 07, 08, 11, 12. 🔶 SEBAGIAN: BUG-09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ **TERBLOKIR (sandbox, lihat `DOKUMEN_LANJUTAN_VSCODE.md`):** BUG-06 (butuh network `prisma generate`), plus verifikasi migrasi/E2E & pekerjaan besar linkage-auth + migrasi data localStorage→DB.
 
 > **Status penyelesaian bertahap (sesi perbaikan):**
 > - **PHASE 1 (Blockers):** ✅ BUG-01 migrasi, BUG-02 PPDB — **selesai & terverifikasi.**
