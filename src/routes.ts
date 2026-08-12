@@ -107,6 +107,12 @@ export const ROUTES = {
   AGENDA: '/agenda',
   PESAN: '/pesan',
   DIREKTORI_GURU: '/direktori-guru',
+
+  // Feedback (per-role)
+  GURU_FEEDBACK: '/guru/feedback',
+  SISWA_FEEDBACK: '/siswa/feedback',
+  ORTU_FEEDBACK: '/ortu/feedback',
+  TAMU_FEEDBACK: '/tamu/feedback',
 } as const;
 
 // ─── Mapping old page IDs to new route paths ───────────────────────────
@@ -127,6 +133,7 @@ const TEACHER_PAGE_ROUTES: Record<string, string> = {
   'ekskul-management': ROUTES.GURU_EKSKUL,
   profile: ROUTES.GURU_PROFIL,
   settings: ROUTES.GURU_PENGATURAN,
+  feedback: ROUTES.GURU_FEEDBACK,
 };
 
 // Student pages
@@ -142,6 +149,7 @@ const STUDENT_PAGE_ROUTES: Record<string, string> = {
   ekskul: ROUTES.SISWA_EKSKUL,
   profile: ROUTES.SISWA_PROFIL,
   settings: ROUTES.SISWA_PENGATURAN,
+  feedback: ROUTES.SISWA_FEEDBACK,
 };
 
 // Parent pages
@@ -154,6 +162,7 @@ const PARENT_PAGE_ROUTES: Record<string, string> = {
   'attendance-history': ROUTES.ORTU_RIWAYAT_ABSENSI,
   'letters-status': ROUTES.ORTU_STATUS_SURAT_IZIN,
   'bk-record': ROUTES.ORTU_BK,
+  feedback: ROUTES.ORTU_FEEDBACK,
 };
 
 // Admin pages
@@ -181,6 +190,7 @@ const GUEST_PAGE_ROUTES: Record<string, string> = {
   'daftar-tamu': ROUTES.TAMU_DAFTAR_TAMU,
   'statistik-tamu': ROUTES.TAMU_STATISTIK_TAMU,
   profile: ROUTES.TAMU_PROFILE,
+  feedback: ROUTES.TAMU_FEEDBACK,
   // Halaman pages
   Profil: ROUTES.TAMU_PROFIL_SEKOLAH,
   'Program Sekolah': ROUTES.TAMU_PROGRAM_SEKOLAH,
@@ -321,4 +331,51 @@ export function getDefaultPath(role?: string): string {
     default:
       return ROUTES.LOGIN;
   }
+}
+
+// Normalisasi path untuk pencocokan (hapus trailing slash, dsb.)
+function normalizePath(path: string): string {
+  const p = (path || '').trim();
+  if (p === '/' || p === '') return '/';
+  return p.replace(/\/+$/, '');
+}
+
+/**
+ * Convert a URL path back to a page ID (inverse of `pageToPath`).
+ * Dipakai untuk mendukung deep-link & refresh: halaman dipulihkan dari URL.
+ * Mengembalikan `undefined` bila path tidak dikenali untuk role tersebut.
+ */
+export function pathToPage(path: string, role?: string): string | undefined {
+  const normalized = normalizePath(path);
+
+  // Kumpulkan map yang relevan untuk role + shared + detail.
+  const maps: Array<Record<string, string>> = [DETAIL_PAGE_ROUTES, SHARED_PAGE_ROUTES];
+  if (role) {
+    switch (role) {
+      case 'teacher':
+        maps.push(TEACHER_PAGE_ROUTES);
+        break;
+      case 'student':
+        maps.push(STUDENT_PAGE_ROUTES);
+        break;
+      case 'parent':
+        maps.push(PARENT_PAGE_ROUTES);
+        break;
+      case 'guest':
+        maps.push(GUEST_PAGE_ROUTES);
+        break;
+      case 'admin':
+        maps.push(ADMIN_PAGE_ROUTES);
+        break;
+    }
+  }
+
+  for (const map of maps) {
+    for (const [pageId, route] of Object.entries(map)) {
+      if (normalized === normalizePath(route)) {
+        return pageId;
+      }
+    }
+  }
+  return undefined;
 }
