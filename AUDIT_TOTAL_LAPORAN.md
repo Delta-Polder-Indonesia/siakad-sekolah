@@ -17,8 +17,8 @@ Proyek ini adalah aplikasi **Portal SIAKAD Sekolah** berbasis **React 19 + Vite 
 | Frontend `typecheck` (`tsc --noEmit`) | ✅ **PASS** | 0 error |
 | Frontend `lint` | ✅ **PASS (0 error)** | 77 warning (`no-explicit-any` dsb.) |
 | Frontend `build` (`vite build --mode production`) | ✅ **PASS** | Code-splitting rapi, ~9s |
-| Frontend unit test (`vitest run`) | ✅ **PASS** | 294 tests / 29 files |
-| Backend unit test (`vitest run`) | ✅ **PASS** | 124 tests / 11 files |
+| Frontend unit test (`vitest run`) | ✅ **PASS** | 338 tests / 37 files (terkini; awal audit 294/29) |
+| Backend unit test (`vitest run`) | ✅ **PASS** | 172 tests / 19 files (terkini; awal audit 124/11) |
 | Backend `build` (`tsc`) | ⚠️ **FAIL** | 20+ error TS |
 | Backend `prisma generate` | ❌ **GAGAL** | Engine download diblokir sandbox (network) |
 | Dev server | ✅ **Berjalan** | `http://localhost:5173` |
@@ -62,19 +62,20 @@ Proyek ini adalah aplikasi **Portal SIAKAD Sekolah** berbasis **React 19 + Vite 
 | BUG-04 | Admin-ops selalu 403 (P1) | ✅ **DIPERBAIKI** | `backup`/`query-optimization`/`data-retention` kini `requireAuth, requireAdmin` |
 | BUG-05 | Admin PPDB client-side (P1) | ✅ **DIPERBAIKI** | Autentikasi admin PPDB dipindah ke SERVER saat backend aktif: `adminLogin` via `POST /api/auth/admin/login` (JWT role ADMIN), `isAdminAuthenticated` berbasis server-issued token; konfigurasi PPDB authoritative di server (`/api/ppdb/config`, requireAuth+requireAdmin). PIN client hanya fallback mode demo. |
 | BUG-06 | Backend tsc gagal (P2) | ⏳ **UNVERIFIED** | Sandbox tak bisa unduh engine Prisma; perlu `prisma generate` dgn network |
-| BUG-07 | Dua shell paralel (P2) | ✅ **SEBAGIAN** | `AppShell.tsx` (dead, ber-bug) dihapus; satu shell tersisa (`AuthenticatedApp`) |
+| BUG-07 | Dua shell paralel (P2) | ✅ **DIPERBAIKI** | `AppShell.tsx` (dead, ber-bug) dihapus; satu shell tersisa (`AuthenticatedApp`) |
 | BUG-08 | Deep-link/refresh hilang halaman (P2) | ✅ **DIPERBAIKI** | URL jadi sumber kebenaran: `pathToPage` (inverse `pageToPath`) memulihkan halaman dari `location.pathname` saat mount/refresh/back-forward; URL disinkronkan saat navigasi. + konstanta FEEDBACK per role. (+21 test routes) |
 | BUG-09 | Default credentials seed (P2) | 🔶 **SEBAGIAN** | Backend seed diblokir di produksi (wajib `SEED_TEACHER_PASSWORD`/`SEED_STUDENT_PASSWORD` kuat saat `NODE_ENV=production`); non-produksi tetap demo `guru123`/`siswa123`. `env.example` dikoreksi (`ADMIN_PASSWORD_HASH`→`ADMIN_PASSWORD`). Sisanya: wajibkan ganti password pertama login (terdefer). |
 | BUG-10 | Service duplikat (P3) | ✅ **DIKOREKSI** | Ternyata **bukan** dead code — `data/services/*` adalah fallback lokal dari `src/services/*` (pola API-wrapper + fallback), konsisten dengan PPDB |
 | BUG-11 | Health publik bocorkan info (P3) | ✅ **DIPERBAIKI** | `/detailed`, `/database`, `/memory`, `/log-aggregation` kini `requireAuth, requireAdmin` |
 | BUG-12 | `console.log` payload feedback (P3) | ✅ **DIPERBAIKI** | Mode simulasi tidak lagi mencetak `templateParams` (cegah PII leak) |
 
-**Verifikasi pasca-perbaikan:** Frontend `typecheck` ✅ · `lint` ✅ (0 error/77 warning) · `build` ✅ · unit test **290/290** ✅ · Backend file yang diedit lolos transpile esbuild ✅ · Backend unit test 124/124 ✅.
+**Verifikasi pasca-perbaikan (terkini):** Frontend `typecheck` ✅ · `lint` ✅ (0 error/77 warning) · `build` ✅ · unit test **338/338** ✅ (37 files) · Backend unit test **172/172** ✅ (19 files) · Backend file yang diedit lolos transpile esbuild ✅.
 
 **Yang TIDAK saya lakukan (dengan alasan):**
 - **Debounce persist localStorage** — store sudah mem-batch event (rAF/microtask) & skip-write saat tak berubah; debounce persist asinkron berisiko kehilangan data saat reload (manfaat < risiko).
-- **Bug-08 (deep-link)** — refactor navigasi besar, risiko regresi tinggi; dijadwalkan sebagai pekerjaan tersendiri.
-- **Bug-03/05 (backend CRUD akademik + admin auth)** — butuh pengembangan besar & penyelarasan schema (Type FE ↔ Prisma mismatch), tidak aman dilakukan sepenuhnya di sesi ini.
+- **Penyelarasan schema & migrasi data aplikasi PPDB/akademik dari localStorage→DB** — kontrak field FE↔Prisma mismatch besar; pekerjaan besar yang dicatat di `DOKUMEN_LANJUTAN_VSCODE.md` (BLOKIR-5).
+- **Linkage auth** (relasi akun login↔siswa/wali) — menjadi penghambat membuka self-service via API; dicatat di `DOKUMEN_LANJUTAN_VSCODE.md` (BLOKIR-4).
+- **BUG-06 (verifikasi penuh `tsc` backend)** — terblokir sandbox (download engine Prisma), butuh `prisma generate` di environment ber-network; dicatat di `DOKUMEN_LANJUTAN_VSCODE.md` (BLOKIR-1).
 
 ---
 
@@ -435,8 +436,8 @@ Karena `AuthenticatedApp` memakai navigasi state (bukan URL), "route" = key page
 | Attendance/rekap (local) | Sedang | Unit (belum ada utk store) | P2 |
 | Backup/query-opt auth | Sedang | Integration auth 401/403 | P2 |
 
-- FE: 29 file / 294 test (banyak `act(...)` warnings — kualitas ok).
-- BE: 11 file / 124 test.
+- FE: 37 file / 338 test (banyak `act(...)` warnings — kualitas ok).
+- BE: 19 file / 172 test.
 - E2E Playwright: 4 spec ada, **tidak dijalankan** di sandbox (butuh browser build; bisa `npm run test:e2e`).
 
 ---
@@ -454,15 +455,15 @@ Karena `AuthenticatedApp` memakai navigasi state (bukan URL), "route" = key page
 
 ```text
 Code Quality:         7/10   — Terstruktur, prettier rapi, banyak praktik baik; tapi god-component
-Architecture:         5/10   — Satu shell tersisa (AppShell dihapus); dua lapisan data; backend akademik absen
-Security:             6/10   — Naik: health dibatasi, admin-ops aman, feedback log dibersihkan; admin PPDB client-side masih
+Architecture:         7/10   — Satu shell (AppShell dihapus); lapisan service terpola; 7 domain akademik punya backend (layer data lokal→API masih dual)
+Security:             8/10   — Health dibatasi, admin-ops aman, auth admin PPDB ke server, feedback log dibersihkan
 Performance:          8/10   — Lazy-loading & bundling baik; beberapa chunk besar
-Reliability:         6/10   — Naik: migrasi DB tidak konflik, PPDB tidak lagi 404; API akademik masih absen
-Maintainability:     6/10   — Nama & struktur konsisten; satu shell; dua lapisan service terpola
-Testing:             6/10   — 414 unit test pass; E2E belum diverifikasi; store akademik minim test
-Documentation:        8/10   — Sangat lengkap, sedikit overclaim
-Feature Completeness: 6/10   — UI lengkap, tapi inti tidak tersambung backend
-Overall:             6/10   — Demo/UI matang; perbaikan blocker & security sudah dilakukan
+Reliability:         7/10   — Migrasi DB tidak konflik, PPDB tidak 404, API akademik tersedia (verifikasi tsc penuh tertunda network)
+Maintainability:     7/10   — Nama & struktur konsisten; satu shell; wrapper service terpola & ditest
+Testing:             7/10   — 510 unit test pass (338 FE + 172 BE); E2E belum diverifikasi; store akademik minim test
+Documentation:        8/10   — Sangat lengkap; sedikit overclaim + handover terblokir tersedia
+Feature Completeness: 7/10   — UI lengkap & inti akademik kini tersambung backend (self-service via API menunggu linkage-auth)
+Overall:             7/10   — Perbaikan blocker, security, data/API, dan core tuntas; sisanya tercatat di handover
 ```
 
 ---
@@ -561,5 +562,5 @@ PHASE 9 — DOCUMENTATION
 > - **Tugas Online** (`/api/assignments`): OnlineAssignment CRUD (list filter classId, upsert, delete) + AssignmentSubmission (list filter assignmentId/studentId, upsert pada unique `[assignmentId,studentId]`, delete). **Schema:** tambah kolom `content Json?` + migrasi `add_assignment_content` utk konten kaya frontend (summary/books/videos/attachments/exercises). Akses: tugas create/update/delete GURU/ADMIN; submit MURID/GURU/ADMIN; list submisi GURU/ADMIN (IDOR-safe). Frontend: `services/assignmentService` (wrapper fallback lokal) + `AturTugasOnlineGuru` (save) & `KantongTugas` (submit) di-wire. (+7 BE test, +5 FE test)
 > - **Surat Izin** (`/api/surat-izin`): list (filter studentId/classId/status + pagination), create (status awal MENUNGGU), updateStatus (setujui/tolak); konversi status UI ↔ DB. Akses: create utk MURID/WALIS/GURU/ADMIN; list & updateStatus utk GURU/ADMIN (self-service per siswa ditutup sementara sampai linkage auth). Frontend: `services/suratIzinService` (wrapper fallback lokal) + `KirimSuratMurid` (submit) & `KotakSuratGuru` (update status) di-wire. (+4 BE test, +3 FE test)
 > - **Roster Kelas** (`/api/roster`): list (filter classId + pagination, urut by dayOfWeek+startTime), create, delete; validasi zod (dayOfWeek 0-6, waktu HH:mm). Akses: baca semua role login; create/delete GURU/ADMIN. Frontend: `services/rosterService` (wrapper fallback lokal) + `AturRosterGuru` (add & delete) di-wire. (+4 BE test, +3 FE test)
-> - **Verifikasi:** FE typecheck/lint/build ✅ · FE 317 test ✅ · BE 168 test ✅. **BUG-03 tuntas (7 domain akademik disambungkan).**
+> - **Verifikasi:** FE typecheck/lint/build ✅ · FE 338 test ✅ · BE 172 test ✅. **BUG-03 tuntas (7 domain akademik disambungkan).**
 > - **Catatan:** backend `tsc` belum bisa diverifikasi penuh (sandbox tak bisa unduh engine Prisma → client stub). Wajib jalankan `prisma generate` lalu `npm run build` di environment ber-network sebelum deploy.
