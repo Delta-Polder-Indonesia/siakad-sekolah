@@ -13,6 +13,10 @@ import { ppdbService } from './ppdbService';
 
 const fetchMock = vi.fn();
 
+type MockResponseInit = { ok?: boolean; status?: number; json?: unknown };
+const jsonResponse = ({ ok = true, status = 200, json = {} }: MockResponseInit = {}) =>
+  ({ ok, status, json: async () => json }) as unknown as Response;
+
 beforeEach(() => {
   localStorage.clear();
   fetchMock.mockReset();
@@ -51,25 +55,34 @@ describe('ppdbService — mode lokal (backend /ppdb belum ada)', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('adminLogin memvalidasi PIN lokal dan tidak memanggil fetch', async () => {
-    vi.stubEnv('VITE_ADMIN_PIN', '123456');
-    const ok = await ppdbService.adminLogin('admin', '123456');
+  // BUG-05: saat backend aktif (hasApi=true di vitest), autentikasi admin
+  // PPDB dilakukan di SERVER (POST /api/auth/admin/login → JWT), bukan lagi
+  // lewat PIN di client.
+  it('adminLogin memverifikasi admin ke server & menandai terautentikasi (JWT)', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ json: { ok: true, accessToken: 'acc', refreshToken: 'ref', profileName: 'admin' } })
+    );
+    const ok = await ppdbService.adminLogin('admin', 'secret');
     expect(ok).toBe(true);
     expect(ppdbService.isAdminAuthenticated()).toBe(true);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toContain('/auth/admin/login');
+    expect(JSON.parse(init.body)).toMatchObject({ username: 'admin', pin: 'secret' });
   });
 
-  it('adminLogin menolak PIN yang salah', async () => {
-    vi.stubEnv('VITE_ADMIN_PIN', '123456');
-    const ok = await ppdbService.adminLogin('admin', '0000');
+  it('adminLogin menolak saat server menolak kredensial', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ ok: false, status: 401 }));
+    const ok = await ppdbService.adminLogin('admin', 'bad');
     expect(ok).toBe(false);
     expect(ppdbService.isAdminAuthenticated()).toBe(false);
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('adminLogout menghapus sesi admin lokal', async () => {
-    vi.stubEnv('VITE_ADMIN_PIN', '123456');
-    await ppdbService.adminLogin('admin', '123456');
+  it('adminLogout menghapus token admin di client', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ json: { ok: true, accessToken: 'acc', refreshToken: 'ref', profileName: 'admin' } })
+    );
+    await ppdbService.adminLogin('admin', 'secret');
     await ppdbService.adminLogout();
     expect(ppdbService.isAdminAuthenticated()).toBe(false);
   });

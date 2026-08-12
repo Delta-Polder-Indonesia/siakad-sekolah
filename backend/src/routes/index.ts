@@ -17,6 +17,7 @@ import { libraryRouter } from '../modules/library/library.route.js';
 import { assignmentRouter } from '../modules/assignment/assignment.route.js';
 import { suratIzinRouter } from '../modules/surat-izin/suratIzin.route.js';
 import { rosterRouter } from '../modules/roster/roster.route.js';
+import { ppdbRouter } from '../modules/ppdb/ppdb.route.js';
 
 export const apiRouter = Router();
 
@@ -38,3 +39,4 @@ apiRouter.use('/library',       libraryRouter);
 apiRouter.use('/assignments',   assignmentRouter);
 apiRouter.use('/surat-izin',    suratIzinRouter);
 apiRouter.use('/roster',        rosterRouter);
+apiRouter.use('/ppdb',          ppdbRouter);

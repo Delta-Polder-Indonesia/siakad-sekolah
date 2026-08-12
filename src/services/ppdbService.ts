@@ -22,7 +22,14 @@ import {
   type PPDBApplication,
   type PPDBAuditLog,
 } from '../data/services';
-import { API_BASE } from './apiConfig';
+import { API_BASE, hasApi } from './apiConfig';
+
+// Flag untuk AUTENTIKASI/OTORISASI admin PPDB & konfigurasi.
+// BUG-05: login & konfigurasi admin PPDB dialihkan ke SERVER (JWT role ADMIN,
+// endpoint /api/auth/admin/login & /api/ppdb/config) saat backend aktif —
+// sehingga admin tidak lagi bergantung pada PIN yang dibundel di client.
+// Berbeda dari `usePpdbApi` (data aplikasi PPDB yang masih lokal).
+const usePpdbAdminApi = hasApi;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CATATAN ARSITEKTUR (BUG-02 / Phase 1)
@@ -84,7 +91,7 @@ const buildHeaders = (init?: RequestInit, useJson = true): HeadersInit => {
 
 const tryRefreshToken = async (): Promise<boolean> => {
   const refreshToken = getRefreshToken();
-  if (!refreshToken || !usePpdbApi) return false;
+  if (!refreshToken || !usePpdbAdminApi) return false;
 
   try {
     const response = await fetch(`${API_BASE}/auth/admin/refresh`, {
@@ -291,14 +298,17 @@ export const ppdbService = {
   },
 
   adminLogin: (username: string, pin: string) => {
-    if (usePpdbApi) {
+    // Saat backend aktif, autentikasi admin diverifikasi SERVER
+    // (POST /api/auth/admin/login → JWT role ADMIN). PIN di client hanya
+    // fallback untuk mode demo/lokal.
+    if (usePpdbAdminApi) {
       return apiLogin(username, pin);
     }
     return Promise.resolve(adminLogin(username, pin));
   },
 
   adminLogout: () => {
-    if (usePpdbApi) {
+    if (usePpdbAdminApi) {
       clearTokens();
       return Promise.resolve();
     }
@@ -307,12 +317,13 @@ export const ppdbService = {
   },
 
   isAdminAuthenticated: () => {
-    if (usePpdbApi) return Boolean(getAccessToken());
+    // Server-issued token adalah sumber kebenaran saat backend aktif.
+    if (usePpdbAdminApi) return Boolean(getAccessToken());
     return isAdminAuthenticated();
   },
 
   getAdminProfileName: () => {
-    if (usePpdbApi) return localStorage.getItem(ADMIN_NAME_KEY) || 'Admin API';
+    if (usePpdbAdminApi) return localStorage.getItem(ADMIN_NAME_KEY) || 'Admin API';
     return getAdminProfileName();
   },
 
@@ -329,6 +340,9 @@ export const ppdbService = {
     return Promise.resolve(getUnreadNotificationCount());
   },
 
+  // Catatan: konfigurasi email notifikasi admin (getAdminSettings/updateAdminSettings)
+  // adalah konsep lokal. Konfigurasi PPDB (open/close, kuota, tahun) authoritative
+  // di server melalui endpoint /api/ppdb/config (lihat backend modules/ppdb).
   getAdminSettings: () => {
     return Promise.resolve(getAdminSettings());
   },
