@@ -14,14 +14,22 @@ export interface JwtPayload {
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
+  // Token idealnya di httpOnly cookie (Set-Cookie), fallback ke Authorization header
+  // untuk kompatibilitas (test, mobile, atau migrasi).
+  let token: string | undefined;
   const header = req.headers.authorization;
+  if (header?.startsWith('Bearer ')) {
+    token = header.slice(7);
+  } else if ((req as unknown as { cookies?: Record<string, string> }).cookies?.accessToken) {
+    token = (req as unknown as { cookies: Record<string, string> }).cookies.accessToken;
+  } else if ((req as unknown as { cookies?: Record<string, string> }).cookies?.access_token) {
+    token = (req as unknown as { cookies: Record<string, string> }).cookies.access_token;
+  }
 
-  if (!header?.startsWith('Bearer ')) {
+  if (!token) {
     res.status(401).json({ ok: false, message: 'Token tidak ditemukan.' });
     return;
   }
-
-  const token = header.slice(7);
 
   try {
     // Verifikasi tanda tangan JWT dulu (tanpa query DB) — token invalid/sampah

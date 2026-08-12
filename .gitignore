@@ -33,6 +33,18 @@ playwright-report/
 
 # Artefak test di folder root (mis. PDF hasil jsPDF saat vitest jalan)
 /*.pdf
+# Artefak PDF/cetak hasil generate (jsPDF) — jangan di-commit
+detail-REG-*.pdf
+detail-*.pdf
+rekap-ppdb-*.pdf
+rekap-*.pdf
+print-*.pdf
+# Placeholder aset anime Konoha-* (cek referensi src/ dulu sebelum hapus;
+# kini terpakai di dashboard, tapi cegah placeholder baru tak sengaja)
+Konoha-*.jpg
+Konoha-*.webp
+Konoha-*.png
+# Aset besar via Git LFS — lihat README bagian "Aset Besar & Git LFS"
 
 # md lokal yang sengaja tidak di-commit (berisi info internal/rahasia)
 # CATATAN: jangan ignore seluruh folder (mis. "dokumentasi/") —

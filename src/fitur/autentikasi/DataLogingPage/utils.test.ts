@@ -54,13 +54,13 @@ describe('validateLoginInput', () => {
     expect(validateLoginInput('student', '2024001', 'pass')).toBeNull();
   });
 
-  // ── Parent ──
-  it('validates parent name is at least 3 characters', () => {
-    expect(validateLoginInput('parent', 'Jo', 'pass')).toBe('Nama minimal 3 karakter.');
+  // ── Parent (login pakai NIS anak, bukan nama) ──
+  it('validates parent NIS is at least 4 digits', () => {
+    expect(validateLoginInput('parent', '123', 'pass')).toBe('NIS anak minimal 4 digit angka.');
   });
 
-  it('accepts valid parent name', () => {
-    expect(validateLoginInput('parent', 'John Doe', 'pass')).toBeNull();
+  it('accepts valid parent NIS', () => {
+    expect(validateLoginInput('parent', '2024001', 'pass')).toBeNull();
   });
 
   // ── Guest (email) ──

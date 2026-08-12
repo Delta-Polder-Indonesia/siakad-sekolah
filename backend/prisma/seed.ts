@@ -15,6 +15,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 // Password demo default (non-produksi saja).
 const DEMO_TEACHER_PASSWORD = 'guru123';
 const DEMO_STUDENT_PASSWORD = 'siswa123';
+const DEMO_GUARDIAN_PASSWORD = 'ortu123';
 
 function resolveTeacherPassword(): string {
   if (isProduction) {
@@ -42,6 +43,19 @@ function resolveStudentPassword(): string {
   return DEMO_STUDENT_PASSWORD;
 }
 
+function resolveGuardianPassword(): string {
+  if (isProduction) {
+    const pwd = process.env.SEED_GUARDIAN_PASSWORD;
+    if (!pwd || pwd.length < 8 || ['ortu123', 'password', 'admin', 'password123'].includes(pwd.toLowerCase())) {
+      throw new Error(
+        'SEED di blokir di production: set SEED_GUARDIAN_PASSWORD (min 8 karakter, kuat) di environment.'
+      );
+    }
+    return pwd;
+  }
+  return DEMO_GUARDIAN_PASSWORD;
+}
+
 const classes = [
   { code: 'c1', name: 'X IPA 1', grade: 'X' },
   { code: 'c2', name: 'X IPA 2', grade: 'X' },
@@ -63,9 +77,11 @@ const students = [
 async function main() {
   const teacherPassword = resolveTeacherPassword();
   const studentPassword = resolveStudentPassword();
+  const guardianPassword = resolveGuardianPassword();
 
   const teacherHash = await bcrypt.hash(teacherPassword, 10);
   const studentHash = await bcrypt.hash(studentPassword, 10);
+  const guardianHash = await bcrypt.hash(guardianPassword, 10);
 
   // School config (single row)
   const existingConfig = await prisma.schoolConfig.findFirst();
@@ -117,14 +133,29 @@ async function main() {
     }
   }
 
-  // Students
+  // Students (termasuk akun wali: guardianPasswordHash untuk login WALIS via NIS anak)
   for (const s of students) {
     const classId = classIdByCode.get(s.classCode);
     if (!classId) continue;
     await prisma.student.upsert({
       where: { nis: s.nis },
-      update: { name: s.name, gender: s.gender, classId, guardianName: s.guardianName, passwordHash: studentHash },
-      create: { nis: s.nis, name: s.name, gender: s.gender, classId, guardianName: s.guardianName, passwordHash: studentHash },
+      update: {
+        name: s.name,
+        gender: s.gender,
+        classId,
+        guardianName: s.guardianName,
+        passwordHash: studentHash,
+        guardianPasswordHash: guardianHash,
+      },
+      create: {
+        nis: s.nis,
+        name: s.name,
+        gender: s.gender,
+        classId,
+        guardianName: s.guardianName,
+        passwordHash: studentHash,
+        guardianPasswordHash: guardianHash,
+      },
     });
   }
 

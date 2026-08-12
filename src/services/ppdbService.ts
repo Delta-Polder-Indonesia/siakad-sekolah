@@ -64,15 +64,40 @@ const ACCESS_TOKEN_KEY = 'ppdb_api_access_token';
 const REFRESH_TOKEN_KEY = 'ppdb_api_refresh_token';
 const ADMIN_NAME_KEY = 'ppdb_api_admin_name';
 
-const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY) || '';
-const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY) || '';
+// KEAMANAN TOKEN PPDB (hasApi=true):
+// - Ideal: token disimpan di httpOnly cookie oleh backend (Set-Cookie httpOnly,
+//   SameSite=Lax/Strict, Secure). Frontend TIDAK simpan di localStorage (XSS).
+//   Request memakai `credentials: 'include'` agar cookie otomatis terkirim.
+// - Fallback minimal: simpan di memory (tidak persisten) saat backend aktif,
+//   dan hapus dari localStorage. localStorage hanya untuk mode demo lokal.
+let memoryAccessToken: string | null = null;
+let memoryRefreshToken: string | null = null;
+
+const getAccessToken = () => {
+  if (usePpdbAdminApi) return memoryAccessToken || '';
+  return localStorage.getItem(ACCESS_TOKEN_KEY) || '';
+};
+const getRefreshToken = () => {
+  if (usePpdbAdminApi) return memoryRefreshToken || '';
+  return localStorage.getItem(REFRESH_TOKEN_KEY) || '';
+};
 
 const saveTokens = (tokens: Partial<AuthTokens>) => {
+  if (usePpdbAdminApi) {
+    if (tokens.accessToken) memoryAccessToken = tokens.accessToken;
+    if (tokens.refreshToken) memoryRefreshToken = tokens.refreshToken;
+    // Migrasi: hapus legacy localStorage
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    return;
+  }
   if (tokens.accessToken) localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
   if (tokens.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
 };
 
 const clearTokens = () => {
+  memoryAccessToken = null;
+  memoryRefreshToken = null;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(ADMIN_NAME_KEY);
@@ -97,6 +122,7 @@ const tryRefreshToken = async (): Promise<boolean> => {
     const response = await fetch(`${API_BASE}/auth/admin/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ refreshToken }),
     });
 
@@ -119,6 +145,7 @@ const tryRefreshToken = async (): Promise<boolean> => {
 const request = async <T>(path: string, init?: RequestInit, isRetry = false): Promise<T> => {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
+    credentials: 'include',
     headers: buildHeaders(init, init?.body ? !(init.body instanceof FormData) : true),
   });
 
@@ -145,13 +172,24 @@ const apiLogin = async (username: string, pin: string): Promise<boolean> => {
       profileName?: string;
     }>('/auth/admin/login', {
       method: 'POST',
+      credentials: 'include',
       body: JSON.stringify({ username, pin }),
       headers: { 'Content-Type': 'application/json' },
     });
     saveTokens({ accessToken: payload.accessToken, refreshToken: payload.refreshToken });
-    localStorage.setItem(ADMIN_NAME_KEY, payload.profileName || username);
+    // ADMIN_NAME_KEY masih di localStorage karena non-sensitif (nama profil),
+    // tapi saat hasApi idealnya server juga mengirim via cookie/endpoint /me.
+    if (usePpdbAdminApi) {
+      // Simpan minimal di memory-equivalent (tetap localStorage untuk nama profil saja)
+      localStorage.setItem(ADMIN_NAME_KEY, payload.profileName || username);
+    } else {
+      localStorage.setItem(ADMIN_NAME_KEY, payload.profileName || username);
+    }
     return true;
   } catch {
+    // Login gagal — bersihkan sesi lama agar isAdminAuthenticated konsisten
+    // (khususnya untuk isolasi tes: localStorage.clear() tidak menghapus memory)
+    clearTokens();
     return false;
   }
 };

@@ -66,7 +66,7 @@ describe('loginPortal', () => {
       })
     );
 
-    const result = await loginPortal('Siti Aminah', 'ortu123', 'parent');
+    const result = await loginPortal('2024001', 'ortu123', 'parent');
 
     expect(result.status).toBe('ok');
     expect(result.status === 'ok' && result.user.role).toBe('WALIS');

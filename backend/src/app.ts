@@ -1,4 +1,5 @@
 import cors    from 'cors';
+import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import express from 'express';
 import helmet  from 'helmet';
@@ -22,8 +23,9 @@ app.use(helmet());
 app.use(cors({
   origin:         allowedOrigins,
   credentials:    true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cookie'],
 }));
+app.use(cookieParser());
 app.use(express.json({ limit: '2mb' }));
 
 // Security middleware (HTTPS + CSRF + sanitization)

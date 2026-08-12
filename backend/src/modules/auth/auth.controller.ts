@@ -23,6 +23,47 @@ import {
   passwordValidationSchema,
   changePasswordSchema 
 } from '../../utils/validation.js';
+import { env } from '../../config/env.js';
+
+function setAuthCookies(
+  res: Parameters<RequestHandler>[1],
+  accessToken: string,
+  refreshToken: string | null
+) {
+  const isProd = env.NODE_ENV === 'production';
+  const cookieOpts = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax' as const,
+    path: '/',
+  };
+  // Access token: 8h (sesuai JWT_EXPIRES_IN default)
+  res.cookie('accessToken', accessToken, {
+    ...cookieOpts,
+    maxAge: 8 * 60 * 60 * 1000,
+  });
+  if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, {
+      ...cookieOpts,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+}
+
+function clearAuthCookies(res: Parameters<RequestHandler>[1]) {
+  const isProd = env.NODE_ENV === 'production';
+  const opts = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax' as const,
+    path: '/',
+  };
+  res.clearCookie('accessToken', opts);
+  res.clearCookie('refreshToken', opts);
+  // Legacy names
+  res.clearCookie('access_token', opts);
+  res.clearCookie('refresh_token', opts);
+}
 
 // POST /api/auth/login
 export const handleLogin: RequestHandler = async (req, res, next) => {
@@ -79,6 +120,9 @@ export const handleLogin: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    // Set httpOnly cookies (SameSite, Secure) — token tidak lagi harus di localStorage.
+    // Frontend mengirim `credentials: 'include'` sehingga cookie otomatis terkirim.
+    setAuthCookies(res, result.accessToken, result.refreshToken ?? null);
     res.json({ ok: true, ...result });
   } catch (err) {
     next(err);
@@ -119,6 +163,7 @@ export const handleGoogleLogin: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    setAuthCookies(res, result.accessToken, result.refreshToken ?? null);
     res.json({ ok: true, ...result });
   } catch (err) {
     next(err);
@@ -148,6 +193,7 @@ export const handleAdminLogin: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    setAuthCookies(res, result.accessToken, result.refreshToken ?? null);
     res.json({ ok: true, ...result });
   } catch (err) {
     next(err);
@@ -157,8 +203,14 @@ export const handleAdminLogin: RequestHandler = async (req, res, next) => {
 // POST /api/auth/refresh  &  POST /api/auth/admin/refresh
 export const handleRefresh: RequestHandler = async (req, res, next) => {
   try {
-    // Validate request body
-    const validation = validateRequest(refreshTokenSchema, req.body);
+    // Refresh token bisa dari body (legacy) atau httpOnly cookie
+    const cookieRefresh =
+      (req as unknown as { cookies?: Record<string, string> }).cookies?.refreshToken ||
+      (req as unknown as { cookies?: Record<string, string> }).cookies?.refresh_token;
+    const rawRefresh = cookieRefresh || (req.body as { refreshToken?: string })?.refreshToken;
+    // Validasi tetap via Zod untuk body, tapi izinkan cookie
+    const tokenToValidate = rawRefresh || '';
+    const validation = validateRequest(refreshTokenSchema, { refreshToken: tokenToValidate });
     if (!validation.success) {
       res.status(400).json({
         ok: false,
@@ -180,6 +232,17 @@ export const handleRefresh: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    // Refresh access token via httpOnly cookie juga
+    if (result.accessToken) {
+      const isProd = env.NODE_ENV === 'production';
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 8 * 60 * 60 * 1000,
+      });
+    }
     res.json({ ok: true, ...result });
   } catch (err) {
     next(err);
@@ -298,11 +361,18 @@ export const handleChangeStudentPassword: RequestHandler = async (req, res, next
 // POST /api/auth/logout
 export const handleLogout: RequestHandler = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    // Token bisa dari Authorization header (legacy) atau httpOnly cookie
+    const headerToken = req.headers.authorization?.replace('Bearer ', '');
+    const cookieToken = (req as unknown as { cookies?: Record<string, string> }).cookies?.accessToken;
+    const token = headerToken || cookieToken;
     const userId = req.jwtUser?.userId;
-    const refreshToken = (req.body as { refreshToken?: string | null } | undefined)?.refreshToken;
+    const cookieRefresh = (req as unknown as { cookies?: Record<string, string> }).cookies?.refreshToken;
+    const refreshToken =
+      (req.body as { refreshToken?: string | null } | undefined)?.refreshToken || cookieRefresh;
 
     if (!token) {
+      // Tetap clear cookie walaupun token tidak ditemukan (idempotent logout)
+      clearAuthCookies(res);
       res.status(400).json({
         ok: false,
         message: 'Token tidak ditemukan.',
@@ -312,6 +382,7 @@ export const handleLogout: RequestHandler = async (req, res, next) => {
 
     const result = await logout(token, userId, refreshToken);
 
+    clearAuthCookies(res);
     res.json({ ok: result.success, message: result.message });
   } catch (err) {
     next(err);

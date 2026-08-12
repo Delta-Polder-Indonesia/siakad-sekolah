@@ -1,6 +1,13 @@
 import type { Database } from './db';
 import type { CatatanBK, Ekskul, EkskulMember, EkskulKehadiran } from '../../../types';
 // ==================== INITIAL DATA ====================
+// CATATAN KEAMANAN:
+// Data di bawah adalah SEED DEMO LOKAL — password polos 'guru123' / 'siswa123' / 'ortu123'
+// HANYA untuk mode tanpa backend (hasApi === false). Password ini DI-HASH dengan
+// hashPassword (SHA-256 + salt statis) saat initializeData() dan disimpan sebagai hash.
+// Untuk produksi (hasApi === true), JANGAN gunakan seed statis ini; autentikasi
+// dilakukan via backend (bcrypt/argon2) dan seed production harus memakai password
+// kuat via environment (lihat backend/prisma/seed.ts).
 
 // Contoh catatan BK awal agar modul tidak kosong saat demo (hanya diisi saat fresh install).
 export const initialCatatanBK: CatatanBK[] = [

@@ -249,7 +249,8 @@ export async function loginStudent(nis: string, password: string) {
 }
 
 // Login Wali Siswa — akun wali menempel pada data siswa (guardian*).
-// Login id = nama wali (tidak case-sensitive) atau nomor HP wali.
+// Identifier unik sekarang adalah NIS anak (bukan nama wali yang tidak unik).
+// Login id = NIS anak (mis. 2024001) ATAU fallback nama/nomor HP untuk kompatibilitas.
 // (filter nama case-insensitive dilakukan di JS karena SQLite tidak
 // mendukung Prisma `mode: 'insensitive'`.)
 export async function loginParent(id: string, password: string) {
@@ -258,6 +259,7 @@ export async function loginParent(id: string, password: string) {
     select: {
       id: true,
       name: true,
+      nis: true,
       classId: true,
       guardianName: true,
       guardianPhone: true,
@@ -265,10 +267,12 @@ export async function loginParent(id: string, password: string) {
     },
   });
 
-  const normalizedId = id.trim().toLowerCase();
+  const trimmedId = id.trim();
+  const normalizedId = trimmedId.toLowerCase();
   const students = candidates.filter((s) =>
+    (s.nis === trimmedId) ||
     (s.guardianName?.toLowerCase() === normalizedId) ||
-    (s.guardianPhone === id.trim())
+    (s.guardianPhone === trimmedId)
   );
 
   if (students.length === 0) {

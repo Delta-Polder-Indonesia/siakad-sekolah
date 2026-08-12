@@ -69,9 +69,12 @@ export function getLocalStudentId(user: AuthUser | null | undefined): string | u
 
 /**
  * Resolusi siswa yang diasuh oleh user wali (role 'parent') di store lokal.
- * - Mode lokal: `user.id` = `p_<id siswa>`.
+ * - Mode lokal: `user.id` = `p_<id siswa>` (login pakai NIS anak).
  * - Mode backend: `user.id` = `wali_<cuid>` dan `user.name` = nama wali;
- *   pencocokan memakai `parentName` yang sama di seed backend & store lokal.
+ *   pencocokan memakai `parentName` yang sama di seed backend & store lokal
+ *   sebagai fallback (backend login wali kini juga mendukung NIS).
+ * Catatan: login wali memakai NIS anak (unik) + parentPassword, bukan nama,
+ * untuk mencegah tabrakan nama wali yang sama.
  */
 export function getParentStudent(user: AuthUser | null | undefined): Student | undefined {
   if (!user) return undefined;
@@ -81,9 +84,14 @@ export function getParentStudent(user: AuthUser | null | undefined): Student | u
   const byId = localId ? students.find((s) => s.id === localId) : undefined;
   if (byId) return byId;
 
+  // Fallback untuk sesi backend (wali_<cuid>) — cari via guardianOf atau parentName.
+  // Untuk sesi lama yang masih pakai nama, tetap coba pencocokan nama agar tidak breaking.
   if (user.name) {
     const nama = user.name.trim().toLowerCase();
-    return students.find((s) => s.parentName && s.parentName.trim().toLowerCase() === nama);
+    const byParentName = students.find(
+      (s) => s.parentName && s.parentName.trim().toLowerCase() === nama
+    );
+    if (byParentName) return byParentName;
   }
   return undefined;
 }
