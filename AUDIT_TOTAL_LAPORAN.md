@@ -60,7 +60,7 @@ Proyek ini adalah aplikasi **Portal SIAKAD Sekolah** berbasis **React 19 + Vite 
 | BUG-02 | PPDB panggil endpoint tak ada (P0) | ✅ **DIMITIGASI** | `ppdbService` terkunci mode lokal (`usePpdbApi=false`) dengan catatan TODO(Phase 3); tidak ada lagi 404 saat API aktif |
 | BUG-03 | Domain akademik tanpa backend (P1) | 🔶 **BLUEPRINT LENGKAP ✅ (7 domain)** | **Attendance** (`/api/attendance`), **Rapot/Nilai** (`/api/rapot`), **Billing/Tagihan** (`/api/billing`), **Perpustakaan** (`/api/library`), **Tugas Online** (`/api/assignments`, + kolom `content Json?`), **Surat Izin** (`/api/surat-izin`), **Roster Kelas** (`/api/roster`) — semuanya sudah disambungkan dengan backend CRUD + auth + zod + test, plus wrapper frontend (fallback lokal). BUG-03 **tuntas** |
 | BUG-04 | Admin-ops selalu 403 (P1) | ✅ **DIPERBAIKI** | `backup`/`query-optimization`/`data-retention` kini `requireAuth, requireAdmin` |
-| BUG-05 | Admin PPDB client-side (P1) | ⏳ Terdefer | Butuh endpoint admin backend `/ppdb` (bergantung BUG-03/Phase 3) |
+| BUG-05 | Admin PPDB client-side (P1) | ✅ **DIPERBAIKI** | Autentikasi admin PPDB dipindah ke SERVER saat backend aktif: `adminLogin` via `POST /api/auth/admin/login` (JWT role ADMIN), `isAdminAuthenticated` berbasis server-issued token; konfigurasi PPDB authoritative di server (`/api/ppdb/config`, requireAuth+requireAdmin). PIN client hanya fallback mode demo. |
 | BUG-06 | Backend tsc gagal (P2) | ⏳ **UNVERIFIED** | Sandbox tak bisa unduh engine Prisma; perlu `prisma generate` dgn network |
 | BUG-07 | Dua shell paralel (P2) | ✅ **SEBAGIAN** | `AppShell.tsx` (dead, ber-bug) dihapus; satu shell tersisa (`AuthenticatedApp`) |
 | BUG-08 | Deep-link/refresh hilang halaman (P2) | ⏳ Terdefer | Butuh migrasi navigasi ke URL-as-source-of-truth; berisiko, tidak dilakukan di sesi ini |
@@ -538,15 +538,20 @@ PHASE 9 — DOCUMENTATION
 24. **Perbaiki dulu:** PHASE 1 (migrasi + PPDB route), lalu PHASE 2 (keamanan).
 25. **Layak produksi?** **Belum** untuk mode backend. Mode frontend/demo **dapat dipakai sebagai prototype**; untuk produksi riil harus menyelesaikan PHASE 1–4.
 
-> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 04, 07, 11, 12. ⏳ TERDEFER: BUG-03, 05, 08, 09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ UNVERIFIED: BUG-06 (butuh network untuk `prisma generate`).
+> **Status verifikasi (perbaikan):** ✅ DIPERBAIKI: BUG-01, 02, 03, 04, 05, 07, 11, 12. ⏳ TERDEFER: BUG-08, 09. ✅ DIKOREKSI (bukan bug): BUG-10. ⏳ UNVERIFIED: BUG-06 (butuh network untuk `prisma generate`).
 
 > **Status penyelesaian bertahap (sesi perbaikan):**
 > - **PHASE 1 (Blockers):** ✅ BUG-01 migrasi, BUG-02 PPDB — **selesai & terverifikasi.**
 > - **PHASE 2 (Security):** ✅ BUG-11 health, BUG-12 feedback log — **selesai.**
 > - **PHASE 3 (Data/API):** ✅ BUG-04 admin-ops 403 — **selesai.** ✅ **BUG-03 tuntas** — blueprint 7 domain akademik disambungkan: **Attendance · Rapot · Billing · Library · Assignment · SuratIzin · Roster**.
+> - **PHASE 3 (Security/Data):** ✅ **BUG-05 selesai** — otorisasi admin PPDB dipindah ke server (login JWT + config authoritative).
 > - **PHASE 4 (Core):** ✅ BUG-07 hapus shell duplikat — **selesai.** ⏳ BUG-08 deep-link — terdefer.
 > - **PHASE 5–9:** ⏳ Sebagian besar terdefer (perlu pengembangan backend CRUD per domain, migrasi router, dsb.).
 
+> **BUG-05 (auth admin PPDB ke server) — ringkasan:**
+> - Backend: modul `modules/ppdb/` — `GET/PATCH /api/ppdb/config` (requireAuth+requireAdmin) utk konfigurasi PPDB authoritative di server (SchoolConfig kolom ppdb*). +4 BE test.
+> - Frontend: `ppdbService.usePpdbAdminApi = hasApi` (terpisah dari data aplikasi yang masih lokal). `adminLogin` diverifikasi server via `/api/auth/admin/login` (JWT role ADMIN); `isAdminAuthenticated` berbasis server token; PIN client hanya fallback mode demo. Test adminLogin PPDB diperbarui ke cabang server.
+>
 > **Blueprint BUG-03 — ringkasan (Attendance, Rapot, Billing, Library, Assignment, SuratIzin, Roster):**
 > - **Attendance** (`/api/attendance`): service→controller→route, akses guru/admin, zod (status enum, format `YYYY-MM-DD`), bulk `createMany`+`skipDuplicates` pada unique `[studentId,date]`, delete. Frontend: `services/attendanceService` (wrapper fallback lokal) + `HalamanAbsensi` di-wire. (+7 BE test, +3 FE test)
 > - **Rapot/Nilai** (`/api/rapot`): upsert pada unique compound `[studentId,classId,academicYear,semester,subject]`, list+pagination, delete; pemetaan DTO `NilaiRapot`↔`ReportCard`. Akses guru/admin only (IDOR-safe; siswa/ortu baca rapot ditutup sementara sampai linkage auth dibangun). Frontend: `services/rapotService` (wrapper fallback lokal, API write/read ikut sinkron ke store) + `InputRapotGuru` di-wire. (+5 BE test, +3 FE test)
