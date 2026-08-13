@@ -51,16 +51,21 @@ const withLocalFallback = async <T>(apiCall: () => Promise<T>, localCall: () => 
   }
 };
 
+const parseLikedBy = (raw: unknown): string[] => {
+  // Backend mengirim likedBy sebagai array JSON (sudah diparse). Fallback ke
+  // JSON.parse menangani bentuk lama yang masih string ("[\"u1\",\"u2\"]").
+  if (Array.isArray(raw)) return raw.filter((v): v is string => typeof v === 'string');
+  try {
+    const parsed = JSON.parse(String(raw ?? '[]'));
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+
 // Konversi record backend → bentuk Feedback frontend.
 const toFeedback = (row: Record<string, unknown>): Feedback => {
-  const likedBy = (() => {
-    try {
-      const parsed = JSON.parse(String(row.likedBy || '[]'));
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  })();
+  const likedBy = parseLikedBy(row.likedBy);
 
   return {
     id: String(row.id),
@@ -123,12 +128,39 @@ export async function submitFeedback(input: FeedbackInput): Promise<Feedback> {
   );
 }
 
+const ANON_LIKE_KEY = 'feedback_anon_liker_id';
+
+let cachedAnonymousLikeId: string | null = null;
+
+// ID stabil per perangkat untuk "suka" dari pengunjung yang belum login.
+// Disimpan di localStorage agar klik berikutnya bisa membatalkan suka.
+export function getAnonymousLikeId(): string {
+  if (cachedAnonymousLikeId) return cachedAnonymousLikeId;
+  try {
+    const existing = localStorage.getItem(ANON_LIKE_KEY);
+    if (existing) {
+      cachedAnonymousLikeId = existing;
+      return existing;
+    }
+  } catch {
+    // localStorage tidak tersedia — pakai id sementara per sesi.
+  }
+  const next = `guest_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+  cachedAnonymousLikeId = next;
+  try {
+    localStorage.setItem(ANON_LIKE_KEY, next);
+  } catch {
+    // abaikan — id tetap berlaku untuk sesi ini.
+  }
+  return next;
+}
+
 export async function toggleFeedbackLikeApi(
   feedbackId: string,
   userId: string
 ): Promise<LikeResult> {
-  return withLocalFallback(
-    async () => {
+  if (hasApi) {
+    try {
       const body = await request<ApiResponse<LikeResult>>(
         `/feedback/${encodeURIComponent(feedbackId)}/like`,
         {
@@ -137,15 +169,30 @@ export async function toggleFeedbackLikeApi(
         }
       );
       return body.data;
-    },
-    () => {
+    } catch (error) {
+      // Backend tidak terjangkau. Feedback yang dibaca dari backend TIDAK ada
+      // di penyimpanan lokal — jangan menimpa angka like dengan 0 secara
+      // diam-diam. Hanya layani dari localStorage kalau feedback-nya memang
+      // berasal dari sana; kalau bukan, biarkan error naik agar UI rollback
+      // dan memberi tahu user.
       toggleFeedbackLikeLocal(feedbackId, userId);
       const updated = getFeedbacksWithRatingLocal().find((f) => f.id === feedbackId);
-      return {
-        id: feedbackId,
-        likes: updated?.likes || 0,
-        liked: Boolean(updated?.likedBy?.includes(userId)),
-      };
+      if (updated) {
+        return {
+          id: feedbackId,
+          likes: updated?.likes ?? 0,
+          liked: Boolean(updated?.likedBy?.includes(userId)),
+        };
+      }
+      throw error;
     }
-  );
+  }
+
+  toggleFeedbackLikeLocal(feedbackId, userId);
+  const updated = getFeedbacksWithRatingLocal().find((f) => f.id === feedbackId);
+  return {
+    id: feedbackId,
+    likes: updated?.likes || 0,
+    liked: Boolean(updated?.likedBy?.includes(userId)),
+  };
 }

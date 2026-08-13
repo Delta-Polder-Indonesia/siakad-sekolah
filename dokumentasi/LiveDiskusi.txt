@@ -1,171 +1,54 @@
-Saya memiliki fitur Feedback / Ratings & Reviews pada aplikasi React + TypeScript + Tailwind CSS.
+Microsoft Windows [Version 10.0.19045.6466]
+(c) Microsoft Corporation. All rights reserved.
 
-Fitur ini terdiri dari beberapa komponen utama:
-- FeedbackButton.tsx
-- FeedbackPage.tsx
-- RatingsReviews.tsx
-- FeedbackForm.tsx
-- feedbackService dan tipe Feedback terkait
+C:\Users\TRIA NANDA ADISTI>cd /d E:\guthub\Folder Baru (2)\reviw\siakad-sekolah\backend
 
-Saya ingin kamu melakukan code review dan refactor fitur ini secara menyeluruh, tetapi JANGAN mengubah fitur hanya demi terlihat lebih kompleks.
+E:\guthub\Folder Baru (2)\reviw\siakad-sekolah\backend>npx prisma migrate dev
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
 
-Fokus utama adalah meningkatkan kualitas production code, reliability, UX, accessibility, maintainability, dan konsistensi data.
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "siakad_sekolah", schema "public" at "localhost:5432"
 
-Tolong analisis kode yang saya berikan dan lakukan perbaikan yang memang relevan.
+√ Enter a name for the new migration: ... init
+Applying migration `20260812224903_init`
 
-Prioritas perbaikan:
+The following migration(s) have been created and applied from new schema changes:
 
-1. DATA & STATE CONSISTENCY
-- Pastikan daftar review dan statistik rating selalu sinkron.
-- Setelah feedback baru dibuat, overall rating, total review, rating count, dan rating breakdown harus ikut diperbarui.
-- Setelah like/unlike, jumlah like dan status liked harus konsisten dengan backend.
-- Pertahankan optimistic update untuk like jika memang cocok, tetapi pastikan rollback benar ketika API gagal.
-- Hindari race condition ketika user melakukan like/unlike dengan cepat.
-- Hindari state yang bisa menjadi stale.
-- Gunakan functional state update jika lebih aman.
-- Jangan melakukan API request berulang yang sebenarnya tidak diperlukan.
+prisma\migrations/
+  └─ 20260812224903_init/
+    └─ migration.sql
 
-2. SUBMIT FLOW
-- Audit flow setelah feedback berhasil dikirim.
-- Saat ini jangan sampai aplikasi melakukan setView('reviews') lalu langsung navigate ke dashboard sehingga perubahan tidak terlihat.
-- Pilih flow UX yang paling logis dan konsisten.
-- Pastikan timer auto-navigation dibersihkan ketika component unmount atau user keluar dari form.
-- Cegah double submit.
-- Feedback yang sudah berhasil disimpan tidak boleh dianggap gagal hanya karena pengiriman email notifikasi gagal.
-- Ticket ID harus menggunakan ID feedback asli dari backend/store.
+Your database is now in sync with your schema.
 
-3. FORM VALIDATION
-- Perbaiki validasi agar error tidak saling overwrite.
-- Trim input sebelum validasi/submission jika sesuai.
-- Nama wajib diisi.
-- Email opsional, tetapi harus valid jika diisi.
-- Subject wajib diisi.
-- Message wajib diisi dan minimal 10 karakter.
-- Rating harus berada pada range 1–5.
-- Tambahkan batas panjang input yang masuk akal jika diperlukan.
-- Pastikan validasi frontend tidak diasumsikan sebagai pengganti validasi backend.
+✔ Generated Prisma Client (v6.19.3) to .\node_modules\@prisma\client in 1.69s
 
-4. RATINGS & REVIEWS
-- Rating desimal seperti 4.5 harus ditampilkan dengan benar dan jangan dibulatkan menjadi 5.
-- Jika menggunakan half-star, implementasikan secara visual dengan benar; jangan hanya menggunakan opacity 50%.
-- Pastikan rating breakdown menggunakan jumlah review yang memang memiliki rating.
-- Lindungi progress percentage agar selalu berada di range 0–100.
-- Filtering rating harus tetap benar ketika data berubah.
-- Tangani empty state, loading state, dan error state dengan baik.
-- Tangani timestamp invalid atau timestamp masa depan pada fungsi "time ago".
-- Pertimbangkan Intl.RelativeTimeFormat jika membuat implementasi lebih robust tanpa overengineering.
 
-5. ACCESSIBILITY
-- Hubungkan label dengan input menggunakan htmlFor/id.
-- Tambahkan name dan autocomplete yang relevan.
-- Gunakan aria-invalid dan aria-describedby untuk validation error.
-- Rating stars harus bisa digunakan dengan keyboard dan memiliki accessible label.
-- Like button harus memiliki aria-label/aria-pressed yang benar.
-- Filter rating harus memiliki state accessible yang jelas.
-- Floating FeedbackButton harus memiliki accessible name dan focus-visible state.
-- Hindari alt text redundan jika gambar berada dalam button yang sudah memiliki aria-label.
-- Jangan mengorbankan accessibility demi tampilan.
 
-6. ERROR HANDLING
-- Jangan hanya console.error jika kegagalan seharusnya diketahui pengguna.
-- Bedakan initial loading, empty data, dan fetch error.
-- Sediakan mekanisme retry jika load review gagal dan memang berguna.
-- Pastikan refreshReviews menangani error.
-- Jangan membuat UI menampilkan data seolah berhasil diperbarui jika backend sebenarnya gagal.
+E:\guthub\Folder Baru (2)\reviw\siakad-sekolah\backend>npm run dev
 
-7. AVATAR
-- Tangani avatar URL yang gagal dimuat.
-- Gunakan fallback avatar yang aman.
-- Evaluasi ketergantungan pada ui-avatars.com karena itu third-party request.
-- Jika ada solusi lebih aman/sederhana untuk fallback initials tanpa layanan eksternal, rekomendasikan.
+> absensi-backend@0.1.0 dev
+> tsx src/server.ts
 
-8. RESPONSIVE UI
-- Pastikan FeedbackButton tidak terlalu besar di mobile dan tidak menutupi konten penting.
-- Pastikan header FeedbackPage tetap baik pada layar kecil.
-- Cek form category, priority, review summary, dan contact information untuk mobile.
-- Hindari fixed sizing yang berpotensi menyebabkan overflow.
-- Pertahankan desain yang sederhana dan profesional.
-
-9. UX & COPY
-- Gunakan Bahasa Indonesia secara konsisten.
-- Hindari campuran seperti "All", "reviews", "Include email", "improvement", dll. jika tidak diperlukan.
-- Gunakan istilah yang natural untuk aplikasi sekolah Indonesia.
-- Pastikan pesan sukses/error informatif tetapi tidak berlebihan.
-- Jika feedback berhasil dibuat, beri user kesempatan melihat hasilnya.
-
-10. TYPESCRIPT
-- Pertahankan strict typing.
-- Hindari `any`.
-- Jangan melakukan type assertion yang tidak diperlukan seperti `as number` jika TypeScript sudah dapat menginferensikannya.
-- Jika memungkinkan, turunkan tipe category/priority langsung dari source of truth agar tidak mudah tidak sinkron.
-- Periksa kemungkinan undefined/null dari data API.
-
-11. CODE QUALITY
-- Kurangi duplikasi fetch logic.
-- Pisahkan business logic dari presentational component jika benar-benar memberikan manfaat.
-- Jangan memecah komponen menjadi terlalu banyak file tanpa alasan.
-- Hindari useMemo/useCallback hanya untuk micro-optimization.
-- Jangan menambahkan library baru jika native React/TypeScript/CSS sudah cukup.
-- Jangan overengineering.
-- Pertahankan struktur:
-  FeedbackButton
-      -> FeedbackPage
-          -> RatingsReviews
-          -> FeedbackForm
-  kecuali ada alasan teknis yang kuat untuk mengubahnya.
-
-12. SECURITY & PRIVACY
-- Jangan expose informasi sensitif lewat frontend environment variable secara tidak tepat.
-- Review bagaimana email dan data pengguna digunakan.
-- Jangan percaya data input hanya karena berasal dari frontend.
-- Escape/render user-generated content dengan cara yang aman.
-- Jangan memperkenalkan dangerouslySetInnerHTML.
-- Pertimbangkan abuse protection/rate limiting pada backend untuk submit feedback dan like jika relevan.
-
-13. PERFORMANCE
-- Hindari fetch seluruh review hanya untuk memperbarui satu like jika API sebenarnya bisa mengembalikan updated feedback.
-- Namun jangan melakukan optimisasi kompleks tanpa kebutuhan nyata.
-- Hindari unnecessary re-render hanya jika memang ada dampak yang jelas.
-- Prioritaskan correctness terlebih dahulu, baru performance.
-
-Yang TIDAK saya inginkan:
-- Rewrite total tanpa alasan.
-- Mengubah UI secara drastis.
-- Menambahkan state-management library baru.
-- Menambahkan dependency hanya untuk masalah kecil.
-- Abstraksi berlebihan.
-- Membuat generic component yang hanya dipakai sekali.
-- Micro-optimization yang membuat kode sulit dibaca.
-- Mengubah API/service contract secara sembarangan.
-- Menghapus fitur yang sudah berjalan.
-
-Cara pengerjaan yang saya inginkan:
-
-Pertama, audit semua file yang saya kirim dan identifikasi masalah berdasarkan severity:
-- Critical
-- High
-- Medium
-- Low
-
-Untuk setiap masalah jelaskan:
-- file/lokasi masalah
-- kenapa itu masalah
-- dampak nyata terhadap user/aplikasi
-- solusi yang direkomendasikan
-
-Setelah audit, prioritaskan perbaikan yang benar-benar memberikan dampak terhadap:
-1. correctness
-2. data consistency
-3. user experience
-4. accessibility
-5. maintainability
-6. performance
-
-Kemudian berikan kode hasil refactor untuk file yang memang perlu diubah.
-
-Jangan sekadar memberi saran. Pastikan implementasi akhirnya konsisten antar-file dan dapat dikompilasi TypeScript.
-
-Jika ada keputusan yang memiliki trade-off, jelaskan secara singkat alasan memilih pendekatan tersebut.
-
-Yang paling penting:
-Jangan menganggap kode saya buruk dan jangan mengubah sesuatu hanya karena ada cara lain untuk menulisnya. Pertahankan bagian yang sudah baik. Fokus hanya pada perubahan yang memberikan peningkatan kualitas nyata untuk aplikasi production.
+05:49:52 [info]: Backend berjalan di http://localhost:4000 {"port":4000,"environment":"development"}
+05:49:52 [info]: Token cleanup scheduled {"interval":"3600000ms"}
+05:49:52 [info]: Data retention scheduled {"interval":"86400000ms"}
+05:49:52 [info]: Database connected successfully
+06:00:51 [info]: HTTP Request {"requestId":"bba3baa9-99b1-4ae6-865a-32dce3f1121c","method":"GET","url":"/stats","status":200,"duration":"1357ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:00:51 [warn]: SLOW REQUEST {"method":"GET","path":"/stats","route":"/stats","duration":"1366ms","statusCode":200}
+06:00:51 [info]: HTTP Request {"requestId":"e545e6a1-5ba4-40f6-93e5-7b737d8c0efb","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"1398ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:00:51 [warn]: SLOW REQUEST {"method":"GET","path":"/","route":"/","duration":"1410ms","statusCode":200}
+06:01:31 [info]: HTTP Request {"requestId":"9f2a1f94-f650-4820-9174-f53dfe5238b3","method":"POST","url":"/","status":201,"duration":"799ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:01:31 [info]: HTTP Request {"requestId":"56c9539e-f533-4672-94e3-06b9cfdefcda","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"18ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:01:31 [info]: HTTP Request {"requestId":"2448b774-65c1-413d-886a-671505b9eb2a","method":"GET","url":"/stats","status":200,"duration":"7ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:03:45 [info]: HTTP Request {"requestId":"9938c239-257e-4cb5-b3bf-08ad10dc004d","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"10ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:03:45 [info]: HTTP Request {"requestId":"e9d01140-d62b-4948-95c0-d284ba81a877","method":"GET","url":"/stats","status":304,"duration":"5ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:04:18 [info]: HTTP Request {"requestId":"4411823a-0c02-47e7-86a1-f2d728c09cf3","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"8ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:04:18 [info]: HTTP Request {"requestId":"4178a1b1-bf51-408c-988d-42555062742a","method":"GET","url":"/stats","status":304,"duration":"9ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:04:58 [info]: HTTP Request {"requestId":"143d58a1-01f3-4c3d-acb4-e229df2bcfdb","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"11ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:04:58 [info]: HTTP Request {"requestId":"7f7bba1a-78a4-41c4-958f-9bb74bf5d07c","method":"GET","url":"/stats","status":304,"duration":"5ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:48:32 [info]: HTTP Request {"requestId":"bf32edb3-1f2b-4919-a20c-11fb59499a9c","method":"GET","url":"/stats","status":304,"duration":"762ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:48:32 [info]: HTTP Request {"requestId":"ae5c0f9a-e528-435d-bc5a-e50f76a6e9dd","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"769ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:48:48 [info]: HTTP Request {"requestId":"3bc6af90-f7f3-4135-b4a3-623d7bf27a99","method":"GET","url":"/?page=1&limit=100","status":200,"duration":"24ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+06:48:48 [info]: HTTP Request {"requestId":"ee959446-7a4f-4fec-bbc3-88540bff62ba","method":"GET","url":"/stats","status":304,"duration":"21ms","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}

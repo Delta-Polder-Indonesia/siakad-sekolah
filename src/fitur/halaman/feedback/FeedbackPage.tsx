@@ -5,6 +5,7 @@ import { sendFeedbackToEmail, type Feedback } from '../../../data/services';
 import {
   fetchFeedbackReviews,
   fetchFeedbackStats,
+  getAnonymousLikeId,
   submitFeedback,
   toggleFeedbackLikeApi,
   type FeedbackStats,
@@ -85,12 +86,14 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
   }, [loadFeedback]);
 
   // Status like diturunkan langsung dari daftar review (single source of truth),
-  // jadi tidak ada state terpisah yang bisa melenceng dari data.
+  // jadi tidak ada state terpisah yang bisa melenceng dari data. Pengunjung yang
+  // belum login memakai ID perangkat yang stabil (getAnonymousLikeId) sehingga
+  // tetap bisa menyukai & membatalkan suka.
   const likedReviews = useMemo(() => {
-    if (!user?.id) return {} as Record<string, boolean>;
+    const likerId = user?.id || getAnonymousLikeId();
     const liked: Record<string, boolean> = {};
     reviews.forEach((f) => {
-      if (f.likedBy?.includes(user.id)) liked[f.id] = true;
+      if (f.likedBy?.includes(likerId)) liked[f.id] = true;
     });
     return liked;
   }, [reviews, user?.id]);
@@ -118,12 +121,13 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
 
   const handleLike = useCallback(
     async (feedbackId: string) => {
-      if (!user?.id || pendingLikeIds.current.has(feedbackId)) return;
+      const likerId = user?.id || getAnonymousLikeId();
+      if (pendingLikeIds.current.has(feedbackId)) return;
       pendingLikeIds.current.add(feedbackId);
 
       const snapshot = reviews;
       const wasLiked = Boolean(
-        snapshot.find((r) => r.id === feedbackId)?.likedBy?.includes(user.id)
+        snapshot.find((r) => r.id === feedbackId)?.likedBy?.includes(likerId)
       );
 
       // Optimistik UI — status dan jumlah like diubah dari satu sumber (likedBy).
@@ -131,22 +135,22 @@ export default function FeedbackPage({ onNavigate }: PageProps) {
         prev.map((r) => {
           if (r.id !== feedbackId) return r;
           const likedBy = wasLiked
-            ? (r.likedBy || []).filter((id) => id !== user.id)
-            : [...(r.likedBy || []), user.id];
+            ? (r.likedBy || []).filter((id) => id !== likerId)
+            : [...(r.likedBy || []), likerId];
           return { ...r, likedBy, likes: likedBy.length };
         })
       );
 
       try {
-        const result = await toggleFeedbackLikeApi(feedbackId, user.id);
+        const result = await toggleFeedbackLikeApi(feedbackId, likerId);
         // Terapkan hasil dari backend agar jumlah like sinkron tanpa fetch ulang
         // seluruh review.
         setReviews((prev) =>
           prev.map((r) => {
             if (r.id !== feedbackId) return r;
             const likedBy = result.liked
-              ? [...new Set([...(r.likedBy || []), user.id])]
-              : (r.likedBy || []).filter((id) => id !== user.id);
+              ? [...new Set([...(r.likedBy || []), likerId])]
+              : (r.likedBy || []).filter((id) => id !== likerId);
             return { ...r, likedBy, likes: result.likes };
           })
         );
