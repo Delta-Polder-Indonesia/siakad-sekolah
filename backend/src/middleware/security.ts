@@ -47,7 +47,14 @@ export const csrfProtection: RequestHandler = (req, res, next) => {
   const isAllowed = (value: string | undefined) => {
     if (!value) return true; // non-browser clients (Postman, mobile) tidak kirim origin
     const base = value.replace(/\/$/, '');
-    return allowedOrigins.some((o) => base === o || base.startsWith(o + '/'));
+    if (allowedOrigins.some((o) => base === o || base.startsWith(o + '/'))) return true;
+    try {
+      const host = new URL(base).hostname;
+      if (env.NODE_ENV !== 'production' && host.endsWith('.e2b.app')) return true;
+    } catch {
+      return false;
+    }
+    return false;
   };
 
   if (!isAllowed(origin) || !isAllowed(referer)) {

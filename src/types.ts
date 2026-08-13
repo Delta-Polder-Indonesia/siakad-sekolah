@@ -322,6 +322,10 @@ export interface AuthUser {
   role: UserRole;
   email?: string;
   avatar?: string;
+  /** ID lokal store (s1/t1) bila login lewat backend CUID. */
+  legacyId?: string;
+  nis?: string;
+  nip?: string;
 }
 
 export interface LoginLog {

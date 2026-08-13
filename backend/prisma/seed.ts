@@ -63,15 +63,15 @@ const classes = [
 ];
 
 const teachers = [
-  { nip: '198501012010011001', name: 'Bapak Andi Pratama', subject: 'Matematika', email: 'andi@sekolah.id', classCode: 'c1' },
-  { nip: '198701022012012002', name: 'Ibu Rina Kartika', subject: 'Bahasa Indonesia', email: 'rina@sekolah.id', classCode: 'c2' },
-  { nip: '198901032014013003', name: 'Bapak Dedi Saputra', subject: 'Fisika', email: 'dedi@sekolah.id', classCode: null },
+  { legacyId: 't1', nip: '198501012010011001', name: 'Bapak Andi Pratama', subject: 'Matematika', email: 'andi@sekolah.id', classCode: 'c1' },
+  { legacyId: 't2', nip: '198701022012012002', name: 'Ibu Rina Kartika', subject: 'Bahasa Indonesia', email: 'rina@sekolah.id', classCode: 'c2' },
+  { legacyId: 't3', nip: '198901032014013003', name: 'Bapak Dedi Saputra', subject: 'Fisika', email: 'dedi@sekolah.id', classCode: null },
 ];
 
 const students = [
-  { nis: '2024001', name: 'Siti Rahma', gender: 'P', classCode: 'c1', guardianName: 'Siti Aminah' },
-  { nis: '2024002', name: 'Budi Santoso', gender: 'L', classCode: 'c1', guardianName: 'Agus Santoso' },
-  { nis: '2024003', name: 'Nabila Putri', gender: 'P', classCode: 'c2', guardianName: 'Dewi Lestari' },
+  { legacyId: 's1', nis: '2024001', name: 'Siti Rahma', gender: 'P', classCode: 'c1', guardianName: 'Siti Aminah' },
+  { legacyId: 's2', nis: '2024002', name: 'Budi Santoso', gender: 'L', classCode: 'c1', guardianName: 'Agus Santoso' },
+  { legacyId: 's3', nis: '2024003', name: 'Nabila Putri', gender: 'P', classCode: 'c2', guardianName: 'Dewi Lestari' },
 ];
 
 async function main() {
@@ -111,8 +111,8 @@ async function main() {
   for (const t of teachers) {
     const teacher = await prisma.teacher.upsert({
       where: { nip: t.nip },
-      update: { name: t.name, subject: t.subject, email: t.email, passwordHash: teacherHash },
-      create: { nip: t.nip, name: t.name, subject: t.subject, email: t.email, passwordHash: teacherHash },
+      update: { name: t.name, subject: t.subject, email: t.email, passwordHash: teacherHash, legacyId: t.legacyId },
+      create: { nip: t.nip, name: t.name, subject: t.subject, email: t.email, passwordHash: teacherHash, legacyId: t.legacyId },
     });
 
     if (t.classCode) {

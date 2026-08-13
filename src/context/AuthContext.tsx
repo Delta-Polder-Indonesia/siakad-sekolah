@@ -97,6 +97,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // avatar/email boleh disertakan untuk UI, tapi bukan rahasia
           avatar: authUser.avatar,
           email: authUser.email,
+          legacyId: authUser.legacyId,
+          nis: authUser.nis,
+          nip: authUser.nip,
         };
         localStorage.setItem('absensi_auth_minimal', JSON.stringify(minimal));
         // Hapus legacy full object jika ada
@@ -152,6 +155,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: role,
           avatar: portalResult.user.avatarUrl ?? undefined,
           email: portalResult.user.email ?? undefined,
+          legacyId:
+            portalResult.user.legacyId ??
+            portalResult.user.guardianOf?.[0]?.legacyId ??
+            undefined,
+          nis: portalResult.user.nis ?? undefined,
+          nip: portalResult.user.nip ?? undefined,
         };
         setUser(authUser);
         simpanSesi(authUser);

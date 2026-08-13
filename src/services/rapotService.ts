@@ -5,7 +5,8 @@
 //
 // Kontrak data sama dengan NilaiRapot di src/types.ts.
 
-import { API_BASE, hasApi } from './apiConfig';
+import { hasApi } from './apiConfig';
+import { apiRequest } from './apiClient';
 import type { NilaiRapot } from '../types';
 import {
   getNilaiRapotBySiswa,
@@ -27,17 +28,7 @@ type ListResponse = {
   data?: NilaiRapot[];
 };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...((init?.headers as Record<string, string>) || {}),
-    },
-  });
-  if (!res.ok) throw new Error(`API request failed (${res.status})`);
-  return (await res.json()) as T;
-}
+const request = apiRequest;
 
 // ── READ ────────────────────────────────────────────────────────────────────
 // Catatan: pembacaan rapot oleh siswa/orang-tua via API belum dibuka di backend

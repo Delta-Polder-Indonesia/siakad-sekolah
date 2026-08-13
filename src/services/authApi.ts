@@ -34,6 +34,7 @@ export interface BackendGuardian {
   studentId: string;
   studentName: string;
   classId: string;
+  legacyId?: string | null;
 }
 
 export interface BackendAuthUser {
@@ -42,6 +43,9 @@ export interface BackendAuthUser {
   role: 'GURU' | 'MURID' | 'WALIS' | 'TAMU';
   avatarUrl?: string | null;
   email?: string | null;
+  legacyId?: string | null;
+  nis?: string | null;
+  nip?: string | null;
   classId?: string | null;
   classIds?: string[]; // guru: kelas ajar (ClassRoomTeacher M2M)
   homeroomClassIds?: string[]; // guru: kelas binaan (ClassRoom.teacherId)

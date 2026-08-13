@@ -4,7 +4,8 @@
 //
 // Kontrak data sama dengan SuratIzin di src/types.ts.
 
-import { API_BASE, hasApi } from './apiConfig';
+import { hasApi } from './apiConfig';
+import { apiRequest } from './apiClient';
 import type { SuratIzin } from '../types';
 import {
   getSuratIzinByStudent,
@@ -12,29 +13,17 @@ import {
   updateStatusSuratIzin,
 } from '../data/services';
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...((init?.headers as Record<string, string>) || {}) },
-  });
-  if (!res.ok) throw new Error(`API request failed (${res.status})`);
-  return (await res.json()) as T;
-}
+const request = apiRequest;
 
 type ListResponse = { ok?: boolean; data?: SuratIzin[] };
 type ItemResponse = { ok?: boolean; data?: SuratIzin };
 
 // ── READ ────────────────────────────────────────────────────────────────────
-// Catatan: endpoint /api/surat-izin GET dibatasi GURU/ADMIN (verifikasi).
-// Self-service list per siswa utk MURID/WALIS ditutup sementara sampai
-// linkage auth (ownership-check) dibangun — di mode demo semua role membaca store.
-
 export async function fetchSuratByStudent(studentId: string): Promise<SuratIzin[]> {
   if (!hasApi) return Promise.resolve(getSuratIzinByStudent(studentId));
-  // Mode API: gurU/admin membaca semua, lalu filter client-side.
-  const data = await request<ListResponse>('/surat-izin');
-  const items = Array.isArray(data?.data) ? data.data : [];
-  return items.filter((s) => s.studentId === studentId);
+  const query = new URLSearchParams({ studentId });
+  const data = await request<ListResponse>(`/surat-izin?${query.toString()}`);
+  return Array.isArray(data?.data) ? data.data : [];
 }
 
 // ── WRITE ───────────────────────────────────────────────────────────────────

@@ -17,11 +17,24 @@ const allowedOrigins = env.CLIENT_ORIGIN
   .split(',')
   .map((o) => o.trim());
 
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  // Preview Arena / e2b (dev saja)
+  if (env.NODE_ENV !== 'production' && /\.e2b\.app$/.test(new URL(origin).hostname)) {
+    return true;
+  }
+  return false;
+}
+
 // Kompresi gzip untuk respons JSON — kurangi bandwidth & latensi API.
 app.use(compression());
 app.use(helmet());
 app.use(cors({
-  origin:         allowedOrigins,
+  origin: (origin, cb) => {
+    if (isAllowedOrigin(origin)) cb(null, true);
+    else cb(new Error('Origin tidak diizinkan'));
+  },
   credentials:    true,
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cookie'],
 }));

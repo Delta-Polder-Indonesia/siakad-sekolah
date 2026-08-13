@@ -1,14 +1,9 @@
-// Route tagihan/billing — blueprint BUG-03.
-//
-// KEAMANAN (IDOR): seperti rapot, endpoint billing yang menyentuh data spesifik
-// siswa dibuka untuk GURU/ADMIN dulu. Self-service pembayaran oleh siswa/orang-tua
-// membutuhkan linkage antara akun login dan data siswa (id lokal 's1' vs CUID
-// backend; relasi WALIS→Student belum lengkap) — tanpa itu, membuka endpoint
-// ke role siswa berisiko IDOR (siswa bisa menandai tagihan orang lain lunas).
-// Konfigurasi & generate tagihan hanya admin.
+// Route tagihan/billing.
+// Self-service siswa/wali: list + pay milik sendiri.
 
 import { Router } from 'express';
 import { requireAuth, requireRoles, requireAdmin } from '../../middleware/auth.js';
+import { scopeStudentQuery } from '../../middleware/ownership.js';
 import {
   handleListBilling,
   handlePayBilling,
@@ -19,12 +14,20 @@ import {
 
 export const billingRouter = Router();
 
-// Konfigurasi & generate tagihan — admin only.
 billingRouter.get('/config', requireAuth, handleGetConfig);
 billingRouter.post('/config', requireAuth, requireAdmin, handleSetConfig);
 billingRouter.post('/generate', requireAuth, requireAdmin, handleGenerateBilling);
 
-// Operasi data tagihan — guru/admin (self-service siswa menunggu linkage).
-billingRouter.use(requireAuth, requireRoles('GURU', 'ADMIN'));
-billingRouter.get('/', handleListBilling);
-billingRouter.post('/:id/pay', handlePayBilling);
+billingRouter.get(
+  '/',
+  requireAuth,
+  requireRoles('GURU', 'ADMIN', 'MURID', 'WALIS'),
+  scopeStudentQuery,
+  handleListBilling
+);
+billingRouter.post(
+  '/:id/pay',
+  requireAuth,
+  requireRoles('GURU', 'ADMIN', 'MURID', 'WALIS'),
+  handlePayBilling
+);

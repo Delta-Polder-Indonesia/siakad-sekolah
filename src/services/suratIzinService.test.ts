@@ -46,12 +46,12 @@ describe('suratIzinService — mode API (hasApi=true)', () => {
     expect(JSON.parse(init.body).status).toBe('disetujui');
   });
 
-  it('fetchSuratByStudent memanggil /surat-izin dan memfilter studentId', async () => {
+  it('fetchSuratByStudent memanggil /surat-izin?studentId=', async () => {
     fetchMock.mockResolvedValueOnce(
-      jsonResponse({ json: { ok: true, data: [surat, { ...surat, id: 'surat-2', studentId: 's2' }] } })
+      jsonResponse({ json: { ok: true, data: [surat] } })
     );
     const result = await fetchSuratByStudent('s1');
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe('surat-1');
+    expect(String(fetchMock.mock.calls[0][0])).toContain('studentId=s1');
   });
 });

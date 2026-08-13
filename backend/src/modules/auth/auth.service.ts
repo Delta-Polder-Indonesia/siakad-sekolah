@@ -50,7 +50,9 @@ async function signTokens(payload: JwtPayload) {
 export async function loginTeacher(nip: string, password: string) {
   logDatabaseOperation('teacher_login_attempt', { nip });
   
-  const teacher = await prisma.teacher.findUnique({ where: { nip } });
+  const teacher =
+    (await prisma.teacher.findUnique({ where: { nip } })) ||
+    (await prisma.teacher.findUnique({ where: { legacyId: nip } }));
 
   if (!teacher) {
     logSecurityEvent('login_failed', { reason: 'teacher_not_found', nip });
@@ -90,6 +92,8 @@ export async function loginTeacher(nip: string, password: string) {
       role:           'GURU' as const,
       avatarUrl:      teacher.avatarUrl,
       email:          teacher.email,
+      legacyId:       teacher.legacyId,
+      nip:            teacher.nip,
       classIds:       classes.map((c) => c.classRoomId),
       homeroomClassIds: homeroomClasses.map((c) => c.id),
     },
@@ -214,7 +218,9 @@ export async function changeStudentPassword(studentId: string, oldPassword: stri
 export async function loginStudent(nis: string, password: string) {
   logDatabaseOperation('student_login_attempt', { nis });
   
-  const student = await prisma.student.findUnique({ where: { nis } });
+  const student =
+    (await prisma.student.findUnique({ where: { nis } })) ||
+    (await prisma.student.findUnique({ where: { legacyId: nis } }));
 
   if (!student) {
     logSecurityEvent('login_failed', { reason: 'student_not_found', nis });
@@ -261,6 +267,7 @@ export async function loginParent(id: string, password: string) {
       name: true,
       nis: true,
       classId: true,
+      legacyId: true,
       guardianName: true,
       guardianPhone: true,
       guardianPasswordHash: true,
@@ -313,6 +320,7 @@ export async function loginParent(id: string, password: string) {
         studentId: match.id,
         studentName: match.name,
         classId: match.classId,
+        legacyId: match.legacyId,
       }],
     },
     ...(await signTokens(payload)),

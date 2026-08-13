@@ -87,6 +87,8 @@ model Teacher {
   id              String              @id @default(cuid())
   name            String
   nip             String              @unique
+  /// ID lokal frontend (t1, t2, …) untuk mapping CUID ↔ store demo.
+  legacyId        String?             @unique
   passwordHash    String
   subject         String
   email           String?
@@ -109,6 +111,8 @@ model Student {
   id             String                 @id @default(cuid())
   name           String
   nis            String                 @unique
+  /// ID lokal frontend (s1, s2, …) untuk mapping CUID ↔ store demo.
+  legacyId       String?                @unique
   passwordHash   String
   gender         String?
   classId        String
@@ -406,6 +410,8 @@ model PPDBApplication {
   adminNotes     String?
   verifiedBy     String?
   verifiedAt     DateTime?
+  /// Field tambahan frontend (bahasa Indonesia) yang tidak ada di kolom inti.
+  extended       Json?
   submittedAt    DateTime           @default(now())
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt

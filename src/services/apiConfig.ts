@@ -10,3 +10,15 @@ const RAW_BASE =
 export const API_BASE = (RAW_BASE || 'http://localhost:4000/api').trim().replace(/\/$/, '');
 
 export const hasApi = Boolean(String(RAW_BASE || '').trim());
+
+/** Header Authorization jika sesi backend aktif (hindari siklus import authApi). */
+export function apiAuthHeaders(): Record<string, string> {
+  try {
+    const token =
+      (typeof localStorage !== 'undefined' && localStorage.getItem('portal_access_token')) || '';
+    // Token memory di-set oleh authApi; import dinamis dihindari.
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}

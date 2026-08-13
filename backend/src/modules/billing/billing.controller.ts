@@ -4,6 +4,8 @@ import type { RequestHandler } from 'express';
 import { z } from 'zod';
 import { ValidationError } from '../../utils/errors.js';
 import { paginatedResponse } from '../../utils/response.js';
+import { prisma } from '../../lib/prisma.js';
+import { canAccessStudent } from '../../middleware/ownership.js';
 import {
   listBilling,
   payBilling,
@@ -66,6 +68,15 @@ export const handlePayBilling: RequestHandler = async (req, res, next) => {
       throw new ValidationError('Data pembayaran tidak valid', {
         errors: { params: params.success ? undefined : params.error.flatten().fieldErrors },
       });
+    }
+
+    const existing = await prisma.billing.findUnique({ where: { id: params.data.id } });
+    if (existing && !(await canAccessStudent(req, existing.studentId))) {
+      res.status(403).json({
+        ok: false,
+        message: 'Akses ditolak. Anda hanya dapat membayar tagihan sendiri.',
+      });
+      return;
     }
 
     const item = await payBilling(params.data.id, body.data.paymentMethod);

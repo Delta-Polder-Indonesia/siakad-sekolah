@@ -4,7 +4,8 @@
 //
 // Kontrak data sama dengan OnlineAssignment & AssignmentSubmission di src/types.ts.
 
-import { API_BASE, hasApi } from './apiConfig';
+import { hasApi } from './apiConfig';
+import { apiRequest } from './apiClient';
 import type { OnlineAssignment, AssignmentSubmission } from '../types';
 import {
   getOnlineAssignmentsByClass,
@@ -16,14 +17,7 @@ import {
   upsertAssignmentSubmission,
 } from '../data/services';
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...((init?.headers as Record<string, string>) || {}) },
-  });
-  if (!res.ok) throw new Error(`API request failed (${res.status})`);
-  return (await res.json()) as T;
-}
+const request = apiRequest;
 
 type ListResponse<T> = { ok?: boolean; data?: T[] };
 type ItemResponse<T> = { ok?: boolean; data?: T };
