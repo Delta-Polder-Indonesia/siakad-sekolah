@@ -6,7 +6,8 @@
 // Kontrak data sama dengan AttendanceRecord di src/types.ts, sehingga komponen
 // (HalamanAbsensi) bisa memakai service ini tanpa tahu detail penyimpanan.
 
-import { API_BASE, hasApi } from './apiConfig';
+import { hasApi } from './apiConfig';
+import { apiRequest } from './apiClient';
 import type { AttendanceRecord } from '../types';
 import {
   getAttendanceByDate,
@@ -24,19 +25,7 @@ type AttendanceListResponse = {
   data?: AttendanceRecord[];
 };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...((init?.headers as Record<string, string>) || {}),
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API request failed (${res.status})`);
-  }
-  return (await res.json()) as T;
-}
+const request = apiRequest;
 
 // Muat absensi per tanggal/kelas. Selalu async (backend) — mode lokal
 // mengembalikan Promise.resolve dari store agar kontrak sama.

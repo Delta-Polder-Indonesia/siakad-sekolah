@@ -16,6 +16,15 @@ export function getTeacherByUser(user: AuthUser | null | undefined): Teacher | u
   const byId = teachers.find((t) => t.id === user.id);
   if (byId) return byId;
 
+  if (user.legacyId) {
+    const byLegacy = teachers.find((t) => t.id === user.legacyId);
+    if (byLegacy) return byLegacy;
+  }
+  if (user.nip) {
+    const byNip = teachers.find((t) => t.nip === user.nip);
+    if (byNip) return byNip;
+  }
+
   if (!user.name) return undefined;
   const nama = user.name.trim().toLowerCase();
   return teachers.find((t) => t.name.trim().toLowerCase() === nama);

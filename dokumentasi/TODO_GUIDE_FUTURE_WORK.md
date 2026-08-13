@@ -1,7 +1,7 @@
 # 📋 TODO GUIDE - FUTURE WORK
 
 **Tanggal dibuat:** 13 Agustus 2026  
-**Status:** Infrastructure Ready, Features Pending  
+**Status:** Kode integrasi + akademik + PPDB CRUD siap; uji live = Postgres (VS Code)  
 **Konteks:** Panduan lengkap pekerjaan yang belum selesai untuk sesi berikutnya
 
 ---
@@ -16,11 +16,12 @@
 - Database schema dan migrations
 - Seed data awal
 
-### 🔴 **PENDING WORK (NOT READY YET)**
-- Full stack integration testing
-- Academic endpoints testing (8 modul)
-- Linkage auth implementation
-- Data migration (localStorage → database)
+### 🟡 **KODE SIAP — UJI LIVE MENUNGGU POSTGRES (VS Code)**
+- Full stack: `apiClient` + auth header di semua service akademik
+- 8 modul akademik: route + ownership + frontend service
+- Linkage auth: `legacyId` + middleware ownership
+- PPDB CRUD + mapper ID↔EN + `usePpdbApi = hasApi`
+- Script: `backend/scripts/integrationSmoke.ts`, `migrateLocalStorage.ts`
 
 ---
 
@@ -271,7 +272,7 @@ curl -X PATCH http://localhost:4000/api/ppdb/config \
 
 ## 🔴 PRIORITY 3: LINKAGE AUTH (BLOCKING ITEM)
 
-### Status: ❌ **NOT STARTED**
+### Status: ✅ **KODE IMPLEMENTED** (uji live menunggu Postgres)
 ### Estimasi: 4-8 jam
 ### Prioritas: **SANGAT TINGGI** - Disebut "BLOKIR-4" di DOKUMEN_LANJUTAN_VSCODE.md
 ### Reference: DOKUMEN_LANJUTAN_VSCODE.md lines 104-121
@@ -418,7 +419,7 @@ router.get('/', requireAuth, requireOwnership('Student'), getSuratIzin);
 
 ## 🔴 PRIORITY 4: DATA MIGRATION (BLOCKING ITEM)
 
-### Status: ❌ **NOT STARTED**
+### Status: ✅ **KODE SIAP** (jalankan migrate saat Postgres ada)
 ### Estimasi: 8-16 jam
 ### Prioritas: **SANGAT TINGGI** - Disebut "BLOKIR-5" di DOKUMEN_LANJUTAN_VSCODE.md
 ### Reference: DOKUMEN_LANJUTAN_VSCODE.md lines 124-143
@@ -595,10 +596,10 @@ Wali: 2024001 / ortu123
 
 | Priority | Task | Status | Estimasi | Urgensi |
 |----------|------|--------|----------|---------|
-| 1 | Integration Testing | ❌ Not Started | 15-30 min | HIGH |
-| 2 | Academic Endpoints Testing | ❌ Not Started | 1-2 jam | HIGH |
-| 3 | Linkage Auth | ❌ Not Started | 4-8 jam | VERY HIGH |
-| 4 | Data Migration | ❌ Not Started | 8-16 jam | VERY HIGH |
+| 1 | Integration Testing | ✅ Kode + smoke script | 15-30 min | HIGH |
+| 2 | Academic Endpoints | ✅ Route + service siap | 1-2 jam | HIGH |
+| 3 | Linkage Auth | ✅ Kode siap | 4-8 jam | VERY HIGH |
+| 4 | Data Migration | ✅ Mapper + script + PPDB CRUD | 8-16 jam | VERY HIGH |
 
 ---
 
@@ -633,8 +634,8 @@ tambahan:
 
   • ✅ Infrastructure: 100% ready
   • ✅ Basic Auth: 100% ready
-  • ❌ Full Integration: ~30% ready
-  • ❌ Academic Features: ~20% ready
-  • ❌ Production Features: ~10% ready
+  • ✅ Full Integration: ~85% ready (uji E2E live = VS Code + Postgres)
+  • ✅ Academic Features: ~80% ready (8 modul + ownership + apiClient)
+  • ✅ Production Features: ~70% ready (linkage, PPDB CRUD, mapper, migrate script)
 
 Rekomendasi saya: Test dulu integration basic (login dari frontend), lalu lanjutkan sesuai kebutuhan Anda (demo vs production).

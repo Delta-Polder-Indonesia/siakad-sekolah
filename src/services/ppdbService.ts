@@ -46,7 +46,7 @@ const usePpdbAdminApi = hasApi;
 //
 // TODO(Phase 3): setelah modul backend `/ppdb` dibangun & kontrak data
 // disamakan (migrasi schema), ubah `usePpdbApi` menjadi `hasApi`.
-const usePpdbApi = false;
+const usePpdbApi = hasApi;
 
 type JsonMap = Record<string, unknown>;
 type AuthTokens = { accessToken: string; refreshToken: string };
@@ -161,7 +161,12 @@ const request = async <T>(path: string, init?: RequestInit, isRetry = false): Pr
   }
 
   if (response.status === 204) return {} as T;
-  return (await response.json()) as T;
+  const payload = (await response.json()) as T & { data?: T };
+  // Backend akademik memakai { ok, data }; unwrap bila ada.
+  if (payload && typeof payload === 'object' && 'data' in payload && payload.data !== undefined) {
+    return payload.data as T;
+  }
+  return payload;
 };
 
 const apiLogin = async (username: string, pin: string): Promise<boolean> => {

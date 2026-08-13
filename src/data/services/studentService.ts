@@ -43,6 +43,15 @@ export function getStudentByUser(user: AuthUser | null | undefined): Student | u
   const byId = students.find((s) => s.id === user.id);
   if (byId) return byId;
 
+  if (user.legacyId) {
+    const byLegacy = students.find((s) => s.id === user.legacyId);
+    if (byLegacy) return byLegacy;
+  }
+  if (user.nis) {
+    const byNis = students.find((s) => s.nis === user.nis);
+    if (byNis) return byNis;
+  }
+
   if (!user.name) return undefined;
   const nama = user.name.trim().toLowerCase();
   const byName = students.filter((s) => s.name.trim().toLowerCase() === nama);
@@ -83,6 +92,11 @@ export function getParentStudent(user: AuthUser | null | undefined): Student | u
   const localId = user.id.startsWith('p_') ? user.id.slice(2) : undefined;
   const byId = localId ? students.find((s) => s.id === localId) : undefined;
   if (byId) return byId;
+
+  if (user.legacyId) {
+    const byLegacy = students.find((s) => s.id === user.legacyId);
+    if (byLegacy) return byLegacy;
+  }
 
   // Fallback untuk sesi backend (wali_<cuid>) — cari via guardianOf atau parentName.
   // Untuk sesi lama yang masih pakai nama, tetap coba pencocokan nama agar tidak breaking.

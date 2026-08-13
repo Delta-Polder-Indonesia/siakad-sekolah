@@ -4,7 +4,8 @@
 //
 // Kontrak data sama dengan TagihanSekolah & PengaturanTagihan di src/types.ts.
 
-import { API_BASE, hasApi } from './apiConfig';
+import { hasApi } from './apiConfig';
+import { apiRequest } from './apiClient';
 import type { TagihanSekolah, PengaturanTagihan } from '../types';
 import {
   getTagihanSekolahBySiswa,
@@ -24,22 +25,10 @@ export interface BillingQuery {
 type ListResponse = { ok?: boolean; data?: TagihanSekolah[] };
 type ConfigResponse = { ok?: boolean; data?: PengaturanTagihan };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...((init?.headers as Record<string, string>) || {}),
-    },
-  });
-  if (!res.ok) throw new Error(`API request failed (${res.status})`);
-  return (await res.json()) as T;
-}
+const request = apiRequest;
 
 // ── READ ────────────────────────────────────────────────────────────────────
-// Catatan: endpoint /api/billing dibatasi GURU/ADMIN (self-service siswa
-// menunggu linkage auth — lihat billing.route.ts). Di mode demo semua role
-// membaca store lokal.
+// Self-service siswa/wali sudah dibuka (ownership di backend).
 
 export async function fetchTagihanBySiswa(
   studentId: string,

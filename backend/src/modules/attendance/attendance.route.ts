@@ -1,8 +1,9 @@
-// Route absensi/kehadiran — blueprint BUG-03.
-// Akses dibatasi guru & admin (mengisi absensi adalah tugas guru).
+// Route absensi/kehadiran.
+// Tulis: guru/admin. Baca: guru/admin + siswa/wali (data sendiri).
 
 import { Router } from 'express';
 import { requireAuth, requireRoles } from '../../middleware/auth.js';
+import { scopeStudentQuery } from '../../middleware/ownership.js';
 import {
   handleListAttendance,
   handleCreateAttendance,
@@ -11,9 +12,8 @@ import {
 
 export const attendanceRouter = Router();
 
-// Semua operasi absensi memerlukan login + role guru/admin.
-attendanceRouter.use(requireAuth, requireRoles('GURU', 'ADMIN'));
+attendanceRouter.use(requireAuth);
 
-attendanceRouter.get('/', handleListAttendance);
-attendanceRouter.post('/', handleCreateAttendance);
-attendanceRouter.delete('/:id', handleDeleteAttendance);
+attendanceRouter.get('/', requireRoles('GURU', 'ADMIN', 'MURID', 'WALIS'), scopeStudentQuery, handleListAttendance);
+attendanceRouter.post('/', requireRoles('GURU', 'ADMIN'), handleCreateAttendance);
+attendanceRouter.delete('/:id', requireRoles('GURU', 'ADMIN'), handleDeleteAttendance);

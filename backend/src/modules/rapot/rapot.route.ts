@@ -1,13 +1,10 @@
-// Route rapot/nilai — blueprint BUG-03.
-//
-// KEAMANAN (IDOR): endpoint rapot hanya dibuka untuk GURU/ADMIN. Membaca rapot
-// oleh siswa/orang-tua (self-service) memerlukan linkage antara akun login dan
-// data siswa yang saat ini belum andal (id local 's1' vs CUID backend; relasi
-// WALIS→Student belum lengkap). Menyediakannya tanpa ownership-check berisiko
-// IDOR, jadi sengaja ditutup dulu sampai linkage auth dibangun (TODO).
+// Route rapot/nilai.
+// GURU/ADMIN: semua data.
+// MURID/WALIS: hanya data sendiri (scopeStudentQuery + ownership).
 
 import { Router } from 'express';
 import { requireAuth, requireRoles } from '../../middleware/auth.js';
+import { scopeStudentQuery } from '../../middleware/ownership.js';
 import {
   handleListRapot,
   handleUpsertRapot,
@@ -16,9 +13,13 @@ import {
 
 export const rapotRouter = Router();
 
-// Semua operasi rapot memerlukan login + role guru/admin.
-rapotRouter.use(requireAuth, requireRoles('GURU', 'ADMIN'));
+rapotRouter.use(requireAuth);
 
-rapotRouter.get('/', handleListRapot);
-rapotRouter.post('/', handleUpsertRapot);
-rapotRouter.delete('/:id', handleDeleteRapot);
+rapotRouter.get(
+  '/',
+  requireRoles('GURU', 'ADMIN', 'MURID', 'WALIS'),
+  scopeStudentQuery,
+  handleListRapot
+);
+rapotRouter.post('/', requireRoles('GURU', 'ADMIN'), handleUpsertRapot);
+rapotRouter.delete('/:id', requireRoles('GURU', 'ADMIN'), handleDeleteRapot);

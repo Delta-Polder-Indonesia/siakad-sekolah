@@ -9,6 +9,7 @@
 
 import { Router } from 'express';
 import { requireAuth, requireRoles } from '../../middleware/auth.js';
+import { scopeStudentQuery, requireStudentBodyOwnership } from '../../middleware/ownership.js';
 import {
   handleListAssignments, handleUpsertAssignment, handleDeleteAssignment,
   handleListSubmissions, handleUpsertSubmission, handleDeleteSubmission,
