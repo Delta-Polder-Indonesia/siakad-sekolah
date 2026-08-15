@@ -20,9 +20,11 @@ const images = [
 ] as unknown as BackgroundImage[];
 
 describe('BackgroundSlideshow', () => {
-  it('tidak merender img slide pertama karena LCP sudah di HTML', () => {
+  it('mempertahankan hero HTML dan hanya mengambil alih scrim pada slide pertama', () => {
     const { container } = render(<BackgroundSlideshow images={images} currentSlide={0} />);
     expect(container.querySelectorAll('img')).toHaveLength(0);
+    expect(container.firstElementChild?.className).toContain('bg-transparent');
+    expect(container.querySelector('.bg-gradient-to-b')).not.toBeNull();
   });
 
   it('merender img slide berikutnya', () => {

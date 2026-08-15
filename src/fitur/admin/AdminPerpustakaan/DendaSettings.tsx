@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Settings, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useToast } from '../../../components/ui';
+import { useRafCallback } from '../../../hooks/useRafCallback';
 import { setDendaConfig } from './dendaUtils';
 
 interface DendaSettingsProps {
@@ -16,29 +17,48 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelPos, setPanelPos] = useState({ top: 0, right: 0 });
 
-  const updatePosition = useCallback(() => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPanelPos({
-        top: rect.bottom + window.scrollY + 8,
-        right: window.innerWidth - rect.right,
-      });
-    }
+  const readPanelPosition = useCallback(() => {
+    const button = buttonRef.current;
+    if (!button) return null;
+
+    // READ batch. Tidak ada style/class/React write sebelum semua nilai selesai dibaca.
+    const rect = button.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    return {
+      top: rect.bottom + 8,
+      right: viewportWidth - rect.right,
+    };
   }, []);
+
+  const commitPanelPosition = useCallback(() => {
+    const nextPosition = readPanelPosition();
+    if (nextPosition) setPanelPos(nextPosition); // WRITE
+  }, [readPanelPosition]);
+  const schedulePositionUpdate = useRafCallback(commitPanelPosition);
 
   useEffect(() => {
     if (!showPanel) return;
 
-    updatePosition();
-
-    window.addEventListener('scroll', updatePosition, true);
-    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', schedulePositionUpdate, { capture: true, passive: true });
+    window.addEventListener('resize', schedulePositionUpdate);
 
     return () => {
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', schedulePositionUpdate, true);
+      window.removeEventListener('resize', schedulePositionUpdate);
     };
-  }, [showPanel, updatePosition]);
+  }, [showPanel, schedulePositionUpdate]);
+
+  const handleTogglePanel = () => {
+    if (showPanel) {
+      setShowPanel(false);
+      return;
+    }
+
+    // Ukur saat DOM masih stabil, lalu kelompokkan seluruh state write.
+    const nextPosition = readPanelPosition();
+    if (nextPosition) setPanelPos(nextPosition);
+    setShowPanel(true);
+  };
 
   useEffect(() => {
     if (!showPanel) return;
@@ -72,7 +92,7 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => setShowPanel(!showPanel)}
+        onClick={handleTogglePanel}
         className="flex items-center gap-1.5 rounded-md border-2 border-black bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:border-black hover:bg-neutral-100"
       >
         <Settings className="h-3.5 w-3.5 text-black" />
@@ -84,7 +104,7 @@ export function DendaSettings({ dendaPerHari, onDendaChange }: DendaSettingsProp
           <div
             ref={panelRef}
             style={{
-              position: 'absolute',
+              position: 'fixed',
               top: panelPos.top,
               right: panelPos.right,
               zIndex: 9999,

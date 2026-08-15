@@ -3,6 +3,7 @@ import { initialCatatanBK } from './seedData';
 import { initialEkskul, initialEkskulMember, initialEkskulKehadiran } from './seedData';
 import { notifyStoreUpdated } from './storeEvents';
 import { hasApi } from '../../../services/apiConfig';
+import { yieldToMainThread } from '../../../utils/scheduler';
 
 export { notifyStoreUpdated, subscribeStore, store } from './storeEvents';
 // ==================== TYPES ====================
@@ -499,10 +500,15 @@ export async function initializeData() {
       students: hashedStudents as typeof initialData.students,
       _version: 2,
     });
+
+    // Pecah serialisasi seed menjadi task terpisah. Browser dapat paint dan
+    // menangani input setelah DB utama sebelum menulis koleksi tambahan.
+    await yieldToMainThread();
     localStorage.setItem(BK_KEY, JSON.stringify(initialCatatanBK));
     localStorage.setItem(EKSKUL_KEY, JSON.stringify(initialEkskul));
     localStorage.setItem(EKSKUL_MEMBER_KEY, JSON.stringify(initialEkskulMember));
     localStorage.setItem(EKSKUL_HADIR_KEY, JSON.stringify(initialEkskulKehadiran));
+    await yieldToMainThread();
     localStorage.setItem(
       '__seed_ids',
       JSON.stringify({

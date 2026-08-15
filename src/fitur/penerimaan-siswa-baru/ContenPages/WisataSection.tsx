@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
+import { useRafCallback } from '../../../hooks/useRafCallback';
 
 type WisataKey = 'aksara' | 'katamso' | 'tjong' | 'museum' | 'avros' | 'lainnya';
 
@@ -51,22 +52,36 @@ export default function WisataSection({ onOpenWisata }: WisataSectionProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const checkScrollBounds = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 5);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
-    }
-  };
+  const measureScrollBounds = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    // READ batch
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+
+    // WRITE batch
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+  }, []);
+  const scheduleScrollMeasurement = useRafCallback(measureScrollBounds);
 
   useEffect(() => {
-    checkScrollBounds();
     const container = scrollRef.current;
-    if (container) {
-      container.addEventListener('scroll', checkScrollBounds);
-      return () => container.removeEventListener('scroll', checkScrollBounds);
-    }
-  }, []);
+    if (!container) return;
+
+    scheduleScrollMeasurement();
+    container.addEventListener('scroll', scheduleScrollMeasurement, { passive: true });
+    window.addEventListener('resize', scheduleScrollMeasurement);
+    return () => {
+      container.removeEventListener('scroll', scheduleScrollMeasurement);
+      window.removeEventListener('resize', scheduleScrollMeasurement);
+      if (animationFrameId.current !== null) {
+        window.cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [scheduleScrollMeasurement]);
 
   const easeOutCubic = (t: number): number => {
     return 1 - Math.pow(1 - t, 3);

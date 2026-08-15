@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRafCallback } from '../../../hooks/useRafCallback';
 
 type FasilitasKey = 'umum' | 'kesehatan' | 'olahraga' | 'disabilitas' | 'selengkapnya';
 
@@ -87,29 +88,35 @@ export default function FasilitasSection({ onOpenFasilitas }: FasilitasSectionPr
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const updateScrollState = () => {
+  const measureScrollState = useCallback(() => {
     const el = sliderRef.current;
     if (!el) return;
 
-    const maxScrollLeft = el.scrollWidth - el.clientWidth;
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft < maxScrollLeft - 1);
-  };
+    // READ batch
+    const scrollLeft = el.scrollLeft;
+    const scrollWidth = el.scrollWidth;
+    const clientWidth = el.clientWidth;
+    const maxScrollLeft = scrollWidth - clientWidth;
+
+    // WRITE batch
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft < maxScrollLeft - 1);
+  }, []);
+  const scheduleScrollMeasurement = useRafCallback(measureScrollState);
 
   useEffect(() => {
     const el = sliderRef.current;
     if (!el) return;
 
-    updateScrollState();
-
-    el.addEventListener('scroll', updateScrollState);
-    window.addEventListener('resize', updateScrollState);
+    scheduleScrollMeasurement();
+    el.addEventListener('scroll', scheduleScrollMeasurement, { passive: true });
+    window.addEventListener('resize', scheduleScrollMeasurement);
 
     return () => {
-      el.removeEventListener('scroll', updateScrollState);
-      window.removeEventListener('resize', updateScrollState);
+      el.removeEventListener('scroll', scheduleScrollMeasurement);
+      window.removeEventListener('resize', scheduleScrollMeasurement);
     };
-  }, []);
+  }, [scheduleScrollMeasurement]);
 
   const scrollByAmount = 320;
 

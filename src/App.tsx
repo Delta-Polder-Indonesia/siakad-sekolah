@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { useSchoolIdentity } from './hooks/useSchoolIdentity';
 import LoginPage from './fitur/autentikasi/LoginPage';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import { scheduleAfterInitialPaint } from './utils/scheduler';
 
 const AuthenticatedApp = lazy(() => import('./layout/AuthenticatedApp'));
 
@@ -29,9 +30,19 @@ export default function App() {
     document.title = `Portal SIAKAD │ ${identity.namaSekolah}`;
   }, [identity.namaSekolah]);
 
-  useEffect(() => {
-    void import('./data/services/coreService').then((m) => m.initializeData());
-  }, []);
+  useEffect(
+    () =>
+      scheduleAfterInitialPaint(() => {
+        // Seed/migrasi localStorage dapat melibatkan JSON besar. Jalankan setelah
+        // LCP dan idle period, bukan pada task commit React pertama.
+        void import('./data/services/coreService')
+          .then((module) => module.initializeData())
+          .catch(() => {
+            // Inisialisasi demo bersifat best-effort; login backend tetap berfungsi.
+          });
+      }),
+    []
+  );
 
   return (
     <ErrorBoundary>

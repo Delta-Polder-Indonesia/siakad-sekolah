@@ -225,8 +225,24 @@ export function useDiskusiTugas(
 
   // Auto-scroll pesan ke paling bawah saat buka chat / kirim pesan / ganti mode.
   useEffect(() => {
-    const el = streamRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    // React baru saja menambah/mengganti DOM pesan. Frame pertama memberi browser
+    // kesempatan menyelesaikan layout; frame kedua hanya membaca layout yang sudah
+    // bersih lalu melakukan write scroll.
+    let writeFrame: number | null = null;
+    const layoutFrame = window.requestAnimationFrame(() => {
+      writeFrame = window.requestAnimationFrame(() => {
+        const el = streamRef.current;
+        if (!el) return;
+
+        const bottom = el.scrollHeight; // READ
+        el.scrollTop = bottom; // WRITE
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(layoutFrame);
+      if (writeFrame !== null) window.cancelAnimationFrame(writeFrame);
+    };
   }, [streamLength, mode, selectedGroupId, privateTarget?.id]);
 
   // Tandai forum sudah dibaca saat aktif melihatnya.
