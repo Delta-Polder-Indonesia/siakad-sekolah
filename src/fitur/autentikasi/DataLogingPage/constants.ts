@@ -2,11 +2,11 @@ import { namaSekolahUppercase } from '../../halaman/components/Profile/dataSekol
 
 export const LOGO_SMP = `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`;
 
-// ── ✨ Ilustrasi foto di samping panel login (foto siswa — menggantikan stok cyber-security lama) ──
-export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/login-illustration.jpg`;
+// ── ✨ BARU: Ilustrasi keamanan di samping panel login ──
+export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/cyber-security-1923446_960_720.png`;
 
-// WebP sebagai format modern (lebih kecil), JPG sebagai fallback.
-export const LOGIN_ILLUSTRATION_WEBP = `${import.meta.env.BASE_URL}images/Dashboard/login-illustration.webp`;
+ // Fallback WebP tersedia untuk ilustrasi (36KB vs 29KB PNG — gunakan PNG sebagai fallback, WebP sebagai modern)
+export const LOGIN_ILLUSTRATION_WEBP = `${import.meta.env.BASE_URL}images/Dashboard/cyber-security-1923446_960_720.webp`;
 
 // ── ✨ BARU: Pesan keamanan yang ditampilkan bersama ilustrasi ──
 export const SECURITY_MESSAGE = {
