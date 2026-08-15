@@ -242,7 +242,7 @@ LoginPage.tsx
 // E:\guthub\projeck-portal-siswa\src\fitur\autentikasi\DataLogingPage\constants.ts
 
 // ── Ganti path ini untuk mengubah foto pengumuman ──
-export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/cyber-security-1923446_960_720.png`;
+export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/login-illustration.jpg`;
 
 // Contoh ganti dengan pengumuman lain:
 // export const LOGIN_ILLUSTRATION = `${import.meta.env.BASE_URL}images/Dashboard/pengumuman-libur.jpg`;
