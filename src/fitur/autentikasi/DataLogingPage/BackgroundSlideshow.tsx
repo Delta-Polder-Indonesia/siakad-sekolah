@@ -2,7 +2,9 @@ import { memo } from 'react';
 import { BackgroundSlideshowProps } from './types';
 
 const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSlide }) => (
-  <div className="absolute inset-0 z-0 bg-slate-900">
+  // Slide pertama memakai #lcp-hero dari index.html. Background harus tetap
+  // transparan agar gambar LCP tersebut tidak tertutup setelah React mount.
+  <div className="absolute inset-0 z-0 bg-transparent">
     {images.map((image, index) => {
       const isActive = index === currentSlide;
       const isNear = index === (currentSlide + 1) % images.length;
@@ -22,7 +24,7 @@ const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSli
           {/* Slide 0: gambar LCP sudah ada di index.html (#lcp-hero) agar
               Lighthouse tidak menunggu JS. Jangan remount <img> yang sama. */}
           {isHtmlLcp ? null : (
-            <picture>
+            <picture className="block h-full w-full">
               {image.src.endsWith('.webp') && (
                 <source
                   type="image/webp"
@@ -41,7 +43,10 @@ const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSli
                 height={752}
                 sizes="100vw"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
+                  const target = e.currentTarget;
+                  window.requestAnimationFrame(() => {
+                    target.style.opacity = '0';
+                  });
                 }}
               />
             </picture>
@@ -49,6 +54,7 @@ const BackgroundSlideshow = memo<BackgroundSlideshowProps>(({ images, currentSli
         </div>
       );
     })}
+    {/* Scrim React menggantikan #lcp-scrim tanpa mengubah layout tree. */}
     <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/50" />
   </div>
 ));

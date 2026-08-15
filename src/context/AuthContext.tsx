@@ -1,18 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import {
-  getTeachers,
-  getTeacherByUser,
-  getLocalTeacherId,
-} from '../data/services/teacherService';
-import {
-  getStudents,
-  getStudentByUser,
-  getParentStudent,
-} from '../data/services/studentService';
-import { hashPassword } from '../data/services/coreService';
 import { addLoginLog } from '../data/services/loginHistoryService';
-import { setClassTeacherId } from '../data/services/classService';
 import {
   loginPortal,
   loginAdmin,
@@ -168,10 +156,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // kelas & panel orang tua ikut konsisten setelah login via backend.
         // Store memakai id guru lokal (mis. 't1'), bukan CUID backend.
         if (role === 'teacher' && portalResult.user.homeroomClassIds?.length) {
-          const localTeacherId = getLocalTeacherId(authUser);
-          portalResult.user.homeroomClassIds.forEach((classId) =>
-            setClassTeacherId(classId, localTeacherId ?? authUser.id)
-          );
+          const homeroomClassIds = portalResult.user.homeroomClassIds;
+          void Promise.all([
+            import('../data/services/teacherService'),
+            import('../data/services/classService'),
+          ])
+            .then(([{ getLocalTeacherId }, { setClassTeacherId }]) => {
+              const localTeacherId = getLocalTeacherId(authUser);
+              homeroomClassIds.forEach((classId) =>
+                setClassTeacherId(classId, localTeacherId ?? authUser.id)
+              );
+            })
+            .catch((error) =>
+              logger.error('[AuthContext] Gagal menyinkronkan kelas binaan:', error)
+            );
         }
         addLoginLog(authUser.name, role, 'form');
         return true;
@@ -188,12 +186,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
 
-      // Fallback: backend unreachable / role tak didukung — pakai store lokal
-      // CATATAN: hashPassword di bawah HANYA untuk mode demo lokal (hasApi===false).
-      // Di mode backend (hasApi===true) cabang ini tidak pernah dieksekusi.
+      // Fallback: backend unreachable / role tak didukung — pakai store lokal.
+      // Store + seed diimpor hanya setelah interaksi login agar parsing data demo
+      // tidak ikut dalam critical rendering path halaman LCP.
+      const { initializeData, hashPassword } = await import('../data/services/coreService');
+      await initializeData();
       const hashedInput = await hashPassword(password);
 
       if (role === 'teacher') {
+        const { getTeachers } = await import('../data/services/teacherService');
         const teachers = getTeachers();
         const teacher = teachers.find((t) => t.nip === id && t.password === hashedInput);
         if (teacher) {
@@ -209,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return true;
         }
       } else if (role === 'student') {
+        const { getStudents } = await import('../data/services/studentService');
         const students = getStudents();
         const student = students.find(
           (s) =>
@@ -234,6 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Login wali: identifier unik = NIS anak (bukan nama). Ini mencegah
         // tabrakan nama & tebakan (nama tidak unik). Kombinasikan NIS + parentPassword.
         const trimmedId = id.trim();
+        const { getStudents } = await import('../data/services/studentService');
         const students = getStudents();
         for (const s of students) {
           if (
@@ -242,8 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             s.status !== 'lulus' &&
             s.status !== 'pindah'
           ) {
-            const parentHash = await hashPassword(password);
-            if (s.parentPassword === parentHash) {
+            if (s.parentPassword === hashedInput) {
               const authUser: AuthUser = {
                 id: `p_${s.id}`,
                 name: s.parentName || `Orang Tua ${s.name}`,
@@ -324,31 +326,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = useCallback(() => {
     if (!user) return;
-    let nextUser: AuthUser | null = null;
 
-    if (user.role === 'teacher') {
-      const teacher = getTeacherByUser(user);
-      if (teacher && (teacher.name !== user.name || teacher.avatar !== user.avatar)) {
-        nextUser = { ...user, name: teacher.name, avatar: teacher.avatar };
-      }
-    } else if (user.role === 'parent') {
-      const student = getParentStudent(user);
-      const targetName = student?.parentName || user.name;
-      const targetAvatar = student?.parentAvatar || student?.avatar || user.avatar;
-      if (student && (targetName !== user.name || targetAvatar !== user.avatar)) {
-        nextUser = { ...user, name: targetName, avatar: targetAvatar };
-      }
-    } else if (user.role === 'student') {
-      const student = getStudentByUser(user);
-      if (student && (student.name !== user.name || student.avatar !== user.avatar)) {
-        nextUser = { ...user, name: student.name, avatar: student.avatar };
-      }
-    }
+    void (async () => {
+      let nextUser: AuthUser | null = null;
 
-    if (nextUser) {
-      setUser(nextUser);
-      simpanSesi(nextUser);
-    }
+      if (user.role === 'teacher') {
+        const { getTeacherByUser } = await import('../data/services/teacherService');
+        const teacher = getTeacherByUser(user);
+        if (teacher && (teacher.name !== user.name || teacher.avatar !== user.avatar)) {
+          nextUser = { ...user, name: teacher.name, avatar: teacher.avatar };
+        }
+      } else if (user.role === 'parent') {
+        const { getParentStudent } = await import('../data/services/studentService');
+        const student = getParentStudent(user);
+        const targetName = student?.parentName || user.name;
+        const targetAvatar = student?.parentAvatar || student?.avatar || user.avatar;
+        if (student && (targetName !== user.name || targetAvatar !== user.avatar)) {
+          nextUser = { ...user, name: targetName, avatar: targetAvatar };
+        }
+      } else if (user.role === 'student') {
+        const { getStudentByUser } = await import('../data/services/studentService');
+        const student = getStudentByUser(user);
+        if (student && (student.name !== user.name || student.avatar !== user.avatar)) {
+          nextUser = { ...user, name: student.name, avatar: student.avatar };
+        }
+      }
+
+      if (nextUser) {
+        setUser(nextUser);
+        simpanSesi(nextUser);
+      }
+    })().catch((error) => logger.error('[AuthContext] Gagal memperbarui profil:', error));
   }, [user, simpanSesi]);
 
   return (

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRafCallback } from '../../../hooks/useRafCallback';
 import type { PageProps } from '../types';
 import { tabs, type TabItem } from '../data/profil/data';
 import {
@@ -36,28 +37,52 @@ export default function ProfilPage({ onNavigate, profilTabRef }: ProfilPageProps
 
   const ActiveComponent = active?.component;
 
-  const handleScroll = () => {
+  const measureScrollFades = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    setShowFadeLeft(el.scrollLeft > 8);
-    setShowFadeRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 8);
-  };
 
-  useEffect(() => {
-    handleScroll();
-    const onResize = () => handleScroll();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    // READ batch — jangan sisipkan setState/style write di antara pengukuran ini.
+    const scrollLeft = el.scrollLeft;
+    const clientWidth = el.clientWidth;
+    const scrollWidth = el.scrollWidth;
+
+    // WRITE batch — React 18+ membatch kedua update ini dalam satu render.
+    setShowFadeLeft(scrollLeft > 8);
+    setShowFadeRight(scrollLeft + clientWidth < scrollWidth - 8);
   }, []);
+  const scheduleScrollMeasurement = useRafCallback(measureScrollFades);
 
   useEffect(() => {
-    const activeEl = tabRefs.current[activeTab];
-    const container = scrollRef.current;
-    if (activeEl && container) {
-      const elRect = activeEl.getBoundingClientRect();
-      const offset = activeEl.offsetLeft - container.offsetWidth / 2 + elRect.width / 2;
-      container.scrollTo({ left: offset, behavior: 'smooth' });
-    }
+    scheduleScrollMeasurement();
+    window.addEventListener('resize', scheduleScrollMeasurement);
+    return () => window.removeEventListener('resize', scheduleScrollMeasurement);
+  }, [scheduleScrollMeasurement]);
+
+  useEffect(() => {
+    // Commit tab mengubah DOM terlebih dahulu. Frame pertama memberi browser
+    // kesempatan menyelesaikan layout; frame kedua membaca geometri yang bersih.
+    let scrollFrame: number | null = null;
+    const layoutFrame = window.requestAnimationFrame(() => {
+      scrollFrame = window.requestAnimationFrame(() => {
+        const activeEl = tabRefs.current[activeTab];
+        const container = scrollRef.current;
+        if (!activeEl || !container) return;
+
+        // READ batch
+        const itemLeft = activeEl.offsetLeft;
+        const itemWidth = activeEl.offsetWidth;
+        const viewportWidth = container.clientWidth;
+        const offset = itemLeft - viewportWidth / 2 + itemWidth / 2;
+
+        // WRITE batch
+        container.scrollTo({ left: offset, behavior: 'smooth' });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(layoutFrame);
+      if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame);
+    };
   }, [activeTab]);
 
   return (
@@ -77,7 +102,7 @@ export default function ProfilPage({ onNavigate, profilTabRef }: ProfilPageProps
 
           <div
             ref={scrollRef}
-            onScroll={handleScroll}
+            onScroll={scheduleScrollMeasurement}
             className="flex items-center overflow-x-auto px-6 whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] md:px-12 [&::-webkit-scrollbar]:hidden"
             role="tablist"
           >

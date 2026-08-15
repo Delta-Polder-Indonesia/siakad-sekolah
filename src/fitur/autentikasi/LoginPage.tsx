@@ -1,7 +1,8 @@
-import { useState, useEffect, useLayoutEffect, useCallback, lazy, Suspense, useRef } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import { logger } from '../../utils/logger';
+import { scheduleAfterInitialPaint } from '../../utils/scheduler';
 import { ToastProvider } from '../../components/ui/Toast';
 import { useSchoolIdentity } from '../../hooks/useSchoolIdentity';
 import {
@@ -61,10 +62,18 @@ export default function LoginPage() {
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showDeferredUi, setShowDeferredUi] = useState(false);
 
-  useLayoutEffect(() => {
-    document.getElementById('lcp-shell')?.setAttribute('data-hydrated', '');
+  useEffect(() => {
+    // WRITE visual ditunda ke frame sesudah commit. CSS memakai visibility,
+    // bukan display:none, sehingga pergantian shell tidak memaksa relayout.
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById('lcp-shell')?.setAttribute('data-hydrated', '');
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => scheduleAfterInitialPaint(() => setShowDeferredUi(true)), []);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -417,7 +426,7 @@ export default function LoginPage() {
               scope={adminScope}
             />
           )}
-          <FeedbackButton onNavigate={() => setShowFeedbackPage(true)} />
+          {showDeferredUi && <FeedbackButton onNavigate={() => setShowFeedbackPage(true)} />}
         </Suspense>
       </div>
     </ToastProvider>

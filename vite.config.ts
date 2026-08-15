@@ -16,7 +16,7 @@ export default defineConfig(({ command }) => ({
           return html.replace(
             /<link rel="stylesheet"([^>]*?) href="([^"]+\.css)"([^>]*)>/g,
             (_match, pre: string, href: string, post: string) =>
-              `<link rel="stylesheet"${pre} href="${href}"${post} media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${href}"></noscript>`
+              `<link rel="stylesheet"${pre} href="${href}"${post} media="print" data-app-styles onload="this.media='all';this.dataset.loaded='true';window.dispatchEvent(new Event('app-styles-ready'))" onerror="this.dataset.loaded='error';window.dispatchEvent(new Event('app-styles-ready'))"><noscript><link rel="stylesheet" href="${href}"></noscript>`
           );
         },
       },

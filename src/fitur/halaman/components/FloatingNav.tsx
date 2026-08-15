@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { ArrowUp, Bookmark, Heart } from 'lucide-react';
+import { useRafCallback } from '../../../hooks/useRafCallback';
 
 type Props = { contentId?: string };
 
@@ -12,17 +13,23 @@ export default function FloatingNav({ contentId = 'global' }: Props) {
     .trim()
     .replace(/\/$/, '');
 
+  const measureVisibility = useCallback(() => {
+    const container = document.getElementById('berita-scroll-container');
+    if (!container) return;
+
+    const shouldShow = container.scrollTop > 600; // READ
+    setShow(shouldShow); // WRITE
+  }, []);
+  const scheduleVisibilityMeasurement = useRafCallback(measureVisibility);
+
   useEffect(() => {
     const container = document.getElementById('berita-scroll-container');
     if (!container) return;
 
-    const handleScroll = () => {
-      setShow(container.scrollTop > 600);
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+    scheduleVisibilityMeasurement();
+    container.addEventListener('scroll', scheduleVisibilityMeasurement, { passive: true });
+    return () => container.removeEventListener('scroll', scheduleVisibilityMeasurement);
+  }, [scheduleVisibilityMeasurement]);
 
   // Ambil jumlah like nyata dari API jika tersedia
   useEffect(() => {
